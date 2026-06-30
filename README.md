@@ -43,9 +43,10 @@ Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
 
 ## Install
 
-Run `./install.sh` from the repo root. It symlinks the `skills/` directory into a
-`prefapp-workflow/` namespace under each detected harness's skills location, so
-`git pull` keeps everyone up to date automatically.
+Run `./install.sh` from the repo root. It always symlinks the `skills/` directory
+into the canonical `~/.agents/skills/prefapp-workflow/` location — which both pi and
+OpenCode read — plus `~/.claude/skills/` if Claude Code is detected. `git pull`
+keeps everyone up to date automatically.
 
 ```sh
 git clone https://github.com/prefapp/skills.git ~/work/prefapp/skills
@@ -57,26 +58,15 @@ Skills are **symlinked, never copied** — the repo is the source of truth.
 
 ## Per-harness discovery details
 
-### pi
+### `~/.agents/skills` (canonical — always linked, covers pi + OpenCode)
 
 - Skills location: `~/.agents/skills/`
-- Install: `~/.agents/skills/prefapp-workflow → <repo>/skills`
-- Recursive discovery: **confirmed** — pi walks nested directories, so a single
+- Install: `~/.agents/skills/prefapp-workflow → <repo>/skills` (always created)
+- Recursive discovery: **confirmed** — nested directories are walked, so a single
   namespace-dir symlink exposes every skill.
-
-### OpenCode
-
-- Skills location: `~/.config/opencode/skills/`
-- Install: `~/.config/opencode/skills/prefapp-workflow → <repo>/skills`
-- Recursive discovery: **unconfirmed** — if OpenCode does not recurse into nested
-  dirs, skills won't be discovered via the namespace symlink.
-
-  **Fallback:** create per-skill symlinks directly in the skills root:
-  ```sh
-  for skill in ~/work/prefapp/skills/skills/*/; do
-    ln -sfn "$skill" ~/.config/opencode/skills/"$(basename "$skill")"
-  done
-  ```
+- Both pi and OpenCode read this location, so no separate OpenCode symlink is
+  needed. (OpenCode also reads `~/.config/opencode/skills`, but `~/.agents/skills`
+  already covers it.)
 
 ### Claude Code
 
