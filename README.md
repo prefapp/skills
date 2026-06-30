@@ -21,6 +21,7 @@ Extracted from a proven, repo-specific skill set and generalized to work anywher
 | `review` | Two-axis review (Standards + Spec) via parallel sub-agents. |
 | `improve-codebase-architecture` | Periodic deep-module rescue scan + HTML report. |
 | `handoff` | Compact the conversation into a handoff doc for another agent. |
+| `writing-great-skills` | Reference vocabulary + principles for authoring/editing skills predictably. |
 
 ## Typical flow
 
@@ -39,7 +40,7 @@ setup-workflow            (once per repo)
 ```
 
 Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
-`improve-codebase-architecture`, `handoff`.
+`improve-codebase-architecture`, `handoff`, `writing-great-skills`.
 
 ## Install
 
