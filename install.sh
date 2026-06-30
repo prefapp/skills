@@ -9,19 +9,12 @@ NAMESPACE="prefapp-workflow"
 
 echo "prefapp-workflow: installing from $SKILLS_DIR"
 
-# ~/.agents/skills — always the canonical location
+# ~/.agents/skills — canonical location, read by pi and OpenCode (both honor it)
 mkdir -p "$HOME/.agents/skills"
 ln -sfn "$SKILLS_DIR" "$HOME/.agents/skills/$NAMESPACE"
 echo "  agents: ~/.agents/skills/$NAMESPACE → $SKILLS_DIR"
 
-# OpenCode — one namespace-dir symlink
-if command -v opencode >/dev/null 2>&1 || [ -d "$HOME/.config/opencode" ]; then
-  mkdir -p "$HOME/.config/opencode/skills"
-  ln -sfn "$SKILLS_DIR" "$HOME/.config/opencode/skills/$NAMESPACE"
-  echo "  opencode: ~/.config/opencode/skills/$NAMESPACE → $SKILLS_DIR"
-fi
-
-# Claude Code — one namespace-dir symlink
+# Claude Code — separate location, does not read ~/.agents/skills — one namespace-dir symlink
 if command -v claude >/dev/null 2>&1 || [ -d "$HOME/.claude" ]; then
   mkdir -p "$HOME/.claude/skills"
   ln -sfn "$SKILLS_DIR" "$HOME/.claude/skills/$NAMESPACE"
