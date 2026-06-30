@@ -9,12 +9,10 @@ NAMESPACE="prefapp-workflow"
 
 echo "prefapp-workflow: installing from $SKILLS_DIR"
 
-# pi — recursive discovery confirmed; one namespace-dir symlink suffices
-if command -v pi >/dev/null 2>&1 || [ -d "$HOME/.agents/skills" ]; then
-  mkdir -p "$HOME/.agents/skills"
-  ln -sfn "$SKILLS_DIR" "$HOME/.agents/skills/$NAMESPACE"
-  echo "  pi: ~/.agents/skills/$NAMESPACE → $SKILLS_DIR"
-fi
+# ~/.agents/skills — always the canonical location
+mkdir -p "$HOME/.agents/skills"
+ln -sfn "$SKILLS_DIR" "$HOME/.agents/skills/$NAMESPACE"
+echo "  agents: ~/.agents/skills/$NAMESPACE → $SKILLS_DIR"
 
 # OpenCode — one namespace-dir symlink
 if command -v opencode >/dev/null 2>&1 || [ -d "$HOME/.config/opencode" ]; then
