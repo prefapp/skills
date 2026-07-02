@@ -1,0 +1,49 @@
+# Sync run: diff Matt Pocock's Upstream skills and open/refresh one Sync PR.
+# See docs/adr/0006-track-upstream-matt-skills.md and issue #1.
+name: Matt sync
+
+on:
+  schedule:
+    # Mon/Wed/Fri 06:00 UTC
+    - cron: "0 6 * * 1,3,5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  UPSTREAM: https://github.com/mattpocock/skills.git
+  SHA_FILE: .github/matt-sync/last-checked-sha
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Diff Upstream since last-checked SHA
+        id: diff
+        run: |
+          set -euo pipefail
+          last_sha="$(cat "$SHA_FILE")"
+          git clone --quiet "$UPSTREAM" /tmp/upstream
+          head_sha="$(git -C /tmp/upstream rev-parse HEAD)"
+          count="$(git -C /tmp/upstream rev-list --count "$last_sha..HEAD")"
+          echo "last_sha=$last_sha"   >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha"   >> "$GITHUB_OUTPUT"
+          echo "count=$count"         >> "$GITHUB_OUTPUT"
+          if [ "$count" -gt 0 ]; then
+            echo "$head_sha" > "$SHA_FILE"
+          fi
+
+      - name: Open/refresh Sync PR
+        if: steps.diff.outputs.count != '0'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: matt-sync
+          title: "Matt sync: upstream skill changes"
+          commit-message: "chore(matt-sync): advance last-checked SHA"
+          body: |
+            ${{ steps.diff.outputs.count }} upstream commits since last check.
+            Last-checked SHA advanced `${{ steps.diff.outputs.last_sha }}` → `${{ steps.diff.outputs.head_sha }}`.
