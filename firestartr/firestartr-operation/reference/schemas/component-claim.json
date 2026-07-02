@@ -1,0 +1,301 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ComponentClaim",
+  "title": "ComponentClaim",
+  "description": "Declares a software component (repository) in the Firestartr IDP. This is the primary way to create and manage GitHub repositories with their configuration, features, secrets, and branch strategies. Official schema from firestartr.dev.",
+  "type": "object",
+  "required": ["kind", "version", "name", "owner", "providers"],
+  "properties": {
+    "kind": { "type": "string", "const": "ComponentClaim" },
+    "version": { "type": "string", "default": "1.0" },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$",
+      "maxLength": 63,
+      "description": "Unique name of the component (becomes the repo name). Lowercase alphanumeric, dots, hyphens, underscores. Max 63 chars."
+    },
+    "description": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": ["service", "library", "website", "documentation"],
+      "default": "service"
+    },
+    "lifecycle": {
+      "type": "string",
+      "enum": ["experimental", "production", "deprecated"],
+      "default": "production"
+    },
+    "system": {
+      "type": "string",
+      "pattern": "^system:([a-z0-9]([a-z0-9._-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9._-]*[a-z0-9])?$",
+      "description": "Reference to a SystemClaim, format: system:{name}"
+    },
+    "owner": {
+      "type": "string",
+      "pattern": "^(user|group):([a-z0-9]([a-z0-9._-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9._-]*[a-z0-9])?$",
+      "description": "Reference to owner (user or group), format: user:{name} or group:{name}"
+    },
+    "maintainedBy": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(user|group|collaborator):([a-z0-9]([a-z0-9._-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9._-]*[a-z0-9])?$"
+      },
+      "description": "Additional maintainers (users, groups, or external collaborators)"
+    },
+    "platformOwner": {
+      "type": "string",
+      "pattern": "^(user|group):([a-z0-9]([a-z0-9._-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9._-]*[a-z0-9])?$",
+      "description": "Platform team that owns the infra aspects of this component"
+    },
+    "subComponentOf": {
+      "type": "string",
+      "pattern": "^component:([a-z0-9]([a-z0-9._-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9._-]*[a-z0-9])?$",
+      "description": "Parent component reference, format: component:{name}"
+    },
+    "annotations": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9/.-]+$": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "picture": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "providers": {
+      "type": "object",
+      "properties": {
+        "github": {
+          "type": "object",
+          "required": ["visibility", "org", "branchStrategy"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string", "description": "Repository name in GitHub" },
+            "org": {
+              "type": "string",
+              "pattern": "^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$",
+              "description": "GitHub organization name"
+            },
+            "tfStateKey": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12,}$",
+              "description": "UUID v4 for Terraform state key (auto-generated if omitted)"
+            },
+            "orgPermissions": { "type": "string", "description": "Level of org permission" },
+            "sync": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "period": { "type": "string", "pattern": "^[0-9]+[smhd]$" },
+                "policy": { "type": "string" },
+                "schedule": { "type": "string" },
+                "schedule_timezone": { "type": "string" }
+              },
+              "additionalProperties": false,
+              "required": ["enabled"]
+            },
+            "technology": {
+              "type": "object",
+              "properties": {
+                "stack": { "type": "string" },
+                "version": { "type": "string" }
+              },
+              "additionalProperties": false,
+              "required": ["stack", "version"]
+            },
+            "defaultBranch": { "type": "string" },
+            "branchStrategy": {
+              "type": "object",
+              "required": ["name"],
+              "additionalProperties": false,
+              "properties": {
+                "name": { "type": "string", "description": "Strategy name (e.g. none, gitflow)" },
+                "defaultBranch": { "type": "string", "default": "main" }
+              }
+            },
+            "additionalBranches": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "orphan"],
+                "additionalProperties": false,
+                "properties": {
+                  "name": { "type": "string" },
+                  "orphan": { "type": "boolean" }
+                }
+              }
+            },
+            "actions": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["oidc"],
+              "properties": {
+                "oidc": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "useDefault": { "type": "boolean", "default": true },
+                    "includeClaimKeys": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            },
+            "description": { "type": "string" },
+            "visibility": { "type": "string", "enum": ["private", "public", "internal"] },
+            "archiveOnDestroy": { "type": "boolean" },
+            "allowMergeCommit": { "type": "boolean" },
+            "allowSquashMerge": { "type": "boolean" },
+            "allowRebaseMerge": { "type": "boolean" },
+            "allowAutoMerge": { "type": "boolean" },
+            "deleteBranchOnMerge": { "type": "boolean" },
+            "autoInit": { "type": "boolean" },
+            "allowUpdateBranch": { "type": "boolean" },
+            "hasIssues": { "type": "boolean" },
+            "hasWiki": { "type": "boolean" },
+            "pages": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "cname": { "type": "string" },
+                "source": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "branch": { "type": "string" },
+                    "path": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "additionalRules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path", "owners"],
+                "additionalProperties": false,
+                "properties": {
+                  "path": { "type": "string" },
+                  "owners": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^(user|group):([a-z0-9]([a-z0-9._-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9._-]*[a-z0-9])?$"
+                    }
+                  }
+                }
+              }
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name"],
+                "additionalProperties": false,
+                "properties": {
+                  "name": { "type": "string", "description": "Feature name from prefapp/features" },
+                  "version": { "type": "string", "description": "Semver version (mutually exclusive with ref)" },
+                  "ref": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-._@/]+$",
+                    "description": "Git reference (mutually exclusive with version)"
+                  },
+                  "args": { "type": "object", "additionalProperties": true },
+                  "repo": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-._]+/[a-zA-Z0-9-._]+$",
+                    "description": "Custom feature repo, format: owner/repository"
+                  }
+                },
+                "oneOf": [
+                  { "required": ["version"], "not": { "required": ["ref"] } },
+                  { "required": ["ref"], "not": { "required": ["version"] } }
+                ]
+              }
+            },
+            "vars": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "actions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["name", "value"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": { "type": "string" },
+                      "value": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "secrets": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "actions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["name", "value"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": { "type": "string" },
+                      "value": {
+                        "type": "string",
+                        "pattern": "^ref:secretsclaim:([a-zA-Z0-9_-]+):([a-zA-Z0-9_-]+)$",
+                        "description": "Secret reference, format: ref:secretsclaim:{claim_name}:{key}"
+                      }
+                    }
+                  }
+                },
+                "codespaces": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["name", "value"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": { "type": "string" },
+                      "value": { "type": "string", "pattern": "^ref:secretsclaim:([a-zA-Z0-9_-]+):([a-zA-Z0-9_-]+)$" }
+                    }
+                  }
+                },
+                "dependabot": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["name", "value"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": { "type": "string" },
+                      "value": { "type": "string", "pattern": "^ref:secretsclaim:([a-zA-Z0-9_-]+):([a-zA-Z0-9_-]+)$" }
+                    }
+                  }
+                }
+              }
+            },
+            "topics": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 50,
+                "pattern": "^[a-z0-9][a-z0-9-]*$"
+              }
+            },
+            "overrides": { "type": "object", "additionalProperties": true }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

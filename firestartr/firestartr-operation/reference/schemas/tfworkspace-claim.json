@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "TFWorkspaceClaim",
+  "title": "TFWorkspaceClaim",
+  "description": "Declares a Terraform workspace in the Firestartr IDP for infrastructure management. Supports remote modules and inline Terraform code. Official schema from firestartr.dev.",
+  "type": "object",
+  "required": ["kind", "version", "name", "owner", "providers"],
+  "properties": {
+    "kind": { "type": "string", "const": "TFWorkspaceClaim" },
+    "version": { "type": "string", "default": "1.0" },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$",
+      "maxLength": 63
+    },
+    "description": { "type": "string" },
+    "lifecycle": { "type": "string", "enum": ["experimental", "production", "deprecated"] },
+    "resourceType": {
+      "type": "string",
+      "description": "The type of infrastructure resource (e.g. aws-eks, azure-aks, aws-s3, etc.)"
+    },
+    "system": {
+      "type": "string",
+      "pattern": "^system:([a-z0-9]([a-z0-9._-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9._-]*[a-z0-9])?$"
+    },
+    "owner": {
+      "type": "string",
+      "pattern": "^(user|group):([a-z0-9]([a-z0-9._-]*[a-z0-9])?/)?[a-z0-9]([a-z0-9._-]*[a-z0-9])?$"
+    },
+    "annotations": {
+      "type": "object",
+      "patternProperties": { "^[a-zA-Z0-9/.-]+$": { "type": "string" } },
+      "additionalProperties": false
+    },
+    "providers": {
+      "type": "object",
+      "required": ["terraform"],
+      "additionalProperties": false,
+      "properties": {
+        "terraform": {
+          "type": "object",
+          "required": ["values", "context", "source", "name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "tfStateKey": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12,}$"
+            },
+            "policy": {
+              "type": "string",
+              "enum": ["apply", "create-only", "create-update-only", "full-control", "observe", "observe-only"],
+              "description": "Master gate: max authority level. apply=create+update, full-control=apply+delete, observe=plan only, create-only=initial provision"
+            },
+            "source": {
+              "type": "string",
+              "enum": ["remote", "inline", "Remote", "Inline"],
+              "description": "remote = use module URL, inline = terraform code in module field"
+            },
+            "module": {
+              "type": "string",
+              "description": "For remote: git URL (e.g. git::https://github.com/org/tfm.git//modules/name?ref=tag). For inline: terraform HCL code."
+            },
+            "files": {
+              "type": "array",
+              "description": "Additional files to include in the terraform project",
+              "items": {
+                "type": "object",
+                "required": ["source", "destination"],
+                "additionalProperties": false,
+                "properties": {
+                  "source": { "type": "string", "description": "Path of the original file" },
+                  "destination": { "type": "string", "description": "Path in the final terraform project" }
+                }
+              }
+            },
+            "valuesSchema": {
+              "type": "string",
+              "description": "Locator for a JSON schema to validate values"
+            },
+            "values": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "Input values passed to the terraform module"
+            },
+            "context": {
+              "type": "object",
+              "required": ["providers"],
+              "additionalProperties": false,
+              "properties": {
+                "providers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": { "type": "string" }
+                    }
+                  },
+                  "description": "List of provider configs to use (defined in .firestartr/providers/)"
+                },
+                "backend": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "sync": {
+              "type": "object",
+              "required": ["enabled"],
+              "additionalProperties": false,
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "period": { "type": "string", "pattern": "^[0-9]+[smhd]$" },
+                "schedule": { "type": "string", "description": "Cron expression (mutually exclusive with period)" },
+                "schedule_timezone": { "type": "string" },
+                "policy": {
+                  "type": "string",
+                  "enum": ["apply", "observe", "full-control", "create-only"],
+                  "description": "Sync policy - cannot exceed general policy permissions"
+                }
+              },
+              "oneOf": [
+                { "required": ["period"] },
+                { "required": ["schedule"] },
+                { "not": { "anyOf": [{ "required": ["period"] }, { "required": ["schedule"] }] } }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
