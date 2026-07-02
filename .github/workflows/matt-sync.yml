@@ -12,6 +12,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  models: read
 
 env:
   UPSTREAM: https://github.com/mattpocock/skills.git
@@ -41,16 +42,41 @@ jobs:
           echo "head_sha=$head_sha"     >> "$GITHUB_OUTPUT"
           echo "count=$count"           >> "$GITHUB_OUTPUT"
           echo "actionable=$actionable" >> "$GITHUB_OUTPUT"
-          # Advance the SHA and compose the PR body only when there is something to PR.
+          # Advance the SHA only when there is something to PR.
           if [ "$actionable" -gt 0 ]; then
             echo "$head_sha" > "$SHA_FILE"
-            {
-              echo "${count} upstream commits since last check."
-              echo "Last-checked SHA advanced \`${last_sha}\` → \`${head_sha}\`."
-              echo
-              cat /tmp/report.md
-            } > /tmp/pr-body.md
           fi
+
+      - name: Run matt-sync agent (pi headless via GitHub Models)
+        if: steps.scope.outputs.actionable != '0'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          npm install -g @earendil-works/pi-coding-agent
+          mkdir -p ~/.pi/agent
+          cp .github/matt-sync/models.json ~/.pi/agent/models.json
+          pi -p --approve \
+            --provider github-copilot --model claude-opus-4.6 --thinking high \
+            --skill .github/skills/matt-sync/SKILL.md \
+            @/tmp/report.md \
+            "Run the matt-sync skill. The change report is above; the Upstream clone is at /tmp/upstream; our skills are under skills/. Apply edits to our existing skills and write the rationale to /tmp/rationale.md."
+          [ -f /tmp/rationale.md ] || echo "_(agent produced no rationale)_" > /tmp/rationale.md
+
+      - name: Compose PR body
+        if: steps.scope.outputs.actionable != '0'
+        run: |
+          set -euo pipefail
+          {
+            echo "${{ steps.scope.outputs.count }} upstream commits since last check."
+            echo "Last-checked SHA advanced \`${{ steps.scope.outputs.last_sha }}\` → \`${{ steps.scope.outputs.head_sha }}\`."
+            echo
+            cat /tmp/report.md
+            echo
+            echo "## Rationale"
+            echo
+            cat /tmp/rationale.md
+          } > /tmp/pr-body.md
 
       - name: Open/refresh Sync PR
         if: steps.scope.outputs.actionable != '0'
