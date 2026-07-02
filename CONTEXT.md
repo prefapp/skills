@@ -34,6 +34,33 @@ with a developer's personal skills.
 **Harness**:
 An agent runtime that discovers and runs skills — pi, OpenCode, or Claude Code.
 
+**Upstream** (a.k.a. Matt's repo):
+`github.com/mattpocock/skills`, the repository our workflow set was generalized
+from. We track its changes to keep our skills sharp.
+_Avoid_: source repo, origin.
+
+**Sync run**:
+A scheduled (Mon/Wed/Fri) GitHub Actions job that diffs Upstream since the
+last-checked SHA and, if anything relevant changed, opens/refreshes one PR
+proposing edits to our skills. It runs `pi` headless, driven by a committed
+sync skill, authed against **GitHub Models via the built-in `GITHUB_TOKEN`**
+(no paid key; OpenCode Zen/Go key is the fallback if rate limits bite).
+Scope excludes Upstream's `in-progress/`, `deprecated/`, and `.out-of-scope/`;
+`misc/` and `personal/` are suggestion-only.
+_Avoid_: sync job, cron job.
+
+**Last-checked SHA**:
+The Upstream commit our most recent Sync run processed, stored in this repo so
+each run diffs exactly-once from there. The Sync PR advances it as part of the change.
+
+**Sync PR**:
+The single PR a Sync run maintains on a fixed branch (`matt-sync`): concrete edits
+to our existing skills plus a rationale body. At most one is open at a time — a
+run refreshes it in place and the agent reads the already-proposed changes and
+extends them rather than clobbering. It never adds new skill directories — net-new
+Upstream skills are only mentioned as import suggestions. The last-checked SHA is
+advanced only inside this PR.
+
 **Governance banner**:
 The one-line preamble at the top of each skill telling the agent to read the
 target repo's `AGENTS.md` / `CLAUDE.md` first and obey it. Repo rules override
