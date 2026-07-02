@@ -57,7 +57,7 @@ jobs:
           mkdir -p ~/.pi/agent
           cp .github/matt-sync/models.json ~/.pi/agent/models.json
           pi -p --approve \
-            --provider github-copilot --model claude-opus-4.6 --thinking high \
+            --model github-models/openai/gpt-4.1 \
             --skill .github/skills/matt-sync/SKILL.md \
             @/tmp/report.md \
             "Run the matt-sync skill. The change report is above; the Upstream clone is at /tmp/upstream; our skills are under skills/. Apply edits to our existing skills and write the rationale to /tmp/rationale.md."
