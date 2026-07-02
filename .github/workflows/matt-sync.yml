@@ -42,7 +42,7 @@ jobs:
         if: steps.diff.outputs.count != '0'
         uses: peter-evans/create-pull-request@v8
         with:
-          base: main
+          base: matt-sync-automation
           branch: matt-sync
           title: "Matt sync: upstream skill changes"
           commit-message: "chore(matt-sync): advance last-checked SHA"
