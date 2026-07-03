@@ -15,6 +15,8 @@ description: Test-driven development. Use when the user wants to build features 
 
 **Bad tests** are coupled to implementation. They mock internal collaborators, test private methods, or verify through external means (like querying a database directly instead of using the interface). The warning sign: your test breaks when you refactor, but behavior hasn't changed. If you rename an internal function and tests fail, those tests were testing implementation, not behavior.
 
+**Tautological tests** pass by construction: the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a snapshot derived by hand the same way, a constant asserted equal to itself), so it can never disagree with the code. Expected values must come from an independent source of truth — a known-good literal, a worked example, the spec.
+
 See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.
 
 ## Anti-Pattern: Horizontal Slices
@@ -47,6 +49,8 @@ RIGHT (vertical):
 ### 1. Planning
 
 When exploring the codebase, follow the context-doc rules in [domain-modeling/domain.md](../domain-modeling/domain.md) so that test names and interface vocabulary match the project's domain language, and respect ADRs in the area you're touching.
+
+**Test only at pre-agreed seams.** A **seam** is the public boundary you test at: the interface where you observe behavior without reaching inside. Tests live at seams, never against internals. Before writing any test, write down the seams under test and confirm them with the user — no test is written at an unconfirmed seam. Agreeing the seams up front is how testing effort lands on critical paths and complex logic instead of every edge case.
 
 Before writing any code:
 
