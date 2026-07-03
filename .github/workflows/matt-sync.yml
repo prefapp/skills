@@ -29,6 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           last_sha="$(cat "$SHA_FILE")"
+          rm -rf /tmp/upstream
           git clone --quiet "$UPSTREAM" /tmp/upstream
           head_sha="$(git -C /tmp/upstream rev-parse HEAD)"
           count="$(git -C /tmp/upstream rev-list --count "$last_sha..HEAD")"
