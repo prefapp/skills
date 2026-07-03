@@ -16,8 +16,9 @@ and list its **suggest-imports** in the rationale.
 
 - **Change report:** `/tmp/report.md` — edit-candidates (`upstream/path → our
   skill`) and suggested imports.
-- **Upstream clone:** `/tmp/upstream` — Matt's repo at its current HEAD. Read
-  only; never edit.
+- **Upstream clone:** `/tmp/upstream` — Matt's repo, freshly cloned at its
+  current HEAD (the Sync run `rm -rf`s any leftover before cloning, so it is
+  never stale). Read only; never edit.
 - **Our skills:** `skills/<name>/` in the working directory. These are what you
   edit.
 
