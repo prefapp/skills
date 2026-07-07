@@ -36,8 +36,10 @@ providers:
 ```
 
 Verify the referenced `owner` group and `system` exist first; if not, offer to
-create them in the same change. Feature entries take `name` + (`version` XOR `ref`);
-see the features catalog in `../reference/reference.md`.
+create them in the same change. Default `system` to `system:default-system`;
+**never** use `system:firestartr` unless the client explicitly names it. Feature
+entries take `name` + (`version` XOR `ref`); see the features catalog in
+`../reference/reference.md`.
 
 ## User → UserClaim  →  `claims/users/{name}.yaml`
 
@@ -63,20 +65,23 @@ providers:
 
 ## Team → GroupClaim  →  `claims/groups/{name}.yaml`
 
+A group may be created with **no members** — `members` is optional. Omit it
+entirely for an empty team; only add it when the client names members.
+
 ```yaml
 kind: GroupClaim
 version: "1.0"
 name: {team-name}
 type: business-unit
-members:
-  - user:{username}
+# members: []   # optional — omit for an empty team
 providers:
   github:
     name: {team-name}
     org: {org}
     privacy: closed
-    sync: { enabled: true, period: 24h }
 ```
+
+Do **not** set `sync` unless the client explicitly asks for it.
 
 `members` is **root-level** (never under `providers.github`). If the desired team
 name isn't a valid slug (uppercase, spaces, non-ASCII), see the naming

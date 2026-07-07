@@ -66,6 +66,11 @@ gh run list --repo {claims_repo} --limit 3
 gh run view {run-id} --repo {claims_repo} --json status,conclusion
 ```
 
+Workflow **display names carry emoji prefixes** (e.g. `💧 GitHub claim: hydrate`,
+`🛑 GitHub claim: delete`), so the bare name fails to match. List them with
+`gh workflow list --repo {claims_repo} --all` and trigger by **workflow ID**
+(hydrate = `250797173`) or the exact emoji-prefixed name.
+
 Proceed only when `conclusion` is `success`.
 
 ## Merge the resulting state PR

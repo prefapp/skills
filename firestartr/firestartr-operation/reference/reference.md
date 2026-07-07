@@ -45,12 +45,13 @@ All default `version: "1.0"`. `org` / `orgName` / `system` / `domain` resolve fr
 `{org}` in `organization.yaml`.
 
 - **ComponentClaim**: `type: service`, `lifecycle: production`,
-  `system: system:{org}-system`, github `visibility: private`,
+  `system: system:default-system` (never `system:firestartr` unless the client
+  names it), github `visibility: private`,
   `branchStrategy: {name: none, defaultBranch: main}`, `allowAutoMerge: true`,
   `deleteBranchOnMerge: true`, `features: []`, `sync: {enabled: true, period: 24h}`.
 - **UserClaim**: github `role: member`, `sync: {enabled: true, period: 24h}`.
-- **GroupClaim**: `type: business-unit`, github `privacy: closed`,
-  `sync: {enabled: true, period: 24h}`.
+- **GroupClaim**: `type: business-unit`, github `privacy: closed`.
+  Only set `sync` when the client explicitly asks for it.
 - **SystemClaim**: `domain: domain:{org}-domain`.
 - **SecretsClaim**: `lifecycle: production`, external_secrets `refreshInterval: 24h`.
 - **TFWorkspaceClaim**: terraform `source: remote`, `policy: apply`,
