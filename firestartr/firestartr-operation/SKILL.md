@@ -13,6 +13,11 @@ is structured internally.
 
 Run these steps in order.
 
+**Asking the client:** whenever you need to ask the client anything, if a
+`grilling` skill is present in your available skills, use it to drive the questions
+— one at a time, each with your recommended answer. Prefer exploring the repos
+over asking.
+
 ## Step 1 — Resolve the target platform
 
 Read `organization.yaml` from this skill's directory.

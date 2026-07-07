@@ -55,29 +55,57 @@ If merge fails with "Base branch was modified", wait 3–5s and retry.
 
 ## Trigger hydration and wait
 
-Always pass **both** `kind` and `name` — a hydration missing either silently does
-nothing.
+Each claim family has its **own** hydrate workflow — not interchangeable, and they
+take different inputs. Pick by the claim you landed:
+
+| Claim family | Workflow (💧 name) | Inputs | State repo |
+|---|---|---|---|
+| Component / User / Group / OrgWebhook | `GitHub claim: hydrate` | `kind` + `name` | state-github |
+| Secrets | `Secrets claim: hydrate` | `name` | state-infra |
+| TFWorkspace | `TFWorkspace claim: hydrate` | `name` **only** (no `kind`) | state-infra |
+
+Workflow **IDs are per-deployment** — never hardcode them; display names carry
+emoji prefixes so bare-name matching fails. List, then trigger by ID:
 
 ```bash
-gh workflow run "GitHub claim: hydrate" --repo {claims_repo} \
-  --field kind={ClaimKind} --field name={claim-name}
+gh workflow list --repo {claims_repo} --all      # find the matching 💧 workflow + ID
+gh workflow run {workflow-id} --repo {claims_repo} \
+  --field name={claim-name}                        # add --field kind={Kind} for GitHub claims ONLY
 sleep 30
-gh run list --repo {claims_repo} --limit 3
-gh run view {run-id} --repo {claims_repo} --json status,conclusion
+gh run list --repo {claims_repo} --workflow {workflow-id} --limit 1 \
+  --json databaseId,status,conclusion
 ```
 
-Workflow **display names carry emoji prefixes** (e.g. `💧 GitHub claim: hydrate`,
-`🛑 GitHub claim: delete`), so the bare name fails to match. List them with
-`gh workflow list --repo {claims_repo} --all` and trigger by **workflow ID**
-(hydrate = `250797173`) or the exact emoji-prefixed name.
+Passing an input the workflow doesn't declare (e.g. `kind` to TFWorkspace hydrate)
+fails HTTP 422. Proceed only when `conclusion` is `success`.
 
-Proceed only when `conclusion` is `success`.
+## Discover Terraform modules (TFWorkspaceClaim)
+
+Remote modules always live in **`prefapp/tfm`** — the canonical module repo, in
+the **`prefapp` org regardless of the client's organization**. Never guess a
+module URL; list what exists and pin the latest per-module release tag.
+
+```bash
+# List available modules (dirs under modules/)
+gh api repos/prefapp/tfm/contents/modules --jq '.[] | select(.type=="dir") | .name'
+
+# Inspect a module's inputs before authoring values
+gh api repos/prefapp/tfm/contents/modules/{module}/variables.tf --jq '.content' | base64 -d
+
+# Latest release tag for a module (tags are per-module: {module}-vX.Y.Z)
+gh api repos/prefapp/tfm/tags --paginate --jq '.[].name' | grep '^{module}-v' | head -1
+```
+
+Build the `module` field as:
+`git::https://github.com/prefapp/tfm.git//modules/{module}?ref={module}-vX.Y.Z`
 
 ## Merge the resulting state PR
 
-Hydration opens a PR (branch `automated/CRs-update`) on the target state repo.
+Hydration opens a PR on the target **state repo** — `state-github` for GitHub
+claims, `state-infra` for Secrets/TFWorkspace. GitHub-claim hydrate auto-merges it;
+Secrets/TFWorkspace hydrate default `automerge: false`, so you **must** merge it.
 
 ```bash
-gh pr list --repo {org}/state-github --limit 5
-gh pr merge {pr} --repo {org}/state-github --squash
+gh pr list --repo {org}/{state-repo} --limit 5
+gh pr merge {pr} --repo {org}/{state-repo} --squash
 ```

@@ -14,6 +14,14 @@ produce the file body; this playbook lands it. All bash idioms live in
 
 ## Create / edit flow
 
+0. **Capture the goal as an issue** before touching branches. Fill in the issue
+   template at `../templates/claim-issue.md` (client's terms, not "claim") and open
+   it in the claims repo. Keep the issue number — reference it in the PR
+   (`Closes #N`).
+   ```bash
+   gh issue create --repo {claims_repo} --title "{goal}" --body "{what the client asked for}"
+   ```
+
 1. **Validate** before writing anything:
    - Schema — the file matches its kind's schema (`../reference/schemas/{kind}.json`).
    - References — every `user:` / `group:` / `system:` / `domain:` /
@@ -24,10 +32,13 @@ produce the file body; this playbook lands it. All bash idioms live in
 2. **Branch** from main.
 3. **Write** the full file on the branch (create or update).
 4. **Open the PR**, show it to the client, **merge** it (squash).
-5. **Hydrate** with both `kind` and `name`; wait for `conclusion: success`.
+5. **Hydrate** with the workflow for the claim's family (see the hydrate table in
+   `../reference/gh-cookbook.md`) — GitHub claims take `kind`+`name`;
+   Secrets/TFWorkspace take `name` only. Wait for `conclusion: success`.
    - When a create adds a new user *and* references it elsewhere (e.g. adds them to
      a team), hydrate the `UserClaim` **first**, then the dependent claim.
-6. **Merge the state PR** that hydration opened on the state repo.
+6. **Merge the state PR** that hydration opened — on `state-github` (GitHub claims,
+   usually auto-merged) or `state-infra` (Secrets/TFWorkspace, merge it yourself).
 7. Report the landed change to the client in plain terms.
 
 A change that stops after step 4 is only half-applied — the platform won't

@@ -98,4 +98,4 @@ discloses the full JSON schema per kind):
 - **DomainClaim** `claims/domains/` — top-level business area.
 - **SecretsClaim** `claims/secrets/` — ExternalSecrets + PushSecrets.
 - **OrgWebhookClaim** `claims/orgwebhooks/` — org-level webhook.
-- **TFWorkspaceClaim** `claims/tfworkspaces/` — remote/inline; policy hierarchy in `../reference/reference.md`.
+- **TFWorkspaceClaim** `claims/tfworkspaces/` — remote/inline; policy hierarchy in `../reference/reference.md`. For a **remote** module, discover it from `prefapp/tfm` (the canonical module repo, always the `prefapp` org whatever the client's org is): list modules, read the module's `variables.tf` to know the inputs, pin the latest `{module}-vX.Y.Z` release tag. Commands in `../reference/gh-cookbook.md`. A cloud resource the client asks for (S3 bucket, RDS, EKS, …) maps to the matching `aws-*`/`azure-*` module and `resourceType`.
