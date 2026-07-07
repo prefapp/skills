@@ -79,6 +79,18 @@ For the complete field definitions, types, and constraints, read the JSON schema
 for the kind in `schemas/`:
 `schemas/{component,user,group,system,domain,secrets,orgwebhook,tfworkspace,argodeploy}-claim.json`.
 
+## Terraform modules (TFWorkspaceClaim, remote source)
+
+Remote modules live in **`prefapp/tfm`** — the canonical module repo, always the
+`prefapp` org **regardless of the client's organization**. Discover, never guess
+(commands in `gh-cookbook.md`): list `modules/`, read the module's `variables.tf`
+for inputs, pin the latest per-module release tag (`{module}-vX.Y.Z`).
+
+`module: git::https://github.com/prefapp/tfm.git//modules/{module}?ref={module}-vX.Y.Z`
+
+Common intent → module / `resourceType`: S3 bucket → `aws-s3` / `aws-s3`,
+RDS → `aws-rds`, EKS → `aws-eks` / `aws-eks`, AKS → `azure-aks`, VPC → `aws-vpc`.
+
 ## Features catalog (ComponentClaim)
 
 Each entry: `name` + (`version` XOR `ref`), optional `repo`, `args`.
