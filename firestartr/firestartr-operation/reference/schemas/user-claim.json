@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "UserClaim",
+  "title": "UserClaim",
+  "description": "Declares a user membership in the Firestartr IDP organization. Maps to a GitHub organization membership. Official schema from firestartr.dev.",
+  "type": "object",
+  "required": ["kind", "version", "name", "providers"],
+  "properties": {
+    "kind": { "type": "string", "const": "UserClaim" },
+    "version": { "type": "string", "default": "1.0" },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$",
+      "maxLength": 63,
+      "description": "GitHub username (lowercase)"
+    },
+    "description": { "type": "string" },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "picture": { "type": "string" }
+      }
+    },
+    "annotations": {
+      "type": "object",
+      "patternProperties": { "^[a-zA-Z0-9/.-]+$": { "type": "string" } },
+      "additionalProperties": false
+    },
+    "providers": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "github": {
+          "type": "object",
+          "required": ["org", "role"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string", "description": "GitHub username" },
+            "org": {
+              "type": "string",
+              "pattern": "^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$",
+              "description": "GitHub organization"
+            },
+            "tfStateKey": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12,}$"
+            },
+            "sync": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "period": { "type": "string", "pattern": "^[0-9]+[smhd]$" }
+              },
+              "additionalProperties": false,
+              "required": ["enabled"]
+            },
+            "role": {
+              "type": "string",
+              "enum": ["admin", "member"],
+              "default": "member"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+# Firestartr Operation — target platform (runtime, git-ignored)
+# Copy this file to `organization.yaml` beside it and fill in your organization.
+# The skill writes it for you on first run if it is missing.
+
+organization:
+  name: "{organization}"        # e.g. prefapp-demo — the bootstrapped GitHub org
+
+# Optional. Defaults to "{organization}/claims" and the standard Firestartr layout.
+# Only set these if your platform deviates from the defaults.
+# claims_repo: "{organization}/claims"
+# state_github_repo: "{organization}/state-github"
+# state_infra_repo: "{organization}/state-infra"
+# catalog_repo: "{organization}/catalog"
