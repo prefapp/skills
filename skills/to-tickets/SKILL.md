@@ -87,4 +87,3 @@ Avoid specific file paths or code snippets — they go stale fast. Exception: if
 Do NOT close or modify any parent issue.
 
 Work the frontier — any ticket whose blockers are all done — one ticket at a time with `/implement`, clearing context between tickets.
-</content>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Self-checking test for scope_changes — no framework, run directly.
 
-Covers the PRD's Testing Decisions fixtures: an edited mapped skill, a rename,
+Covers the spec's Testing Decisions fixtures: an edited mapped skill, a rename,
 ignored (in-progress / deprecated / .out-of-scope / README / package file), a
 net-new misc skill, and an empty range. Includes one real git-fixture run to
 prove the since..HEAD diff integration, not just pure classification.
