@@ -1,0 +1,89 @@
+# Sync run: diff Matt Pocock's Upstream skills and open/refresh one Sync issue.
+# A pure notifier — no agent runs here. A human then runs the matt-sync skill.
+# See docs/adr/0008-track-upstream-matt-skills.md.
+name: Matt sync
+
+on:
+  schedule:
+    # Mon/Wed/Fri 06:00 UTC
+    - cron: "0 6 * * 1,3,5"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+concurrency:
+  group: matt-sync
+  cancel-in-progress: false
+
+env:
+  UPSTREAM: https://github.com/mattpocock/skills.git
+  SHA_FILE: .github/matt-sync/last-checked-sha
+  LABEL: matt-sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Diff Upstream and scope changes
+        id: scope
+        run: |
+          set -euo pipefail
+          last_sha="$(cat "$SHA_FILE")"
+          git clone --quiet "$UPSTREAM" /tmp/upstream
+          head_sha="$(git -C /tmp/upstream rev-parse HEAD)"
+          count="$(git -C /tmp/upstream rev-list --count "$last_sha..HEAD")"
+          actionable=0
+          if [ "$count" -gt 0 ]; then
+            actionable="$(python3 .github/matt-sync/scope_changes.py \
+              --upstream /tmp/upstream --since "$last_sha" --ours skills \
+              --out /tmp/report.md)"
+          fi
+          echo "last_sha=$last_sha"     >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha"     >> "$GITHUB_OUTPUT"
+          echo "count=$count"           >> "$GITHUB_OUTPUT"
+          echo "actionable=$actionable" >> "$GITHUB_OUTPUT"
+
+      - name: Compose issue body
+        if: steps.scope.outputs.actionable != '0'
+        run: |
+          set -euo pipefail
+          {
+            echo "${{ steps.scope.outputs.count }} upstream commits pending since last incorporated."
+            echo "Upstream \`${{ steps.scope.outputs.last_sha }}\` → \`${{ steps.scope.outputs.head_sha }}\`."
+            echo
+            echo "Run the \`matt-sync\` skill to carry the relevant changes into our skills,"
+            echo "then advance \`$SHA_FILE\` in that same change."
+            echo
+            cat /tmp/report.md
+          } > /tmp/issue-body.md
+
+      # One issue, refreshed in place, found by the matt-sync label.
+      - name: Open or refresh the Sync issue
+        if: steps.scope.outputs.actionable != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          num="$(gh issue list --state open --label "$LABEL" --limit 1 --json number --jq '.[0].number // empty')"
+          title="Matt sync: ${{ steps.scope.outputs.count }} upstream commits pending"
+          if [ -n "$num" ]; then
+            gh issue edit "$num" --title "$title" --body-file /tmp/issue-body.md
+          else
+            gh label create "$LABEL" --color BFD4F2 --description "Pending upstream (Matt) skill changes" 2>/dev/null || true
+            gh issue create --title "$title" --label "$LABEL" --body-file /tmp/issue-body.md
+          fi
+
+      # No actionable upstream changes pending: close the open issue.
+      - name: Close the Sync issue when nothing actionable is pending
+        if: steps.scope.outputs.actionable == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          num="$(gh issue list --state open --label "$LABEL" --limit 1 --json number --jq '.[0].number // empty')"
+          if [ -n "$num" ]; then
+            gh issue close "$num" --comment "No actionable upstream changes pending through \`${{ steps.scope.outputs.head_sha }}\`."
+          fi

@@ -12,7 +12,7 @@ A self-contained capability package — a directory with a `SKILL.md` (Agent
 Skills standard) plus optional helper docs/scripts. The unit this repo ships.
 
 **Workflow set**:
-The 13 generalized skills in this repo that, together, describe the end-to-end
+The 16 generalized skills in this repo that, together, describe the end-to-end
 development workflow (plan → spec → implement → review).
 _Avoid_: skill bundle, skill pack.
 
@@ -50,6 +50,44 @@ with a developer's personal skills.
 **Harness**:
 An agent runtime that discovers and runs skills — pi, OpenCode, or Claude Code.
 
+**Upstream** (a.k.a. Matt's repo):
+`github.com/mattpocock/skills`, the repository our workflow set was generalized
+from. We track its changes to keep our skills sharp.
+_Avoid_: source repo, origin.
+
+**Sync run**:
+A scheduled (Mon/Wed/Fri) GitHub Actions job that diffs Upstream since the
+last-checked SHA, classifies the changes with `scope_changes.py`, and, if
+anything relevant changed, opens/refreshes one **Sync issue** describing them.
+It runs **no agent** and edits nothing — a pure notifier (`issues: write`).
+Scope excludes Upstream's `in-progress/`, `deprecated/`, and `.out-of-scope/`;
+`misc/` and `personal/` are suggestion-only.
+_Avoid_: sync job, cron job.
+
+**Last-checked SHA**:
+The Upstream commit a fork has *actually incorporated*, stored in the fork so
+each Sync run diffs exactly-once from there. Advanced **only by the human's edit
+change, via the matt-sync skill** — never by the Action. A failed run or an
+ignored issue changes nothing and self-heals on the next diff.
+
+**Sync issue**:
+The single GitHub issue a Sync run maintains, found by the `matt-sync` label: the
+classifier's report of pending Upstream changes (edit-candidates → our skills,
+import suggestions, ignored counts). At most one is open at a time — a run
+refreshes it in place and auto-closes it when no actionable upstream changes are
+pending. It proposes no edits and adds no files; the human acts on it by running
+the matt-sync skill.
+_Avoid_: sync PR.
+
+**matt-sync skill**:
+The human-run, **portable** skill at `.github/skills/matt-sync/` that carries
+Upstream improvements into a fork's skills. It takes an *upstream location* and a
+*target skill set* as inputs, so it can update any Matt-derived fork, mapping
+upstream→target by semantic content. It edits existing skills only, never adds
+new skill directories (net-new Upstream skills are suggestion-only), and
+conditionally advances the fork's last-checked SHA. Not distributed by
+`install.sh`.
+
 **Governance banner**:
 The one-line preamble at the top of each skill telling the agent to read the
 target repo's `AGENTS.md` / `CLAUDE.md` first and obey it. Repo rules override
@@ -64,13 +102,16 @@ the skill.
 | `grill-with-docs` | explicit | `grilling` that also writes CONTEXT/ADRs as it goes (runs `domain-modeling`). |
 | `domain-modeling` | auto | Build/sharpen the glossary + ADRs. Single- and multi-context aware. |
 | `codebase-design` | auto | Deep-module vocabulary (module / interface / depth / seam) + testability. |
-| `to-prd` | explicit | Synthesize the conversation into a PRD and publish it as a GitHub issue. |
-| `to-issues` | explicit | Break a PRD/plan into independently-grabbable vertical-slice GitHub issues. |
-| `implement` | explicit | Implement from PRD/issues at agreed seams. **Never commits.** |
+| `to-spec` | explicit | Synthesize the conversation into a spec and publish it as a GitHub issue. |
+| `to-tickets` | explicit | Break a spec/plan into independently-grabbable tracer-bullet tickets, each declaring its blocking edges, published as GitHub issues. |
+| `implement` | explicit | Implement from spec/tickets at agreed seams. **Never commits.** |
 | `tdd` | auto | Red-green-refactor, one test at a time. |
 | `diagnosing-bugs` | auto | Disciplined feedback-loop debugging for hard bugs / perf regressions. |
 | `review` | auto | Two-axis review (Standards + Spec) via parallel sub-agents. |
 | `improve-codebase-architecture` | explicit | Periodic deep-module rescue scan + report. |
+| `wayfinder` | explicit | Chart a too-big-for-one-session effort as a shared map of investigation tickets on the tracker; resolve them one at a time. |
+| `research` | auto | Delegate reading/investigation against primary sources to a background agent; capture findings as a Markdown file. |
+| `prototype` | auto | Build throwaway code (logic TUI or UI variants) to answer a design question, then delete or absorb it. |
 | `handoff` | explicit | Compact the conversation into a handoff doc for another agent. |
 
 ## Typical flow
@@ -80,9 +121,9 @@ setup-workflow            (once per repo)
         │
    grilling / grill-with-docs        ← align on the plan
         │
-     to-prd                          ← PRD published as a GitHub issue
+     to-spec                         ← spec published as a GitHub issue
         │
-    to-issues                        ← PRD split into vertical slices
+    to-tickets                      ← spec split into tracer-bullet tickets
         │
     implement                        ← uses tdd + codebase-design at seams
         │
@@ -90,7 +131,8 @@ setup-workflow            (once per repo)
 ```
 
 Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
-`improve-codebase-architecture`, `handoff`.
+`improve-codebase-architecture`, `handoff`, `research`, `prototype`. For an
+effort too big to hold in one session, start with `wayfinder`.
 
 ## Install
 
@@ -110,5 +152,6 @@ default install is workflow-set only.
 
 See [`docs/adr/`](docs/adr/) for the why behind: source-of-truth, GitHub-only
 tracker, governance banner, single/multi-context support, the install model, the
-two-category model (workflow set + opt-in operational set, ADR-0006), and
-schema-drift detection over auto-sync (ADR-0007).
+two-category model (workflow set + opt-in operational set, ADR-0006),
+schema-drift detection over auto-sync (ADR-0007), and tracking Upstream via a
+notifier Action + human-run generic sync skill (ADR-0008).
