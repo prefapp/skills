@@ -1,6 +1,6 @@
 # Sync run: diff Matt Pocock's Upstream skills and open/refresh one Sync issue.
 # A pure notifier — no agent runs here. A human then runs the matt-sync skill.
-# See docs/adr/0008-track-upstream-matt-skills.md and issue #1.
+# See docs/adr/0008-track-upstream-matt-skills.md.
 name: Matt sync
 
 on:
@@ -11,6 +11,10 @@ on:
 
 permissions:
   issues: write
+
+concurrency:
+  group: matt-sync
+  cancel-in-progress: false
 
 env:
   UPSTREAM: https://github.com/mattpocock/skills.git

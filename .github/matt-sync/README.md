@@ -3,11 +3,11 @@
 Support files for the scheduled **Sync run** (`.github/workflows/matt-sync.yml`).
 The Sync run is a pure **notifier**: it diffs Upstream, classifies the changes,
 and opens/refreshes one labelled **Sync issue**. No agent runs in the workflow.
-See `docs/adr/0008-track-upstream-matt-skills.md` and issue #1 for the design.
+See `docs/adr/0008-track-upstream-matt-skills.md` for the design.
 
 | File | Role |
 |------|------|
-| `last-checked-sha` | The Upstream commit the fork has actually incorporated. Advanced **only by a human** via the `matt-sync` skill, never by the Action. Seeded `42396a5`. |
+| `last-checked-sha` | The Upstream commit the fork has actually incorporated. Advanced **only by a human** via the `matt-sync` skill, never by the Action. This file is the source of truth for the current checkpoint. |
 | `scope_changes.py` | Deterministic classifier: raw Upstream diff → change report (edit-candidate / suggest-import / ignored). Its markdown is the Sync issue body. The one tested seam. |
 | `test_scope_changes.py` | Self-checking test for the classifier. Run: `python3 .github/matt-sync/test_scope_changes.py`. |
 

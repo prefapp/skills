@@ -36,9 +36,8 @@ To keep our skills sharp as he evolves his, we split the job in two:
   fork tracks one, else it's a no-op.
 - **Issue lifecycle.** **One issue, refreshed in place**, found by a `matt-sync`
   label — the heir of the old "one Sync PR, refreshed in place" invariant. It is
-  auto-closed when the pending diff empties (SHA caught up to Upstream HEAD).
-  New-issue-per-run was rejected as tracker noise (up to 3/week of a duplicated,
-  growing diff).
+  auto-closed when no actionable upstream changes are pending. New-issue-per-run
+  was rejected as tracker noise (up to 3/week of a duplicated, growing diff).
 - **Worklist source (in this repo).** The skill reads the labelled issue via
   `gh` **primary**, and falls back to re-running the classifier / diff itself
   when no issue is found — which is also the generic path for a stranger's fork.
@@ -57,6 +56,7 @@ issue. No model auth, no `models.json`, no PR bot, no OpenCode fallback. The
 `matt-sync` skill lives at `.github/skills/matt-sync/` — *outside* the installed
 `skills/` set — but is written generically so anyone can point it at their own
 upstream + target. Exactly one Sync issue is open at a time, refreshed in place
-and auto-closed when the fork catches up. Runs fail loud and change nothing on
-error. Seeded at Upstream `42396a5`, so the first run reacts to future changes
-only, not the back-catalog.
+and auto-closed when no actionable upstream changes are pending. Runs fail loud
+and change nothing on error. The tracked starting point lives in
+`.github/matt-sync/last-checked-sha`, so this doc does not drift from the repo's
+current Upstream checkpoint.

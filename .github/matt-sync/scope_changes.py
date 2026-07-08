@@ -2,7 +2,7 @@
 """Turn a raw Upstream diff into a classified change report (the tested seam).
 
 Given a checked-out Upstream repo and a last-checked SHA, classify every changed
-path as edit-candidate / suggest-import / ignored, per issue #1 + ADR 0006.
+path as edit-candidate / suggest-import / ignored, per ADR 0006 and ADR 0008.
 
 Usage (workflow):
     python3 scope_changes.py --upstream DIR --since SHA --ours skills --out report.md

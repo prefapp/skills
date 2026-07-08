@@ -74,9 +74,9 @@ ignored issue changes nothing and self-heals on the next diff.
 The single GitHub issue a Sync run maintains, found by the `matt-sync` label: the
 classifier's report of pending Upstream changes (edit-candidates → our skills,
 import suggestions, ignored counts). At most one is open at a time — a run
-refreshes it in place and auto-closes it when the pending diff empties (the fork
-has caught up). It proposes no edits and adds no files; the human acts on it by
-running the matt-sync skill.
+refreshes it in place and auto-closes it when no actionable upstream changes are
+pending. It proposes no edits and adds no files; the human acts on it by running
+the matt-sync skill.
 _Avoid_: sync PR.
 
 **matt-sync skill**:
