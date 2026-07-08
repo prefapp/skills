@@ -62,6 +62,21 @@ cd ~/work/prefapp/skills
 
 Skills are **symlinked, never copied** — the repo is the source of truth.
 
+### Opt-in: Firestartr operational skill set
+
+A separate, client-facing operational set (drive a Prefapp-managed Firestartr
+platform via one `/firestartr-operation` command) ships under `firestartr/` and is
+**not** installed by default. Add it with:
+
+```sh
+./install.sh --with-firestartr
+```
+
+This creates a second namespace symlink `~/.agents/skills/prefapp-firestartr`
+(plus `~/.claude/skills/` if Claude Code is detected). On first use the skill asks
+for your organization and writes a git-ignored `organization.yaml`; nothing
+client-specific is ever committed.
+
 ## Per-harness discovery details
 
 ### `~/.agents/skills` (canonical — always linked, covers pi + OpenCode)

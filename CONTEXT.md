@@ -16,6 +16,22 @@ The 16 generalized skills in this repo that, together, describe the end-to-end
 development workflow (plan → spec → implement → review).
 _Avoid_: skill bundle, skill pack.
 
+**Operational skill set**:
+The opt-in Firestartr skills under `firestartr/` (namespace `prefapp-firestartr`)
+that drive a Prefapp-managed platform. Separate audience (client developers) and
+charter from the workflow set. Installed only with `install.sh --with-firestartr`.
+
+**Playbook**:
+A disclosed `.md` file loaded on demand by the single entry skill
+`firestartr-operation` (e.g. `lifecycle`, `create-claim`). Not a skill — no
+description, no auto-fire — so the operational group costs one description of
+context load.
+
+**Claim**:
+Firestartr's declarative desired-state unit (ComponentClaim = repo, GroupClaim =
+team, UserClaim = user, …). Internal vocabulary — the client never hears it; the
+entry skill translates intent to the right claim kind.
+
 **Workflow skill**:
 A skill that is part of the generalized workflow set and is meant to apply to
 any repository.
@@ -117,7 +133,13 @@ location:
 - OpenCode / Claude Code: same idea into their skills dir; recursion not yet
   confirmed — README documents the per-harness config edge cases.
 
+The **operational skill set** is opt-in: `./install.sh --with-firestartr` adds a
+second symlink `~/.agents/skills/prefapp-firestartr → <repo>/firestartr`. The
+default install is workflow-set only.
+
 ## Decisions
 
 See [`docs/adr/`](docs/adr/) for the why behind: source-of-truth, GitHub-only
-tracker, governance banner, single/multi-context support, and the install model.
+tracker, governance banner, single/multi-context support, the install model, the
+two-category model (workflow set + opt-in operational set, ADR-0006), and
+schema-drift detection over auto-sync (ADR-0007).

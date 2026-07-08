@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "OrgWebhookClaim",
+  "title": "OrgWebhookClaim",
+  "description": "Declares a GitHub organization-level webhook in the Firestartr IDP.",
+  "type": "object",
+  "required": ["kind", "version", "name", "owner"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "OrgWebhookClaim"
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0"
+    },
+    "name": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "string",
+      "pattern": "^group:.+$"
+    },
+    "annotations": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "providers": {
+      "type": "object",
+      "properties": {
+        "github": {
+          "type": "object",
+          "required": ["name", "orgName", "webhook"],
+          "properties": {
+            "name": { "type": "string" },
+            "orgName": { "type": "string" },
+            "webhook": {
+              "type": "object",
+              "required": ["url"],
+              "properties": {
+                "url": { "type": "string", "format": "uri" },
+                "active": { "type": "boolean", "default": true },
+                "contentType": {
+                  "type": "string",
+                  "enum": ["json", "form"],
+                  "default": "json"
+                },
+                "events": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "GitHub webhook events to subscribe to"
+                },
+                "secretRef": {
+                  "type": "string",
+                  "description": "Reference to a secret, format: ref:secretsclaim:{claim}:{key}"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
