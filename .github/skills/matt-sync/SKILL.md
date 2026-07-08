@@ -1,62 +1,77 @@
 ---
 name: matt-sync
-description: Sync run agent. Turn a change report of Upstream (Matt Pocock) skill changes into concrete edits to our existing skills, plus import suggestions for net-new skills. Use only inside this repo's scheduled Matt-sync GitHub Action.
+description: Carry upstream (Matt Pocock) skill improvements into a fork's skills. A human runs this to turn a diff of Matt's skills into concrete edits to an existing, differently-customized fork — this repo's, or anyone's. Portable across forks; edits existing skills only.
 ---
 
-> **Before acting:** read this repo's root `AGENTS.md` / `CLAUDE.md` and `CONTEXT.md` and obey them — repo rules override this skill.
+> **Before acting:** read the target repo's root `AGENTS.md` / `CLAUDE.md` and
+> `CONTEXT.md` and obey them — repo rules override this skill.
 
-# Matt-sync agent
+# Matt-sync
 
-You are the agent half of this repo's **Sync run** (see `CONTEXT.md` → "Sync
-run", "Sync PR"). A deterministic step has already classified the Upstream diff.
-Your job: turn its **edit-candidates** into real edits to *our existing* skills,
-and list its **suggest-imports** in the rationale.
+You carry improvements from **Upstream** (Matt Pocock's skills,
+`github.com/mattpocock/skills`) into a **fork** whose skills were generalized
+from his but customized differently. You run **by hand**, not inside any
+workflow. You edit *existing* skills only.
 
-## Inputs (already prepared for you)
+## Step 1 — Confirm your two locations (ask if not given)
 
-- **Change report:** `/tmp/report.md` — edit-candidates (`upstream/path → our
-  skill`) and suggested imports.
-- **Upstream clone:** `/tmp/upstream` — Matt's repo at its current HEAD. Read
-  only; never edit.
-- **Our skills:** `skills/<name>/` in the working directory. These are what you
-  edit.
+1. **Upstream location.** Where is Matt's skills clone? If none exists, offer to
+   `git clone https://github.com/mattpocock/skills.git` into a temp dir. Read
+   only — never edit it.
+2. **Target skill set.** Which skills am I updating? Default: this repo's
+   `skills/`. Accept any other fork's skills directory.
 
-## What to do
+## Step 2 — Get the worklist
 
-1. Read `/tmp/report.md`.
-2. For each **edit-candidate** `engineering|productivity/<upstream> → our <ours>`:
-   - Read the Upstream skill (`/tmp/upstream/skills/<category>/<upstream>/`) and
-     our mapped skill (`skills/<ours>/`).
-   - Map by **semantic content, not filename** — our set is a generalized fork,
-     so wording differs (the report already resolves the upstream→ours path).
-   - Identify what genuinely changed Upstream that would **improve ours**: a
-     sharper instruction, a new step, a fixed mistake, a better example.
-   - Apply it as concrete edits to **our** skill file(s). Preserve our
-     generalizations: harness-agnostic wording, the governance banner, our
-     `CONTEXT.md` vocabulary. Drop Matt-specific details (his repo names, his
-     personal setup, tool-specific asides that don't apply here).
-   - If nothing in the Upstream change actually improves ours, make **no edit**
-     to that skill and say why in the rationale.
-3. For each **suggest-import**: note it in the rationale as a candidate for a
-   human to import deliberately.
+- **If a Sync issue exists (this repo):** read it — `gh issue list --state open
+  --label matt-sync` then `gh issue view <n>`. Its classified report already maps
+  upstream changes to our skills (edit-candidates) and lists suggested imports.
+  That is your worklist.
+- **Otherwise (another fork, or no issue):** diff Upstream yourself since the
+  fork's last-checked point (`git -C <upstream> diff --name-only <sha>..HEAD`,
+  scoped to `skills/`), and scope it. In *this* repo you may reuse
+  `.github/matt-sync/scope_changes.py` to classify. For an arbitrary fork, scan
+  the changed upstream skills and match them to target skills yourself.
+
+## Step 3 — For each edit-candidate `<upstream skill> → <target skill>`
+
+- Read the Upstream skill and the mapped target skill.
+- **Map by semantic content, not filename** — a fork renames and rewords things,
+  so match by what each skill *does*, per pair. A target skill with no upstream
+  counterpart is left alone; upstream with no target match becomes a
+  suggest-import note.
+- Identify what genuinely changed Upstream that would **improve the target**: a
+  sharper instruction, a new step, a fixed mistake, a better example.
+- Apply it as concrete edits to the **target** skill file(s). Preserve the fork's
+  customizations: its wording, its governance banner, its `CONTEXT.md`
+  vocabulary. Drop Matt-specific details (his repo names, personal setup,
+  tool-specific asides that don't apply).
+- If nothing in the Upstream change improves the target, make **no edit** and say
+  why in the rationale.
+
+## Step 4 — Advance the fork's last-checked SHA (conditional)
+
+If the fork tracks a last-checked SHA, advance it to Upstream HEAD **in this same
+change**. In this repo that's `.github/matt-sync/last-checked-sha`. If the fork
+tracks upstream some other way, or not at all, this is a no-op.
 
 ## Hard rules
 
-- **Edit existing skills only.** Never create a new `skills/<name>/` directory.
-- **Never edit `/tmp/upstream`** or anything outside `skills/`.
-- Do not touch `.github/matt-sync/last-checked-sha` — the workflow already
-  advanced it.
+- **Edit existing skills only.** Never create a new skill directory. Net-new
+  Upstream skills are suggestion-only.
+- **Never edit the Upstream clone** or anything outside the target skill set
+  (except the fork's last-checked SHA in Step 4).
 - Prefer the smallest edit that lands the improvement. No rewrites for style.
 
 ## Output: the rationale
 
-Write `/tmp/rationale.md` — this becomes the Sync PR body's rationale. Include:
+Summarize for the human reviewing/committing your change:
 
 - **Edits made:** per edited skill, what changed and *why* (which Upstream
   improvement it carries).
-- **Considered but skipped:** edit-candidates you left unchanged, with the
-  reason (Matt-specific, already covered, not an improvement).
-- **Suggested imports:** the net-new Upstream skills worth a human's look, one
-  line each — explicitly *not added as files*.
+- **Considered but skipped:** edit-candidates left unchanged, with the reason
+  (Matt-specific, already covered, not an improvement).
+- **Suggested imports:** net-new Upstream skills worth a human's look, one line
+  each — explicitly *not added as files*.
 
-If you made no edits at all, say so plainly and explain why in the rationale.
+If you made no edits at all, say so plainly and explain why.

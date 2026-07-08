@@ -1,5 +1,6 @@
-# Sync run: diff Matt Pocock's Upstream skills and open/refresh one Sync PR.
-# See docs/adr/0006-track-upstream-matt-skills.md and issue #1.
+# Sync run: diff Matt Pocock's Upstream skills and open/refresh one Sync issue.
+# A pure notifier — no agent runs here. A human then runs the matt-sync skill.
+# See docs/adr/0008-track-upstream-matt-skills.md and issue #1.
 name: Matt sync
 
 on:
@@ -7,16 +8,14 @@ on:
     # Mon/Wed/Fri 06:00 UTC
     - cron: "0 6 * * 1,3,5"
   workflow_dispatch:
-  pull_request: # ponytail: TEST-ONLY trigger, remove before merge (see base below)
 
 permissions:
-  contents: write
-  pull-requests: write
-  models: read
+  issues: write
 
 env:
   UPSTREAM: https://github.com/mattpocock/skills.git
   SHA_FILE: .github/matt-sync/last-checked-sha
+  LABEL: matt-sync
 
 jobs:
   sync:
@@ -42,48 +41,45 @@ jobs:
           echo "head_sha=$head_sha"     >> "$GITHUB_OUTPUT"
           echo "count=$count"           >> "$GITHUB_OUTPUT"
           echo "actionable=$actionable" >> "$GITHUB_OUTPUT"
-          # Advance the SHA only when there is something to PR.
-          if [ "$actionable" -gt 0 ]; then
-            echo "$head_sha" > "$SHA_FILE"
-          fi
 
-      - name: Run matt-sync agent (pi headless via GitHub Models)
-        if: steps.scope.outputs.actionable != '0'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          npm install -g @earendil-works/pi-coding-agent
-          mkdir -p ~/.pi/agent
-          cp .github/matt-sync/models.json ~/.pi/agent/models.json
-          pi -p --approve \
-            --model github-models/openai/gpt-4.1 \
-            --skill .github/skills/matt-sync/SKILL.md \
-            @/tmp/report.md \
-            "Run the matt-sync skill. The change report is above; the Upstream clone is at /tmp/upstream; our skills are under skills/. Apply edits to our existing skills and write the rationale to /tmp/rationale.md."
-          [ -f /tmp/rationale.md ] || echo "_(agent produced no rationale)_" > /tmp/rationale.md
-
-      - name: Compose PR body
+      - name: Compose issue body
         if: steps.scope.outputs.actionable != '0'
         run: |
           set -euo pipefail
           {
-            echo "${{ steps.scope.outputs.count }} upstream commits since last check."
-            echo "Last-checked SHA advanced \`${{ steps.scope.outputs.last_sha }}\` → \`${{ steps.scope.outputs.head_sha }}\`."
+            echo "${{ steps.scope.outputs.count }} upstream commits pending since last incorporated."
+            echo "Upstream \`${{ steps.scope.outputs.last_sha }}\` → \`${{ steps.scope.outputs.head_sha }}\`."
+            echo
+            echo "Run the \`matt-sync\` skill to carry the relevant changes into our skills,"
+            echo "then advance \`$SHA_FILE\` in that same change."
             echo
             cat /tmp/report.md
-            echo
-            echo "## Rationale"
-            echo
-            cat /tmp/rationale.md
-          } > /tmp/pr-body.md
+          } > /tmp/issue-body.md
 
-      - name: Open/refresh Sync PR
+      # One issue, refreshed in place, found by the matt-sync label.
+      - name: Open or refresh the Sync issue
         if: steps.scope.outputs.actionable != '0'
-        uses: peter-evans/create-pull-request@v8
-        with:
-          base: matt-sync-automation # ponytail: TEST-ONLY, revert to `main` before merge
-          branch: matt-sync
-          title: "Matt sync: upstream skill changes"
-          commit-message: "chore(matt-sync): advance last-checked SHA"
-          body-path: /tmp/pr-body.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          num="$(gh issue list --state open --label "$LABEL" --limit 1 --json number --jq '.[0].number // empty')"
+          title="Matt sync: ${{ steps.scope.outputs.count }} upstream commits pending"
+          if [ -n "$num" ]; then
+            gh issue edit "$num" --title "$title" --body-file /tmp/issue-body.md
+          else
+            gh label create "$LABEL" --color BFD4F2 --description "Pending upstream (Matt) skill changes" 2>/dev/null || true
+            gh issue create --title "$title" --label "$LABEL" --body-file /tmp/issue-body.md
+          fi
+
+      # Fork caught up (a human advanced the SHA): close the open issue.
+      - name: Close the Sync issue when caught up
+        if: steps.scope.outputs.actionable == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          num="$(gh issue list --state open --label "$LABEL" --limit 1 --json number --jq '.[0].number // empty')"
+          if [ -n "$num" ]; then
+            gh issue close "$num" --comment "Fork caught up to upstream \`${{ steps.scope.outputs.head_sha }}\` — nothing pending."
+          fi

@@ -57,25 +57,36 @@ _Avoid_: source repo, origin.
 
 **Sync run**:
 A scheduled (Mon/Wed/Fri) GitHub Actions job that diffs Upstream since the
-last-checked SHA and, if anything relevant changed, opens/refreshes one PR
-proposing edits to our skills. It runs `pi` headless, driven by a committed
-sync skill, authed against **GitHub Models via the built-in `GITHUB_TOKEN`**
-(no paid key; OpenCode Zen/Go key is the fallback if rate limits bite).
+last-checked SHA, classifies the changes with `scope_changes.py`, and, if
+anything relevant changed, opens/refreshes one **Sync issue** describing them.
+It runs **no agent** and edits nothing — a pure notifier (`issues: write`).
 Scope excludes Upstream's `in-progress/`, `deprecated/`, and `.out-of-scope/`;
 `misc/` and `personal/` are suggestion-only.
 _Avoid_: sync job, cron job.
 
 **Last-checked SHA**:
-The Upstream commit our most recent Sync run processed, stored in this repo so
-each run diffs exactly-once from there. The Sync PR advances it as part of the change.
+The Upstream commit a fork has *actually incorporated*, stored in the fork so
+each Sync run diffs exactly-once from there. Advanced **only by the human's edit
+change, via the matt-sync skill** — never by the Action. A failed run or an
+ignored issue changes nothing and self-heals on the next diff.
 
-**Sync PR**:
-The single PR a Sync run maintains on a fixed branch (`matt-sync`): concrete edits
-to our existing skills plus a rationale body. At most one is open at a time — a
-run refreshes it in place and the agent reads the already-proposed changes and
-extends them rather than clobbering. It never adds new skill directories — net-new
-Upstream skills are only mentioned as import suggestions. The last-checked SHA is
-advanced only inside this PR.
+**Sync issue**:
+The single GitHub issue a Sync run maintains, found by the `matt-sync` label: the
+classifier's report of pending Upstream changes (edit-candidates → our skills,
+import suggestions, ignored counts). At most one is open at a time — a run
+refreshes it in place and auto-closes it when the pending diff empties (the fork
+has caught up). It proposes no edits and adds no files; the human acts on it by
+running the matt-sync skill.
+_Avoid_: sync PR.
+
+**matt-sync skill**:
+The human-run, **portable** skill at `.github/skills/matt-sync/` that carries
+Upstream improvements into a fork's skills. It takes an *upstream location* and a
+*target skill set* as inputs, so it can update any Matt-derived fork, mapping
+upstream→target by semantic content. It edits existing skills only, never adds
+new skill directories (net-new Upstream skills are suggestion-only), and
+conditionally advances the fork's last-checked SHA. Not distributed by
+`install.sh`.
 
 **Governance banner**:
 The one-line preamble at the top of each skill telling the agent to read the
@@ -141,5 +152,6 @@ default install is workflow-set only.
 
 See [`docs/adr/`](docs/adr/) for the why behind: source-of-truth, GitHub-only
 tracker, governance banner, single/multi-context support, the install model, the
-two-category model (workflow set + opt-in operational set, ADR-0006), and
-schema-drift detection over auto-sync (ADR-0007).
+two-category model (workflow set + opt-in operational set, ADR-0006),
+schema-drift detection over auto-sync (ADR-0007), and tracking Upstream via a
+notifier Action + human-run generic sync skill (ADR-0008).
