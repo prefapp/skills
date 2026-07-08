@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 > **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it — repo rules override this skill.
 
-This skill takes the current conversation context and codebase understanding and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what you already know.
+This skill takes the current conversation context and codebase understanding and produces a spec (you may know this document as a PRD). Do NOT run a fresh interview — synthesize what you already know, with at most the seam confirmation below.
 
 Specs and tickets live as GitHub issues in the current repo (use the `gh` CLI). For exact conventions, see [setup-workflow/issue-tracker-github.md](../setup-workflow/issue-tracker-github.md).
 
@@ -16,7 +16,7 @@ Specs and tickets live as GitHub issues in the current repo (use the `gh` CLI). 
 
 2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
-Check with the user that these seams match their expectations.
+Ask for a quick yes/no confirmation that these seams match their expectations; do not broaden this into a new elicitation session.
 
 3. Write the spec using the template below, then publish it as a GitHub issue (`gh issue create`). Do not apply triage labels unless the user asks.
 

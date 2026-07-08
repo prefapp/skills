@@ -7,7 +7,8 @@ path as edit-candidate / suggest-import / ignored, per issue #1 + ADR 0006.
 Usage (workflow):
     python3 scope_changes.py --upstream DIR --since SHA --ours skills --out report.md
 Prints the count of actionable items (edit-candidates + suggest-imports) to
-stdout; writes the markdown report body to --out. Actionable == 0 means no PR.
+stdout; writes the markdown report body to --out. Actionable == 0 means no Sync
+issue is needed.
 """
 import argparse
 import os

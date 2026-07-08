@@ -72,8 +72,8 @@ jobs:
             gh issue create --title "$title" --label "$LABEL" --body-file /tmp/issue-body.md
           fi
 
-      # Fork caught up (a human advanced the SHA): close the open issue.
-      - name: Close the Sync issue when caught up
+      # No actionable upstream changes pending: close the open issue.
+      - name: Close the Sync issue when nothing actionable is pending
         if: steps.scope.outputs.actionable == '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -81,5 +81,5 @@ jobs:
           set -euo pipefail
           num="$(gh issue list --state open --label "$LABEL" --limit 1 --json number --jq '.[0].number // empty')"
           if [ -n "$num" ]; then
-            gh issue close "$num" --comment "Fork caught up to upstream \`${{ steps.scope.outputs.head_sha }}\` — nothing pending."
+            gh issue close "$num" --comment "No actionable upstream changes pending through \`${{ steps.scope.outputs.head_sha }}\`."
           fi
