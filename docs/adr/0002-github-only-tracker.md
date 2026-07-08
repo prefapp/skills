@@ -7,5 +7,5 @@ source-repo name — they act on whatever repo they run in.
 
 ## Consequences
 
-`to-prd`, `to-issues`, and the tracker-conventions doc stay essentially intact.
+`to-spec`, `to-tickets`, and the tracker-conventions doc stay essentially intact.
 If a client on a non-GitHub tracker appears later, revisit this ADR.

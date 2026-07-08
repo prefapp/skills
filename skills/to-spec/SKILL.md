@@ -1,26 +1,26 @@
 ---
-name: to-prd
-description: Turn the current conversation into a PRD and publish it to the project issue tracker — no interview, just synthesis of what you've already discussed.
+name: to-spec
+description: Turn the current conversation into a spec and publish it to the project issue tracker — no interview, just synthesis of what you've already discussed.
 disable-model-invocation: true
 ---
 
 > **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it — repo rules override this skill.
 
-This skill takes the current conversation context and codebase understanding and produces a PRD. Do NOT interview the user — just synthesize what you already know.
+This skill takes the current conversation context and codebase understanding and produces a spec (you may know this document as a PRD). Do NOT interview the user — just synthesize what you already know.
 
-Issues and PRDs live as GitHub issues in the current repo (use the `gh` CLI). For exact conventions, see [setup-workflow/issue-tracker-github.md](../setup-workflow/issue-tracker-github.md).
+Specs and tickets live as GitHub issues in the current repo (use the `gh` CLI). For exact conventions, see [setup-workflow/issue-tracker-github.md](../setup-workflow/issue-tracker-github.md).
 
 ## Process
 
-1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the PRD, and respect any ADRs in the area you're touching.
+1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
 
 2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
 Check with the user that these seams match their expectations.
 
-3. Write the PRD using the template below, then publish it as a GitHub issue (`gh issue create`). Do not apply triage labels unless the user asks.
+3. Write the spec using the template below, then publish it as a GitHub issue (`gh issue create`). Do not apply triage labels unless the user asks.
 
-<prd-template>
+<spec-template>
 
 ## Problem Statement
 
@@ -68,10 +68,10 @@ A list of testing decisions that were made. Include:
 
 ## Out of Scope
 
-A description of the things that are out of scope for this PRD.
+A description of the things that are out of scope for this spec.
 
 ## Further Notes
 
 Any further notes about the feature.
 
-</prd-template>
+</spec-template>

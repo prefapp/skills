@@ -12,7 +12,7 @@ A self-contained capability package — a directory with a `SKILL.md` (Agent
 Skills standard) plus optional helper docs/scripts. The unit this repo ships.
 
 **Workflow set**:
-The 13 generalized skills in this repo that, together, describe the end-to-end
+The 16 generalized skills in this repo that, together, describe the end-to-end
 development workflow (plan → spec → implement → review).
 _Avoid_: skill bundle, skill pack.
 
@@ -75,13 +75,16 @@ the skill.
 | `grill-with-docs` | explicit | `grilling` that also writes CONTEXT/ADRs as it goes (runs `domain-modeling`). |
 | `domain-modeling` | auto | Build/sharpen the glossary + ADRs. Single- and multi-context aware. |
 | `codebase-design` | auto | Deep-module vocabulary (module / interface / depth / seam) + testability. |
-| `to-prd` | explicit | Synthesize the conversation into a PRD and publish it as a GitHub issue. |
-| `to-issues` | explicit | Break a PRD/plan into independently-grabbable vertical-slice GitHub issues. |
-| `implement` | explicit | Implement from PRD/issues at agreed seams. **Never commits.** |
+| `to-spec` | explicit | Synthesize the conversation into a spec and publish it as a GitHub issue. |
+| `to-tickets` | explicit | Break a spec/plan into independently-grabbable tracer-bullet tickets, each declaring its blocking edges, published as GitHub issues. |
+| `implement` | explicit | Implement from spec/tickets at agreed seams. **Never commits.** |
 | `tdd` | auto | Red-green-refactor, one test at a time. |
 | `diagnosing-bugs` | auto | Disciplined feedback-loop debugging for hard bugs / perf regressions. |
 | `review` | auto | Two-axis review (Standards + Spec) via parallel sub-agents. |
 | `improve-codebase-architecture` | explicit | Periodic deep-module rescue scan + report. |
+| `wayfinder` | explicit | Chart a too-big-for-one-session effort as a shared map of investigation tickets on the tracker; resolve them one at a time. |
+| `research` | auto | Delegate reading/investigation against primary sources to a background agent; capture findings as a Markdown file. |
+| `prototype` | auto | Build throwaway code (logic TUI or UI variants) to answer a design question, then delete or absorb it. |
 | `handoff` | explicit | Compact the conversation into a handoff doc for another agent. |
 
 ## Typical flow
@@ -91,9 +94,9 @@ setup-workflow            (once per repo)
         │
    grilling / grill-with-docs        ← align on the plan
         │
-     to-prd                          ← PRD published as a GitHub issue
+     to-spec                         ← spec published as a GitHub issue
         │
-    to-issues                        ← PRD split into vertical slices
+    to-tickets                      ← spec split into tracer-bullet tickets
         │
     implement                        ← uses tdd + codebase-design at seams
         │
@@ -101,7 +104,8 @@ setup-workflow            (once per repo)
 ```
 
 Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
-`improve-codebase-architecture`, `handoff`.
+`improve-codebase-architecture`, `handoff`, `research`, `prototype`. For an
+effort too big to hold in one session, start with `wayfinder`.
 
 ## Install
 

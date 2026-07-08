@@ -13,13 +13,16 @@ Extracted from a proven, repo-specific skill set and generalized to work anywher
 | `grill-with-docs` | `grilling` that also writes CONTEXT/ADRs as it goes (runs `domain-modeling`). |
 | `domain-modeling` | Build/sharpen the glossary + ADRs. Single- and multi-context aware. |
 | `codebase-design` | Deep-module vocabulary (module / interface / depth / seam) + testability principles. |
-| `to-prd` | Synthesize the conversation into a PRD and publish it as a GitHub issue. |
-| `to-issues` | Break a PRD/plan into independently-grabbable vertical-slice GitHub issues. |
-| `implement` | Implement from PRD/issues at agreed seams. **Never commits.** |
+| `to-spec` | Synthesize the conversation into a spec and publish it as a GitHub issue. |
+| `to-tickets` | Break a spec/plan into independently-grabbable tracer-bullet tickets, each declaring its blocking edges, published as GitHub issues. |
+| `implement` | Implement from spec/tickets at agreed seams. **Never commits.** |
 | `tdd` | Red-green-refactor, one test at a time. |
 | `diagnosing-bugs` | Disciplined feedback-loop debugging for hard bugs / perf regressions. |
 | `review` | Two-axis review (Standards + Spec) via parallel sub-agents. |
 | `improve-codebase-architecture` | Periodic deep-module rescue scan + HTML report. |
+| `wayfinder` | Chart a too-big-for-one-session effort as a shared map of investigation tickets on the tracker; resolve them one at a time. |
+| `research` | Delegate reading/investigation against primary sources to a background agent; capture findings as a Markdown file. |
+| `prototype` | Build throwaway code (logic TUI or UI variants) to answer a design question, then delete or absorb it. |
 | `handoff` | Compact the conversation into a handoff doc for another agent. |
 | `writing-great-skills` | Reference vocabulary + principles for authoring/editing skills predictably. |
 
@@ -30,9 +33,9 @@ setup-workflow            (once per repo)
         │
    grilling / grill-with-docs        ← align on the plan
         │
-     to-prd                          ← PRD published as a GitHub issue
+     to-spec                         ← spec published as a GitHub issue
         │
-    to-issues                        ← PRD split into vertical slices
+    to-tickets                      ← spec split into tracer-bullet tickets
         │
     implement                        ← uses tdd + codebase-design at seams
         │
@@ -40,7 +43,9 @@ setup-workflow            (once per repo)
 ```
 
 Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
-`improve-codebase-architecture`, `handoff`, `writing-great-skills`.
+`improve-codebase-architecture`, `handoff`, `research`, `prototype`,
+`writing-great-skills`. For an effort too big to hold in one session, start with
+`wayfinder`.
 
 ## Install
 
