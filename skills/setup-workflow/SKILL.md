@@ -27,7 +27,7 @@ Read whatever exists; don't assume:
 - `AGENTS.md` (and `CLAUDE.md`) at the repo root — does an `## Agent skills` (or workflow routing) section already exist?
 - `CONTEXT.md` and `CONTEXT-MAP.md` at the repo root.
 - `docs/adr/` and any per-package `docs/adr/` directories.
-- Root `package.json` `workspaces` and a `packages/` directory — signals a monorepo.
+- `pnpm-workspace.yaml`, root `package.json` `workspaces`, or populated `packages/*` directories with their own `src/` — signals a monorepo.
 
 ### 2. Decide the layout
 
@@ -36,7 +36,7 @@ Detect the repo's current state and pick the layout:
 - **`CONTEXT-MAP.md` exists at root** → already multi-context. Extend it; never clobber.
 - **Root `CONTEXT.md` exists, no `CONTEXT-MAP.md`** → single-context.
 - **Neither exists** → no-docs. Pick by repo shape:
-  - **Monorepo-like** — root `package.json` has a `workspaces` field, **or** a `packages/` directory with subdirectories exists → suggest **multi-context**.
+  - **Monorepo-like** — `pnpm-workspace.yaml` exists, root `package.json` has a `workspaces` field, **or** populated `packages/*` directories have their own `src/` → suggest **multi-context**.
   - **Otherwise** → suggest **single-context**.
 
 Present what you found and the proposed layout, and confirm with the user before writing.

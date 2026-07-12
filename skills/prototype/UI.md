@@ -97,12 +97,12 @@ Surface the URL (and the `?variant=` keys). The user will flip through whenever 
 
 ### 6. Capture the answer and clean up
 
-Once a variant has won, write down which one and why (commit message, ADR, issue, or a `NOTES.md` next to the prototype if running AFK and the user hasn't responded yet). Then:
+Once a variant has won, capture which one and why, then follow [SKILL.md](SKILL.md):
 
-- **Sub-shape A** — delete the losing variants and the switcher; fold the winner into the existing page.
-- **Sub-shape B** — promote the winning variant to a real route, delete the throwaway route and the switcher.
+- **Sub-shape A** — fold the winner into the existing page; remove the losing variants and switcher from main.
+- **Sub-shape B** — promote the winner to a real route; remove the throwaway route and switcher from main.
 
-Don't leave variant components or the switcher lying around. They rot fast and confuse the next reader.
+With explicit commit approval, preserve the full set of variants as a primary source on a linked throwaway branch; otherwise delete it.
 
 ## Anti-patterns
 
