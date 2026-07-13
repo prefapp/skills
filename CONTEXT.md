@@ -12,7 +12,7 @@ A self-contained capability package — a directory with a `SKILL.md` (Agent
 Skills standard) plus optional helper docs/scripts. The unit this repo ships.
 
 **Workflow set**:
-The 16 generalized skills in this repo that, together, describe the end-to-end
+The 17 generalized skills in this repo that, together, describe the end-to-end
 development workflow (plan → spec → implement → review).
 _Avoid_: skill bundle, skill pack.
 
@@ -104,12 +104,13 @@ the skill.
 | `codebase-design` | auto | Deep-module vocabulary (module / interface / depth / seam) + testability. |
 | `to-spec` | explicit | Synthesize the conversation into a spec and publish it as a GitHub issue. |
 | `to-tickets` | explicit | Break a spec/plan into independently-grabbable tracer-bullet tickets, each declaring its blocking edges, published as GitHub issues. |
+| `triage` | explicit | Move issues through a state machine of triage roles; optionally include external PRs when the repo config enables PRs as a triage surface — categorise, verify, grill if needed, write agent-ready briefs, and record rejections in `.out-of-scope/`. |
 | `implement` | explicit | Implement from spec/tickets at agreed seams. **Never commits.** |
 | `tdd` | auto | Red-green-refactor, one test at a time. |
 | `diagnosing-bugs` | auto | Disciplined feedback-loop debugging for hard bugs / perf regressions. |
 | `review` | auto | Two-axis review (Standards + Spec) via parallel sub-agents. |
 | `improve-codebase-architecture` | explicit | Periodic deep-module rescue scan + report. |
-| `wayfinder` | explicit | Chart a too-big-for-one-session effort as a shared map of investigation tickets on the tracker; resolve them one at a time. |
+| `wayfinder` | explicit | Chart a too-big-for-one-session effort as a shared map of decision tickets on the tracker; resolve them one at a time. |
 | `research` | auto | Delegate reading/investigation against primary sources to a background agent; capture findings as a Markdown file. |
 | `prototype` | auto | Build throwaway code (logic TUI or UI variants) to answer a design question, then delete or absorb it. |
 | `handoff` | explicit | Compact the conversation into a handoff doc for another agent. |
@@ -132,7 +133,8 @@ setup-workflow            (once per repo)
 
 Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
 `improve-codebase-architecture`, `handoff`, `research`, `prototype`. For an
-effort too big to hold in one session, start with `wayfinder`.
+effort too big to hold in one session, start with `wayfinder`. To move incoming
+issues/PRs through a triage state machine, use `triage`.
 
 ## Install
 

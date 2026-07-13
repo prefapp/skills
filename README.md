@@ -15,12 +15,13 @@ Extracted from a proven, repo-specific skill set and generalized to work anywher
 | `codebase-design` | Deep-module vocabulary (module / interface / depth / seam) + testability principles. |
 | `to-spec` | Synthesize the conversation into a spec and publish it as a GitHub issue. |
 | `to-tickets` | Break a spec/plan into independently-grabbable tracer-bullet tickets, each declaring its blocking edges, published as GitHub issues. |
+| `triage` | Move issues through a state machine of triage roles; optionally include external PRs when the repo config enables PRs as a triage surface — categorise, verify, grill if needed, and write agent-ready briefs. |
 | `implement` | Implement from spec/tickets at agreed seams. **Never commits.** |
 | `tdd` | Red-green-refactor, one test at a time. |
 | `diagnosing-bugs` | Disciplined feedback-loop debugging for hard bugs / perf regressions. |
 | `review` | Two-axis review (Standards + Spec) via parallel sub-agents. |
 | `improve-codebase-architecture` | Periodic deep-module rescue scan + HTML report. |
-| `wayfinder` | Chart a too-big-for-one-session effort as a shared map of investigation tickets on the tracker; resolve them one at a time. |
+| `wayfinder` | Chart a too-big-for-one-session effort as a shared map of decision tickets on the tracker; resolve them one at a time. |
 | `research` | Delegate reading/investigation against primary sources to a background agent; capture findings as a Markdown file. |
 | `prototype` | Build throwaway code (logic TUI or UI variants) to answer a design question, then delete or absorb it. |
 | `handoff` | Compact the conversation into a handoff doc for another agent. |
@@ -45,7 +46,8 @@ setup-workflow            (once per repo)
 Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
 `improve-codebase-architecture`, `handoff`, `research`, `prototype`,
 `writing-great-skills`. For an effort too big to hold in one session, start with
-`wayfinder`.
+`wayfinder`. To move incoming issues/PRs through a triage state machine, use
+`triage`.
 
 ## Install
 

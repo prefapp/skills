@@ -27,6 +27,7 @@ Read whatever exists; don't assume:
 - `AGENTS.md` (and `CLAUDE.md`) at the repo root — does an `## Agent skills` (or workflow routing) section already exist?
 - `CONTEXT.md` and `CONTEXT-MAP.md` at the repo root.
 - `docs/adr/` and any per-package `docs/adr/` directories.
+- `docs/agents/triage-labels.md` — the triage label vocabulary (for the `triage` skill).
 - `pnpm-workspace.yaml`, root `package.json` `workspaces`, or populated `packages/*` directories with their own `src/` — signals a monorepo.
 
 ### 2. Decide the layout
@@ -47,6 +48,13 @@ Present what you found and the proposed layout, and confirm with the user before
 > glossary terms or ADR content here — `CONTEXT.md`/ADR bodies are filled in lazily
 > by `/domain-modeling` (via `/grill-with-docs` and `/improve-codebase-architecture`)
 > as packages are touched. This skill only creates the structure.
+
+**Triage labels.** The `triage` skill maps seven canonical roles (two category
+roles and five state roles) to real label strings. Write
+`docs/agents/triage-labels.md` with the defaults (each label
+equal to its canonical name) unless the user's tracker already uses other
+strings — then collect the overrides so `triage` applies existing labels instead
+of creating duplicates.
 
 **Single-context:**
 
@@ -85,6 +93,8 @@ overwrite surrounding sections:
 
 [one-line summary of layout — "single-context" or "multi-context"]. See `.agents/skills/domain-modeling/domain.md` for the consumer rules.
 ```
+
+Also confirm a `### Triage labels` subsection under `## Agent skills` points at `docs/agents/triage-labels.md`.
 
 ### 5. Done
 

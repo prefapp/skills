@@ -8,14 +8,22 @@ when run inside a clone.
 
 - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
 - **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
+- **Resolve a bare `#42` reference**: `gh api repos/{owner}/{repo}/issues/42 --jq 'if .pull_request then "PR" else "issue" end'`, then use the matching issue or PR commands below.
+- **Read a pull request**: `gh pr view <number> --comments --json number,title,body,state,labels,author,createdAt,updatedAt,comments` and `gh pr diff <number>`.
 - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
-- **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."` (only when the user explicitly asks — no triage-label workflow by default)
+- **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`. Spec/ticket skills don't apply triage labels unless asked; the `triage` skill drives the triage-label workflow (see `docs/agents/triage-labels.md`).
 - **Close**: `gh issue close <number> --comment "..."`
 
 ## When a skill says "publish to the issue tracker"
 
 Create a GitHub issue.
+
+## Pull requests as a triage surface
+
+**PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; the `/triage` skill reads this flag.)_ When `yes`:
+
+- **List external PRs for triage**: `gh pr list --state open --json number,title,body,labels,author,authorAssociation,comments`, then keep only `authorAssociation` of `CONTRIBUTOR`, `FIRST_TIME_CONTRIBUTOR`, or `NONE` (drop `OWNER`/`MEMBER`/`COLLABORATOR`). This filter is discovery-only — an explicitly named PR is always triaged regardless of author.
 
 ## When a skill says "fetch the relevant ticket"
 
