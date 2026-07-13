@@ -49,8 +49,9 @@ Present what you found and the proposed layout, and confirm with the user before
 > by `/domain-modeling` (via `/grill-with-docs` and `/improve-codebase-architecture`)
 > as packages are touched. This skill only creates the structure.
 
-**Triage labels.** The `triage` skill maps five canonical roles to real label
-strings. Write `docs/agents/triage-labels.md` with the defaults (each label
+**Triage labels.** The `triage` skill maps seven canonical roles (two category
+roles and five state roles) to real label strings. Write
+`docs/agents/triage-labels.md` with the defaults (each label
 equal to its canonical name) unless the user's tracker already uses other
 strings — then collect the overrides so `triage` applies existing labels instead
 of creating duplicates.
