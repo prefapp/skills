@@ -110,7 +110,7 @@ the skill.
 | `diagnosing-bugs` | auto | Disciplined feedback-loop debugging for hard bugs / perf regressions. |
 | `review` | auto | Two-axis review (Standards + Spec) via parallel sub-agents. |
 | `improve-codebase-architecture` | explicit | Periodic deep-module rescue scan + report. |
-| `wayfinder` | explicit | Chart a too-big-for-one-session effort as a shared map of investigation tickets on the tracker; resolve them one at a time. |
+| `wayfinder` | explicit | Chart a too-big-for-one-session effort as a shared map of decision tickets on the tracker; resolve them one at a time. |
 | `research` | auto | Delegate reading/investigation against primary sources to a background agent; capture findings as a Markdown file. |
 | `prototype` | auto | Build throwaway code (logic TUI or UI variants) to answer a design question, then delete or absorb it. |
 | `handoff` | explicit | Compact the conversation into a handoff doc for another agent. |

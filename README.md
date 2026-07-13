@@ -21,7 +21,7 @@ Extracted from a proven, repo-specific skill set and generalized to work anywher
 | `diagnosing-bugs` | Disciplined feedback-loop debugging for hard bugs / perf regressions. |
 | `review` | Two-axis review (Standards + Spec) via parallel sub-agents. |
 | `improve-codebase-architecture` | Periodic deep-module rescue scan + HTML report. |
-| `wayfinder` | Chart a too-big-for-one-session effort as a shared map of investigation tickets on the tracker; resolve them one at a time. |
+| `wayfinder` | Chart a too-big-for-one-session effort as a shared map of decision tickets on the tracker; resolve them one at a time. |
 | `research` | Delegate reading/investigation against primary sources to a background agent; capture findings as a Markdown file. |
 | `prototype` | Build throwaway code (logic TUI or UI variants) to answer a design question, then delete or absorb it. |
 | `handoff` | Compact the conversation into a handoff doc for another agent. |
