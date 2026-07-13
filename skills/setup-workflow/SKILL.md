@@ -94,7 +94,7 @@ overwrite surrounding sections:
 [one-line summary of layout — "single-context" or "multi-context"]. See `.agents/skills/domain-modeling/domain.md` for the consumer rules.
 ```
 
-Also confirm a `### Triage labels` note points at `docs/agents/triage-labels.md`.
+Also confirm a `### Triage labels` subsection under `## Agent skills` points at `docs/agents/triage-labels.md`.
 
 ### 5. Done
 
