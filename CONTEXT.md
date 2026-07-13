@@ -104,7 +104,7 @@ the skill.
 | `codebase-design` | auto | Deep-module vocabulary (module / interface / depth / seam) + testability. |
 | `to-spec` | explicit | Synthesize the conversation into a spec and publish it as a GitHub issue. |
 | `to-tickets` | explicit | Break a spec/plan into independently-grabbable tracer-bullet tickets, each declaring its blocking edges, published as GitHub issues. |
-| `triage` | explicit | Move issues (and external PRs) through a state machine of triage roles — categorise, verify, grill if needed, write agent-ready briefs, and record rejections in `.out-of-scope/`. |
+| `triage` | explicit | Move issues through a state machine of triage roles; optionally include external PRs when the repo config enables PRs as a triage surface — categorise, verify, grill if needed, write agent-ready briefs, and record rejections in `.out-of-scope/`. |
 | `implement` | explicit | Implement from spec/tickets at agreed seams. **Never commits.** |
 | `tdd` | auto | Red-green-refactor, one test at a time. |
 | `diagnosing-bugs` | auto | Disciplined feedback-loop debugging for hard bugs / perf regressions. |

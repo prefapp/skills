@@ -15,7 +15,7 @@ Extracted from a proven, repo-specific skill set and generalized to work anywher
 | `codebase-design` | Deep-module vocabulary (module / interface / depth / seam) + testability principles. |
 | `to-spec` | Synthesize the conversation into a spec and publish it as a GitHub issue. |
 | `to-tickets` | Break a spec/plan into independently-grabbable tracer-bullet tickets, each declaring its blocking edges, published as GitHub issues. |
-| `triage` | Move issues (and external PRs) through a state machine of triage roles — categorise, verify, grill if needed, and write agent-ready briefs. |
+| `triage` | Move issues through a state machine of triage roles; optionally include external PRs when the repo config enables PRs as a triage surface — categorise, verify, grill if needed, and write agent-ready briefs. |
 | `implement` | Implement from spec/tickets at agreed seams. **Never commits.** |
 | `tdd` | Red-green-refactor, one test at a time. |
 | `diagnosing-bugs` | Disciplined feedback-loop debugging for hard bugs / perf regressions. |

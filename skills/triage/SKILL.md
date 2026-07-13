@@ -1,6 +1,6 @@
 ---
 name: triage
-description: Move issues and external PRs through a state machine of triage roles — categorise, verify, grill if needed, and write agent-ready briefs.
+description: Move issues through a state machine of triage roles; when configured as a triage surface, move external PRs through it too — categorise, verify, grill if needed, and write agent-ready briefs.
 disable-model-invocation: true
 ---
 
@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 Move issues on the repo's GitHub issue tracker through a small state machine of triage roles.
 
-If this repo treats external pull requests as a request surface (see [../setup-workflow/issue-tracker-github.md](../setup-workflow/issue-tracker-github.md)'s "Pull requests as a triage surface"), triage covers them too: **a PR is an issue with attached code** — same roles, same states, same machine, with a few deltas marked "for a PR" below. Resolve a bare `#42` to an issue or PR per the tracker config.
+If this repo treats external pull requests as a request surface (see [../setup-workflow/issue-tracker-github.md](../setup-workflow/issue-tracker-github.md)'s "Pull requests as a triage surface"), triage covers them too: **a PR is an issue with attached code** — same roles, same states, same machine, with a few deltas marked "for a PR" below. Resolve a bare `#42` with the deterministic API check described in [the GitHub tracker guidance](../setup-workflow/issue-tracker-github.md), then use the matching issue or PR commands.
 
 Every comment or issue posted to the issue tracker during triage **must** start with this disclaimer:
 
