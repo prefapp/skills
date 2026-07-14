@@ -33,7 +33,7 @@ This returns an array of FlagSpec objects. Each has:
 
 | Field | Meaning |
 |---|---|
-| `name` | CLI flag name used to pass the value |
+| `name` | Long CLI flag name without the leading `--`; pass it as `--<name>` |
 | `path` | Dotted path of the claim field this flag sets (e.g. `providers.github.org`) |
 | `type` | Value type (`string`, `boolean`, `number`, …) |
 | `required` | Whether the flag must be provided |
