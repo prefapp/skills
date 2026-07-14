@@ -48,6 +48,9 @@ org flag.
 
 ## `{org}` passthrough
 
+The discovery example below uses `jq` to parse FlagSpec JSON; install `jq` or use
+an equivalent JSON parser when following it.
+
 The `{org}` value resolved from `organization.yaml` must be passed to the flag
 whose FlagSpec `path` equals the kind's org field.
 
