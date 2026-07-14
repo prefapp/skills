@@ -74,26 +74,6 @@ is resolved from `organization.yaml` and passed to the kind's org field flag.
   `firestartr-terraform-state`.
 - **OrgWebhookClaim**: github `webhook: {active: true, contentType: json}`.
 
-## Required fields per kind
-
-- **ComponentClaim**: `kind, version, type, lifecycle, name, providers.github.name,
-  providers.github.org`.
-- **UserClaim**: `kind, version, name, providers.github.name, providers.github.org,
-  providers.github.role` (`admin`|`member`).
-- **GroupClaim**: `kind, version, name, providers.github.name, providers.github.org`.
-  Optional: `members[]`, `type`, `parent`, `children[]`, `privacy` (closed|secret).
-- **SystemClaim / DomainClaim**: `kind, version, name`.
-- **SecretsClaim**: `kind, version, name`; externalSecrets need
-  `refreshInterval, data[].remoteRef.key, data[].secretKey, secretStoreRef`.
-- **OrgWebhookClaim**: `kind, version, name, providers.github.orgName,
-  providers.github.webhook.url`.
-- **TFWorkspaceClaim**: `kind, version, name, providers.terraform.name, source,
-  policy`. `source: remote` needs `module`; `inline` needs `files`.
-
-For the complete field definitions, types, and constraints, read the JSON schema
-for the kind in `schemas/`:
-`schemas/{component,user,group,system,domain,secrets,orgwebhook,tfworkspace,argodeploy}-claim.json`.
-
 ## Terraform modules (TFWorkspaceClaim, remote source)
 
 Remote modules live in **`prefapp/tfm`** — the canonical module repo, always the
