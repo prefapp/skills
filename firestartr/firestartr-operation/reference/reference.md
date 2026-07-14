@@ -3,6 +3,11 @@
 Stable platform facts carried inside the skill (portable across deployments).
 Everything org-specific comes from `organization.yaml`; everything here does not.
 
+## fscli
+
+Runnable invocation and validation idioms live in `fscli-cookbook.md` (sibling of
+this file). Read it before calling fscli or writing any claim.
+
 ## Kind ↔ intent ↔ path
 
 The client never names a kind — you pick it from the intent.
@@ -39,10 +44,20 @@ GitHub-backed kinds) `providers.github.name` — GitHub teams accept Unicode.
 `component:{name}` · `ref:secretsclaim:{claim}:{key}` · maintainer
 `(user|group|collaborator):{name}`.
 
-## Defaults for new claims
+## Validation split
 
-All default `version: "1.0"`. `org` / `orgName` / `system` / `domain` resolve from
-`{org}` in `organization.yaml`.
+fscli validates syntax only (schema, types, enums) — via `fscli validate -f`.
+The skill is responsible for:
+- **References** — `user:`/`group:`/`system:`/… values point at claims that
+  actually exist.
+- **Uniqueness** — a create would not duplicate an existing claim.
+- **Naming normalization** — the slug, displayName, and github.name rules
+  described above.
+
+## Default flag values for new claims
+
+All default `version: "1.0"`. The `{org}` flag value (see `fscli-cookbook.md`)
+is resolved from `organization.yaml` and passed to the kind's org field flag.
 
 - **ComponentClaim**: `type: service`, `lifecycle: production`,
   `system: system:default-system` (never `system:firestartr` unless the client
