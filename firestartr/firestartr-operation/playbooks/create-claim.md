@@ -16,7 +16,7 @@ and the generated file for approval, then run the `lifecycle` create flow.
    fscli create <Kind> --help --json
    ```
    Map client answers + policy defaults from `../reference/reference.md` onto the
-   flags returned. **Never hardcode a flag name** — derive it from the FlagSpec.
+   flags returned. **Never hardcode a CLI flag name** — derive it from the FlagSpec.
 
 2. **Create the claim file:**
    ```bash
@@ -27,10 +27,8 @@ and the generated file for approval, then run the `lifecycle` create flow.
      -o claims/{dir}/{name}.yaml
    ```
    For complex arrays and union values, write the value to a temporary JSON file
-   and pass it with the corresponding `.json` escape-hatch flag:
-   - `features` → `--features.json=features.json`
-   - `providesApis` → `--providesApis.json=providesApis.json`
-   - `additionalRules` → `--additionalRules.json=additionalRules.json`
+   and use the `name` from the relevant FlagSpec for its `.json` escape-hatch
+   flag. Pass that discovered flag name verbatim; never construct or hardcode it.
 
 3. **Validate:**
    ```bash
@@ -55,8 +53,8 @@ explicitly names it.
 `branchStrategy.defaultBranch=main`, `allowAutoMerge=true`,
 `deleteBranchOnMerge=true`, `sync.enabled=true`, `sync.period=24h`.
 
-For `features`, write the array to `features.json` and pass
-`--features.json=features.json`.
+For `features`, write the array to a temporary JSON file and use the discovered
+FlagSpec name for its `.json` escape-hatch flag, as described above.
 
 ## User → UserClaim  →  `claims/users/{name}.yaml`
 
