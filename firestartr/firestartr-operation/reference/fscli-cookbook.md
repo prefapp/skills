@@ -18,7 +18,7 @@ placeholder is intentional — do not substitute a concrete version.
 stop immediately and tell the user:
 
 > `fscli` is required but not installed.
-> Install it with `npm install -g @prefapp/fscli` or use `npx @prefapp/fscli@<pin>`.
+> Install it with `npm install -g @prefapp/fscli@<pin>` or use `npx @prefapp/fscli@<pin>`.
 > Do not proceed without it.
 
 Never hand-author a claim body when fscli is unavailable.
@@ -33,6 +33,7 @@ This returns an array of FlagSpec objects. Each has:
 
 | Field | Meaning |
 |---|---|
+| `name` | CLI flag name used to pass the value |
 | `path` | Dotted path of the claim field this flag sets (e.g. `providers.github.org`) |
 | `type` | Value type (`string`, `boolean`, `number`, …) |
 | `required` | Whether the flag must be provided |
