@@ -41,8 +41,10 @@ This returns an array of FlagSpec objects. Each has:
 | `defaultValue` | fscli's own default (if any) |
 | `multiple` | Whether the flag accepts multiple values |
 
-**Never hardcode a flag name or field path.** Always derive them from the
-FlagSpec returned by `--help --json` for the target kind.
+**Never hardcode a CLI flag name.** Derive flag names from the FlagSpec returned
+by `--help --json`. For field paths, use the returned `path`; the two stable org
+field paths documented below are the deliberate exception used to identify the
+org flag.
 
 ## `{org}` passthrough
 
