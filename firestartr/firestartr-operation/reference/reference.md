@@ -56,23 +56,29 @@ The skill is responsible for:
 
 ## Default flag values for new claims
 
+These are logical claim-field values, not literal CLI flag names. Map them to the
+matching FlagSpec paths and use each returned `name` when calling `fscli create`.
 All default `version: "1.0"`. The `{org}` flag value (see `fscli-cookbook.md`)
 is resolved from `organization.yaml` and passed to the kind's org field flag.
 
 - **ComponentClaim**: `type: service`, `lifecycle: production`,
   `system: system:default-system` (never `system:firestartr` unless the client
-  names it), github `visibility: private`,
+  names it), GitHub provider: `visibility: private`,
   `branchStrategy: {name: none, defaultBranch: main}`, `allowAutoMerge: true`,
-  `deleteBranchOnMerge: true`, `features: []`, `sync: {enabled: true, period: 24h}`.
-- **UserClaim**: github `role: member`, `sync: {enabled: true, period: 24h}`.
-- **GroupClaim**: `type: business-unit`, github `privacy: closed`.
-  Only set `sync` when the client explicitly asks for it.
+  `deleteBranchOnMerge: true`, `features: []`,
+  `sync: {enabled: true, period: 24h}`.
+- **UserClaim**: GitHub provider: `role: member`,
+  `sync: {enabled: true, period: 24h}`.
+- **GroupClaim**: `type: business-unit`, GitHub provider: `privacy: closed`.
+  Only set GitHub provider `sync` when the client explicitly asks for it.
 - **SystemClaim**: `domain: domain:{org}-domain`.
-- **SecretsClaim**: `lifecycle: production`, external_secrets `refreshInterval: 24h`.
-- **TFWorkspaceClaim**: terraform `source: remote`, `policy: apply`,
-  `sync: {policy: observe, period: 24h, enabled: true}`, backend
-  `firestartr-terraform-state`.
-- **OrgWebhookClaim**: github `webhook: {active: true, contentType: json}`.
+- **SecretsClaim**: `lifecycle: production`, external-secrets provider:
+  `refreshInterval: 24h`.
+- **TFWorkspaceClaim**: Terraform provider: `source: remote`, `policy: apply`,
+  `sync: {policy: observe, period: 24h, enabled: true}`,
+  `backend: firestartr-terraform-state`.
+- **OrgWebhookClaim**: GitHub provider:
+  `webhook: {active: true, contentType: json}`.
 
 ## Terraform modules (TFWorkspaceClaim, remote source)
 

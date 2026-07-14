@@ -16,7 +16,8 @@ and the generated file for approval, then run the `lifecycle` create flow.
    fscli create <Kind> --help --json
    ```
    Map client answers + policy defaults from `../reference/reference.md` onto the
-   flags returned. **Never hardcode a CLI flag name** — derive it from the FlagSpec.
+   logical claim-field paths returned in the FlagSpec. **Never hardcode a CLI flag
+   name** — derive the `name` from the FlagSpec for each value.
 
 2. **Create the claim file:**
    ```bash
@@ -48,10 +49,12 @@ and the generated file for approval, then run the `lifecycle` create flow.
 create them in the same change. **Never** use `system:firestartr` unless the client
 explicitly names it.
 
-**Default flag values** (see `../reference/reference.md`): `type=service`,
-`lifecycle=production`, `visibility=private`, `branchStrategy.name=none`,
+**Default flag values** (see `../reference/reference.md`; these are logical
+values, not literal CLI flag names): `type=service`, `lifecycle=production`,
+GitHub provider `visibility=private`, `branchStrategy.name=none`,
 `branchStrategy.defaultBranch=main`, `allowAutoMerge=true`,
-`deleteBranchOnMerge=true`, `sync.enabled=true`, `sync.period=24h`.
+`deleteBranchOnMerge=true`, `sync.enabled=true`, `sync.period=24h`. Map each to
+its discovered FlagSpec path and `name`.
 
 For `features`, write the array to a temporary JSON file and use the discovered
 FlagSpec name for its `.json` escape-hatch flag, as described above.
@@ -64,7 +67,8 @@ which teams to add them to.
 If teams are named, add the user to each `GroupClaim`'s root-level `members` in the
 **same** PR (see `edit-claim`), and hydrate the user before the groups.
 
-**Default flag values:** `role=member`, `sync.enabled=true`, `sync.period=24h`.
+**Default flag values:** GitHub provider `role=member`, `sync.enabled=true`,
+`sync.period=24h`; map each to its discovered FlagSpec path and `name`.
 
 ## Team → GroupClaim  →  `claims/groups/{name}.yaml`
 
@@ -77,7 +81,8 @@ If the desired team name isn't a valid slug (uppercase, spaces, non-ASCII), see 
 naming normalization rules in `../reference/reference.md`: `name` gets the slug,
 `profile.displayName` and `providers.github.name` keep the original.
 
-**Default flag values:** `type=business-unit`, `privacy=closed`.
+**Default flag values:** `type=business-unit`, GitHub provider
+`privacy=closed`; map each to its discovered FlagSpec path and `name`.
 
 ## Other kinds
 
@@ -86,13 +91,14 @@ Pull defaults from `../reference/reference.md`:
 
 - **SystemClaim** `claims/systems/` — `domain=domain:{org}-domain`.
 - **DomainClaim** `claims/domains/` — top-level business area; no special defaults.
-- **SecretsClaim** `claims/secrets/` — `lifecycle=production`,
-  `refreshInterval=24h`.
-- **OrgWebhookClaim** `claims/orgwebhooks/` — `webhook.active=true`,
-  `webhook.contentType=json`.
-- **TFWorkspaceClaim** `claims/tfworkspaces/` — `source=remote`, `policy=apply`,
-  `sync.policy=observe`, `sync.period=24h`, `sync.enabled=true`,
-  `backend=firestartr-terraform-state`. For a **remote** module, discover it from
-  `prefapp/tfm` (always the `prefapp` org, regardless of client's org): list
+- **SecretsClaim** `claims/secrets/` — `lifecycle=production`, external-secrets
+  provider `refreshInterval=24h`.
+- **OrgWebhookClaim** `claims/orgwebhooks/` — GitHub-provider
+  `webhook.active=true`, `webhook.contentType=json`.
+- **TFWorkspaceClaim** `claims/tfworkspaces/` — Terraform-provider
+  `source=remote`, `policy=apply`, `sync.policy=observe`, `sync.period=24h`,
+  `sync.enabled=true`, `backend=firestartr-terraform-state`. For a **remote**
+  module, discover it from `prefapp/tfm` (always the `prefapp` org, regardless of
+  client's org): list
   modules, read the module's `variables.tf` for inputs, pin the latest
   `{module}-vX.Y.Z` tag. Commands in `../reference/gh-cookbook.md`.
