@@ -116,3 +116,9 @@ client-specific is ever committed.
   `review HEAD~5` after finishing a feature.
 - **`handoff` saves to the OS temp dir**, not the repo. Pass an argument describing
   what the next session will focus on to get a targeted doc.
+
+## Attribution
+
+Parts of this workflow skill set are adapted from
+[`mattpocock/skills`](https://github.com/mattpocock/skills). See
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for its MIT license notice.
