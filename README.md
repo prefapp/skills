@@ -51,15 +51,17 @@ Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
 
 ## Install
 
-Run `./install.sh` from the repo root. It always symlinks the `skills/` directory
-into the canonical `~/.agents/skills/prefapp-workflow/` location — which both pi and
-OpenCode read — plus `~/.claude/skills/` if Claude Code is detected. `git pull`
-keeps everyone up to date automatically.
+Run `./install.sh` from the repo root to see the available options. Use
+`--workflow` for the workflow set, `--fs` for the Firestartr operational skill,
+or `--all` for both. The selected skills are linked into the canonical
+`~/.agents/skills/` location — which both pi and OpenCode read — plus
+`~/.claude/skills/` if Claude Code is detected. `git pull` keeps everyone up to
+date automatically.
 
 ```sh
 git clone https://github.com/prefapp/skills.git ~/work/prefapp/skills
 cd ~/work/prefapp/skills
-./install.sh
+./install.sh --workflow
 ```
 
 Skills are **symlinked, never copied** — the repo is the source of truth.
@@ -68,10 +70,10 @@ Skills are **symlinked, never copied** — the repo is the source of truth.
 
 A separate, client-facing operational set (drive a Prefapp-managed Firestartr
 platform via one `/firestartr-operation` command) ships under `firestartr/` and is
-**not** installed by default. Add it with:
+installed separately or together with the workflow set:
 
 ```sh
-./install.sh --with-firestartr
+./install.sh --fs  # or: ./install.sh --all
 ```
 
 This creates a second namespace symlink `~/.agents/skills/prefapp-firestartr`
@@ -84,7 +86,7 @@ client-specific is ever committed.
 ### `~/.agents/skills` (canonical — always linked, covers pi + OpenCode)
 
 - Skills location: `~/.agents/skills/`
-- Install: `~/.agents/skills/prefapp-workflow → <repo>/skills` (always created)
+- Workflow install: `~/.agents/skills/prefapp-workflow → <repo>/skills`
 - Recursive discovery: **confirmed** — nested directories are walked, so a single
   namespace-dir symlink exposes every skill.
 - Both pi and OpenCode read this location, so no separate OpenCode symlink is

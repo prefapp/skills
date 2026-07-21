@@ -29,7 +29,7 @@ workflow set.
   first run.
 - **Governance.** Every change is PR-only, never committed to main — stated once
   in `lifecycle`.
-- **Opt-in install.** `install.sh --with-firestartr` creates the
+- **Opt-in install.** `install.sh --fs` (or `--all`) creates the
   `prefapp-firestartr` symlink; the default install is unchanged (workflow set
   only). Symlink-only, idempotent.
 - **Operator/platform kit deferred.** Operator upgrades, image provenance,

@@ -19,7 +19,7 @@ _Avoid_: skill bundle, skill pack.
 **Operational skill set**:
 The opt-in Firestartr skills under `firestartr/` (namespace `prefapp-firestartr`)
 that drive a Prefapp-managed platform. Separate audience (client developers) and
-charter from the workflow set. Installed only with `install.sh --with-firestartr`.
+charter from the workflow set. Installed with `install.sh --fs` or `--all`.
 
 **Playbook**:
 A disclosed `.md` file loaded on demand by the single entry skill
@@ -146,9 +146,9 @@ location:
 - OpenCode / Claude Code: same idea into their skills dir; recursion not yet
   confirmed — README documents the per-harness config edge cases.
 
-The **operational skill set** is opt-in: `./install.sh --with-firestartr` adds a
-second symlink `~/.agents/skills/prefapp-firestartr → <repo>/firestartr`. The
-default install is workflow-set only.
+The **operational skill set** is opt-in: `./install.sh --fs` adds a second
+symlink `~/.agents/skills/prefapp-firestartr → <repo>/firestartr`. Use
+`--workflow` for the workflow set or `--all` for both; no arguments shows help.
 
 ## Decisions
 
