@@ -2,8 +2,8 @@
 # Install prefapp-workflow skills into detected agent harnesses.
 # Idempotent — safe to re-run. Symlinks only, never copies.
 #
-# By default installs only the generalized workflow set. Pass --with-firestartr
-# to also install the opt-in Firestartr operational skill set.
+# Run without arguments for usage. Install the workflow set, the opt-in
+# Firestartr operational skill, or both.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -12,13 +12,28 @@ NAMESPACE="prefapp-workflow"
 FIRESTARTR_DIR="$REPO_DIR/firestartr"
 FIRESTARTR_NAMESPACE="prefapp-firestartr"
 
-WITH_FIRESTARTR=0
-for arg in "$@"; do
-  case "$arg" in
-    --with-firestartr) WITH_FIRESTARTR=1 ;;
-    *) echo "unknown option: $arg" >&2; exit 2 ;;
-  esac
-done
+usage() {
+  cat <<'EOF'
+Usage: ./install.sh OPTION
+
+Options:
+  --all       Install workflow and Firestartr skills
+  --workflow  Install workflow skills
+  --fs        Install the Firestartr operational skill
+  -h, --help  Show this help
+EOF
+}
+
+INSTALL_WORKFLOW=0
+INSTALL_FIRESTARTR=0
+case "${1:-}" in
+  --all) INSTALL_WORKFLOW=1; INSTALL_FIRESTARTR=1 ;;
+  --workflow) INSTALL_WORKFLOW=1 ;;
+  --fs) INSTALL_FIRESTARTR=1 ;;
+  ""|-h|--help) usage; exit 0 ;;
+  *) echo "unknown option: $1" >&2; usage >&2; exit 2 ;;
+esac
+[ "$#" -eq 1 ] || { echo "expected one option" >&2; usage >&2; exit 2; }
 
 # Link one source dir into every harness skills location under $namespace.
 link_into_harnesses() {
@@ -33,10 +48,12 @@ link_into_harnesses() {
   fi
 }
 
-echo "prefapp-workflow: installing from $SKILLS_DIR"
-link_into_harnesses "$SKILLS_DIR" "$NAMESPACE"
+if [ "$INSTALL_WORKFLOW" -eq 1 ]; then
+  echo "prefapp-workflow: installing from $SKILLS_DIR"
+  link_into_harnesses "$SKILLS_DIR" "$NAMESPACE"
+fi
 
-if [ "$WITH_FIRESTARTR" -eq 1 ]; then
+if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
   echo "prefapp-firestartr: installing from $FIRESTARTR_DIR"
   link_into_harnesses "$FIRESTARTR_DIR" "$FIRESTARTR_NAMESPACE"
 fi

@@ -12,24 +12,30 @@ trap 'rm -rf "$TMP"' EXIT
 WORKFLOW_LINK="$TMP/.agents/skills/prefapp-workflow"
 FIRESTARTR_LINK="$TMP/.agents/skills/prefapp-firestartr"
 
-run() { HOME="$TMP" "$INSTALL" "$@" >/dev/null; }
+run() { HOME="$TMP" "$INSTALL" "$@"; }
+reset() { rm -rf "$TMP/.agents" "$TMP/.claude"; }
 
-# (b) Default install: workflow linked, operational NOT created.
-run
-[ -L "$WORKFLOW_LINK" ] || { echo "FAIL: default did not create workflow symlink"; exit 1; }
-[ "$(readlink "$WORKFLOW_LINK")" = "$REPO_DIR/skills" ] || { echo "FAIL: workflow symlink wrong target"; exit 1; }
-[ ! -e "$FIRESTARTR_LINK" ] || { echo "FAIL: default created operational symlink"; exit 1; }
+# No option shows help and installs nothing.
+HELP="$(run)"
+printf '%s' "$HELP" | grep -q -- '--all'
+[ ! -e "$WORKFLOW_LINK" ] && [ ! -e "$FIRESTARTR_LINK" ] || { echo "FAIL: help installed skills"; exit 1; }
 
-# (a) Opt-in: operational symlink created and points at the operational dir;
-#     workflow link still intact.
-run --with-firestartr
-[ -L "$FIRESTARTR_LINK" ] || { echo "FAIL: --with-firestartr did not create operational symlink"; exit 1; }
-[ "$(readlink "$FIRESTARTR_LINK")" = "$REPO_DIR/firestartr" ] || { echo "FAIL: operational symlink wrong target"; exit 1; }
-[ -L "$WORKFLOW_LINK" ] || { echo "FAIL: opt-in disturbed workflow symlink"; exit 1; }
+# Workflow-only install.
+run --workflow >/dev/null
+[ "$(readlink "$WORKFLOW_LINK")" = "$REPO_DIR/skills" ] || { echo "FAIL: --workflow symlink wrong"; exit 1; }
+[ ! -e "$FIRESTARTR_LINK" ] || { echo "FAIL: --workflow installed Firestartr"; exit 1; }
 
-# (c) Idempotent: re-running the opt-in install leaves both links correct.
-run --with-firestartr
-[ "$(readlink "$FIRESTARTR_LINK")" = "$REPO_DIR/firestartr" ] || { echo "FAIL: re-run broke operational symlink"; exit 1; }
-[ "$(readlink "$WORKFLOW_LINK")" = "$REPO_DIR/skills" ] || { echo "FAIL: re-run broke workflow symlink"; exit 1; }
+# Firestartr-only install.
+reset
+run --fs >/dev/null
+[ "$(readlink "$FIRESTARTR_LINK")" = "$REPO_DIR/firestartr" ] || { echo "FAIL: --fs symlink wrong"; exit 1; }
+[ ! -e "$WORKFLOW_LINK" ] || { echo "FAIL: --fs installed workflow"; exit 1; }
 
-echo "PASS: install.sh opt-in behavior"
+# Install both sets and remain idempotent.
+reset
+run --all >/dev/null
+run --all >/dev/null
+[ "$(readlink "$WORKFLOW_LINK")" = "$REPO_DIR/skills" ] || { echo "FAIL: --all workflow symlink wrong"; exit 1; }
+[ "$(readlink "$FIRESTARTR_LINK")" = "$REPO_DIR/firestartr" ] || { echo "FAIL: --all Firestartr symlink wrong"; exit 1; }
+
+echo "PASS: install.sh options"
