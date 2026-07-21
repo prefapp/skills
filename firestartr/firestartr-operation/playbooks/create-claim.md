@@ -1,101 +1,104 @@
 # Create Claim Playbook
 
-Author a new claim body, then hand off to `lifecycle` to land it. Apply defaults
-and naming rules from `../reference/reference.md` before writing. File path is
+Author a new claim body via `fscli`, then hand off to `lifecycle` to land it.
+Apply defaults from `../reference/reference.md` before calling fscli. File path is
 `claims/{dir}/{name}.yaml` in the claims repo (see the kind table in
-`../reference/reference.md`).
+`../reference/reference.md`). Read `../reference/fscli-cookbook.md` before
+invoking fscli.
 
-Ask the client only for what you can't infer or default. Show the proposed YAML for
-approval, then run the `lifecycle` create/edit flow.
+Ask the client only for what you can't infer or default. Show the proposed command
+and the generated file for approval, then run the `lifecycle` create flow.
+
+## General flow (all kinds)
+
+1. **Discover flags** for the target kind:
+   ```bash
+   fscli create <Kind> --help --json
+   ```
+   Map client answers + policy defaults from `../reference/reference.md` onto the
+   logical claim-field paths returned in the FlagSpec. **Never hardcode a CLI flag
+   name** — derive the `name` from the FlagSpec for each value.
+
+2. **Create the claim file:**
+   ```bash
+   fscli create <Kind> \
+     --<org-flag>={org} \
+     --<flag>=<value> \
+     ... \
+     -o claims/{dir}/{name}.yaml
+   ```
+   For complex arrays and union values, write the value to a temporary JSON file
+   and use the `name` from the relevant FlagSpec for its `.json` escape-hatch
+   flag. Pass that discovered flag name verbatim; never construct or hardcode it.
+
+3. **Validate:**
+   ```bash
+   fscli validate -f claims/{dir}/{name}.yaml
+   ```
+   Fix any errors before proceeding.
+
+4. Show the generated file to the client for approval, then run the `lifecycle` flow.
 
 ## Repository → ComponentClaim  →  `claims/components/{name}.yaml`
 
-Ask for: description, owner (a team or user), system, visibility (default private),
-branch strategy (default `none`), features to install (default none).
+**Ask for:** description, owner (a team or user), system (default
+`system:default-system`), visibility (default private), branch strategy (default
+`none`), features to install (default none).
 
-```yaml
-kind: ComponentClaim
-version: "1.0"
-type: service
-lifecycle: production
-name: {repo-name}
-owner: group:{team}
-system: system:{system}
-providers:
-  github:
-    name: {repo-name}
-    org: {org}
-    description: "{description}"
-    visibility: private
-    branchStrategy:
-      name: none
-      defaultBranch: main
-    allowAutoMerge: true
-    deleteBranchOnMerge: true
-    features: []
-```
+**Verify first:** the referenced `owner` group and `system` exist; if not, offer to
+create them in the same change. **Never** use `system:firestartr` unless the client
+explicitly names it.
 
-Verify the referenced `owner` group and `system` exist first; if not, offer to
-create them in the same change. Default `system` to `system:default-system`;
-**never** use `system:firestartr` unless the client explicitly names it. Feature
-entries take `name` + (`version` XOR `ref`); see the features catalog in
-`../reference/reference.md`.
+**Default flag values** (see `../reference/reference.md`; these are logical
+values, not literal CLI flag names): `type=service`, `lifecycle=production`,
+GitHub provider `visibility=private`, `branchStrategy.name=none`,
+`branchStrategy.defaultBranch=main`, `allowAutoMerge=true`,
+`deleteBranchOnMerge=true`, `sync.enabled=true`, `sync.period=24h`. Map each to
+its discovered FlagSpec path and `name`.
+
+For `features`, write the array to a temporary JSON file and use the discovered
+FlagSpec name for its `.json` escape-hatch flag, as described above.
 
 ## User → UserClaim  →  `claims/users/{name}.yaml`
 
-Ask for: display name, email, role (`admin`/`member`, default `member`), and which
-teams to add them to. If teams are named, add the user to each `GroupClaim`'s
-root-level `members` in the **same** PR (see `edit-claim`), and hydrate the user
-before the groups.
+**Ask for:** display name, email, role (`admin`/`member`, default `member`), and
+which teams to add them to.
 
-```yaml
-kind: UserClaim
-version: "1.0"
-name: {username}
-profile:
-  displayName: "{display name}"
-  email: "{email}"
-providers:
-  github:
-    name: {username}
-    org: {org}
-    role: member
-    sync: { enabled: true, period: 24h }
-```
+If teams are named, add the user to each `GroupClaim`'s root-level `members` in the
+**same** PR (see `edit-claim`), and hydrate the user before the groups.
+
+**Default flag values:** GitHub provider `role=member`, `sync.enabled=true`,
+`sync.period=24h`; map each to its discovered FlagSpec path and `name`.
 
 ## Team → GroupClaim  →  `claims/groups/{name}.yaml`
 
-A group may be created with **no members** — `members` is optional. Omit it
-entirely for an empty team; only add it when the client names members.
-
-```yaml
-kind: GroupClaim
-version: "1.0"
-name: {team-name}
-type: business-unit
-# members: []   # optional — omit for an empty team
-providers:
-  github:
-    name: {team-name}
-    org: {org}
-    privacy: closed
-```
+A group may be created with **no members** — `members` is optional. Omit the
+`members` flag entirely for an empty team; only pass it when the client names members.
 
 Do **not** set `sync` unless the client explicitly asks for it.
 
-`members` is **root-level** (never under `providers.github`). If the desired team
-name isn't a valid slug (uppercase, spaces, non-ASCII), see the naming
-normalization rules in `../reference/reference.md`: `name` gets the slug, `profile.displayName` and
-`providers.github.name` keep the original.
+If the desired team name isn't a valid slug (uppercase, spaces, non-ASCII), see the
+naming normalization rules in `../reference/reference.md`: `name` gets the slug,
+`profile.displayName` and `providers.github.name` keep the original.
+
+**Default flag values:** `type=business-unit`, GitHub provider
+`privacy=closed`; map each to its discovered FlagSpec path and `name`.
 
 ## Other kinds
 
-Same shape — `kind`, `version: "1.0"`, `name`, then a `providers` block. Pull the
-required/optional fields and defaults from `../reference/reference.md` (which
-discloses the full JSON schema per kind):
+Same flow — discover flags, fill from client answers + policy defaults, `fscli create`, `fscli validate -f`.
+Pull defaults from `../reference/reference.md`:
 
-- **SystemClaim** `claims/systems/` — logical grouping; `domain: domain:{org}-domain`.
-- **DomainClaim** `claims/domains/` — top-level business area.
-- **SecretsClaim** `claims/secrets/` — ExternalSecrets + PushSecrets.
-- **OrgWebhookClaim** `claims/orgwebhooks/` — org-level webhook.
-- **TFWorkspaceClaim** `claims/tfworkspaces/` — remote/inline; policy hierarchy in `../reference/reference.md`. For a **remote** module, discover it from `prefapp/tfm` (the canonical module repo, always the `prefapp` org whatever the client's org is): list modules, read the module's `variables.tf` to know the inputs, pin the latest `{module}-vX.Y.Z` release tag. Commands in `../reference/gh-cookbook.md`. A cloud resource the client asks for (S3 bucket, RDS, EKS, …) maps to the matching `aws-*`/`azure-*` module and `resourceType`.
+- **SystemClaim** `claims/systems/` — `domain=domain:{org}-domain`.
+- **DomainClaim** `claims/domains/` — top-level business area; no special defaults.
+- **SecretsClaim** `claims/secrets/` — `lifecycle=production`, external-secrets
+  provider `refreshInterval=24h`.
+- **OrgWebhookClaim** `claims/orgwebhooks/` — GitHub-provider
+  `webhook.active=true`, `webhook.contentType=json`.
+- **TFWorkspaceClaim** `claims/tfworkspaces/` — Terraform-provider
+  `source=remote`, `policy=apply`, `sync.policy=observe`, `sync.period=24h`,
+  `sync.enabled=true`, `backend=firestartr-terraform-state`. For a **remote**
+  module, discover it from `prefapp/tfm` (always the `prefapp` org, regardless of
+  client's org): list
+  modules, read the module's `variables.tf` for inputs, pin the latest
+  `{module}-vX.Y.Z` tag. Commands in `../reference/gh-cookbook.md`.

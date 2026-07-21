@@ -22,8 +22,8 @@ produce the file body; this playbook lands it. All bash idioms live in
    gh issue create --repo {claims_repo} --title "{goal}" --body "{what the client asked for}"
    ```
 
-1. **Validate** before writing anything:
-   - Schema — the file matches its kind's schema (`../reference/schemas/{kind}.json`).
+1. **Validate the generated or updated file before opening the PR:**
+   - Schema — run `fscli validate -f {claim-file}` (see `../reference/fscli-cookbook.md`).
    - References — every `user:` / `group:` / `system:` / `domain:` /
      `ref:secretsclaim:` points at an existing claim.
    - Naming — matches `^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$`, ≤63 chars (see `../reference/reference.md`).

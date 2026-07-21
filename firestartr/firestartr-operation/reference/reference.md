@@ -3,6 +3,11 @@
 Stable platform facts carried inside the skill (portable across deployments).
 Everything org-specific comes from `organization.yaml`; everything here does not.
 
+## fscli
+
+Runnable invocation and validation idioms live in `fscli-cookbook.md` (sibling of
+this file). Read it before calling fscli or writing any claim.
+
 ## Kind ↔ intent ↔ path
 
 The client never names a kind — you pick it from the intent.
@@ -39,45 +44,41 @@ GitHub-backed kinds) `providers.github.name` — GitHub teams accept Unicode.
 `component:{name}` · `ref:secretsclaim:{claim}:{key}` · maintainer
 `(user|group|collaborator):{name}`.
 
-## Defaults for new claims
+## Validation split
 
-All default `version: "1.0"`. `org` / `orgName` / `system` / `domain` resolve from
-`{org}` in `organization.yaml`.
+fscli validates syntax only (schema, types, enums) — via `fscli validate -f`.
+The skill is responsible for:
+- **References** — `user:`/`group:`/`system:`/… values point at claims that
+  actually exist.
+- **Uniqueness** — a create would not duplicate an existing claim.
+- **Naming normalization** — the slug, displayName, and github.name rules
+  described above.
+
+## Default flag values for new claims
+
+These are logical claim-field values, not literal CLI flag names. Map them to the
+matching FlagSpec paths and use each returned `name` when calling `fscli create`.
+All default `version: "1.0"`. The `{org}` flag value (see `fscli-cookbook.md`)
+is resolved from `organization.yaml` and passed to the kind's org field flag.
 
 - **ComponentClaim**: `type: service`, `lifecycle: production`,
   `system: system:default-system` (never `system:firestartr` unless the client
-  names it), github `visibility: private`,
+  names it), GitHub provider: `visibility: private`,
   `branchStrategy: {name: none, defaultBranch: main}`, `allowAutoMerge: true`,
-  `deleteBranchOnMerge: true`, `features: []`, `sync: {enabled: true, period: 24h}`.
-- **UserClaim**: github `role: member`, `sync: {enabled: true, period: 24h}`.
-- **GroupClaim**: `type: business-unit`, github `privacy: closed`.
-  Only set `sync` when the client explicitly asks for it.
+  `deleteBranchOnMerge: true`, `features: []`,
+  `sync: {enabled: true, period: 24h}`.
+- **UserClaim**: GitHub provider: `role: member`,
+  `sync: {enabled: true, period: 24h}`.
+- **GroupClaim**: `type: business-unit`, GitHub provider: `privacy: closed`.
+  Only set GitHub provider `sync` when the client explicitly asks for it.
 - **SystemClaim**: `domain: domain:{org}-domain`.
-- **SecretsClaim**: `lifecycle: production`, external_secrets `refreshInterval: 24h`.
-- **TFWorkspaceClaim**: terraform `source: remote`, `policy: apply`,
-  `sync: {policy: observe, period: 24h, enabled: true}`, backend
-  `firestartr-terraform-state`.
-- **OrgWebhookClaim**: github `webhook: {active: true, contentType: json}`.
-
-## Required fields per kind
-
-- **ComponentClaim**: `kind, version, type, lifecycle, name, providers.github.name,
-  providers.github.org`.
-- **UserClaim**: `kind, version, name, providers.github.name, providers.github.org,
-  providers.github.role` (`admin`|`member`).
-- **GroupClaim**: `kind, version, name, providers.github.name, providers.github.org`.
-  Optional: `members[]`, `type`, `parent`, `children[]`, `privacy` (closed|secret).
-- **SystemClaim / DomainClaim**: `kind, version, name`.
-- **SecretsClaim**: `kind, version, name`; externalSecrets need
-  `refreshInterval, data[].remoteRef.key, data[].secretKey, secretStoreRef`.
-- **OrgWebhookClaim**: `kind, version, name, providers.github.orgName,
-  providers.github.webhook.url`.
-- **TFWorkspaceClaim**: `kind, version, name, providers.terraform.name, source,
-  policy`. `source: remote` needs `module`; `inline` needs `files`.
-
-For the complete field definitions, types, and constraints, read the JSON schema
-for the kind in `schemas/`:
-`schemas/{component,user,group,system,domain,secrets,orgwebhook,tfworkspace,argodeploy}-claim.json`.
+- **SecretsClaim**: `lifecycle: production`, external-secrets provider:
+  `refreshInterval: 24h`.
+- **TFWorkspaceClaim**: Terraform provider: `source: remote`, `policy: apply`,
+  `sync: {policy: observe, period: 24h, enabled: true}`,
+  `backend: firestartr-terraform-state`.
+- **OrgWebhookClaim**: GitHub provider:
+  `webhook: {active: true, contentType: json}`.
 
 ## Terraform modules (TFWorkspaceClaim, remote source)
 
