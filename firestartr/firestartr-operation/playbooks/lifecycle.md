@@ -23,7 +23,7 @@ produce the file body; this playbook lands it. All bash idioms live in
    ```
 
 1. **Validate the generated or updated file before opening the PR:**
-   - Schema — run `fscli validate -f {claim-file}` (see `../reference/fscli-cookbook.md`).
+   - Schema — run `fs-forge validate -f {claim-file}` (see `../reference/fs-forge-cookbook.md`).
    - References — every `user:` / `group:` / `system:` / `domain:` /
      `ref:secretsclaim:` points at an existing claim.
    - Naming — matches `^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$`, ≤63 chars (see `../reference/reference.md`).

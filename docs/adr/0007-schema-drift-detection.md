@@ -1,4 +1,4 @@
-# Claim schemas are owned by fscli, not vendored
+# Claim schemas are owned by fs-forge, not vendored
 
 **Status: accepted; supersedes the previous drift-detection decision.**
 
@@ -9,15 +9,15 @@ losslessly.
 
 ## Decision
 
-- `@prefapp/fscli` is the single source of truth for claim schemas.
+- `@firestartr/fs-forge-cli` is the single source of truth for claim schemas.
 - Creates discover the current kind's flags with
-  `fscli create <Kind> --help --json`; the skill maps client answers and policy
+  `fs-forge create <Kind> --help --json`; the skill maps client answers and policy
   defaults onto those discovered flags.
 - Validation of schema, types, and enum constraints runs through
-  `fscli validate -f`. References, uniqueness, and naming normalization remain
+  `fs-forge validate -f`. References, uniqueness, and naming normalization remain
   the skill's judgment.
 - This repository does not vendor claim-schema JSON files or maintain a schema
-  drift detector for them. Schema changes are consumed through the fscli release
+  drift detector for them. Schema changes are consumed through the fs-forge release
   and version-pin process.
 
 ## Consequences
@@ -25,5 +25,5 @@ losslessly.
 The operational skill no longer duplicates platform schemas and cannot silently
 validate against an outdated local copy. The skill's reference material remains
 portable policy and judgment: kind selection, naming, references, defaults, and
-hydration mapping. Updating claim schemas is an fscli release concern rather than
+hydration mapping. Updating claim schemas is an fs-forge release concern rather than
 a copy-refresh PR in `prefapp/skills`.
