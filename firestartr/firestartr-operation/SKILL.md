@@ -20,19 +20,33 @@ over asking.
 
 ## Step 1 — Resolve the target platform
 
-Read `organization.yaml` from this skill's directory.
+Read `firestartr-config.yaml` from this skill's directory.
 
 - If it exists and `organization.name` is a concrete value (not `{organization}`,
   empty, or missing), use it. `claims_repo` is `{organization}/claims` unless the
   file overrides it.
 - If it is **missing or unresolved**, this is a first-time setup: ask the client
   for their organization name (and claims repo full-name if it differs from
-  `{org}/claims`), then write `organization.yaml` from the shape in
-  `organization.example.yaml`. Do this once; subsequent runs skip the question.
+  `{org}/claims`), then write `firestartr-config.yaml` from the shape in
+  `firestartr-config.example.yaml`. Do this once; subsequent runs skip the question.
 
 Do not touch any repository until the organization resolves to a concrete value.
 
-**Completion:** you hold a concrete `{org}` and `{claims_repo}`.
+**Resolve the CLI version** after the organization is known:
+1. If `cli_version` is set in `firestartr-config.yaml`, use that value as `{version}`.
+2. Otherwise, run:
+   ```bash
+   npm dist-tag ls @firestartr/fs-forge-cli | grep "latest:" | cut -d" " -f2
+   ```
+   If the result is empty or contains `snapshot`, no stable release is available:
+   list all published versions with `npm view @firestartr/fs-forge-cli versions`,
+   ask the client to choose one, then persist the choice as `cli_version` in
+   `firestartr-config.yaml` before proceeding.
+
+Emit a single line confirming the resolved context, e.g.:
+> `Using org: prefapp-demo | fs-forge: 0.1.0`
+
+**Completion:** you hold a concrete `{org}`, `{claims_repo}`, and `{version}`.
 
 ## Step 2 — Classify the intent
 

@@ -1,9 +1,13 @@
 # Firestartr Operation — target platform (runtime, git-ignored)
-# Copy this file to `organization.yaml` beside it and fill in your organization.
+# Copy this file to `firestartr-config.yaml` beside it and fill in your organization.
 # The skill writes it for you on first run if it is missing.
 
 organization:
   name: "{organization}"        # e.g. prefapp-demo — the bootstrapped GitHub org
+
+# Optional. Pin the CLI to a specific version. When absent, the agent resolves
+# the latest stable release of @firestartr/fs-forge-cli automatically.
+# cli_version: "0.1.0"
 
 # Optional. Defaults to "{organization}/claims" and the standard Firestartr layout.
 # Only set these if your platform deviates from the defaults.

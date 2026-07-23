@@ -1,7 +1,7 @@
 # gh Cookbook
 
 The repeated `gh` idioms every playbook builds on. `{claims_repo}` is
-`{org}/claims` from `organization.yaml`. Prefer a host-provided composite tool
+`{org}/claims` from `firestartr-config.yaml`. Prefer a host-provided composite tool
 when the playbook names one; otherwise use these raw commands.
 
 ## Read a file (decoded)
