@@ -4,10 +4,10 @@ Change an existing claim in place, then land it via `lifecycle`. Both concerns
 below mutate one claim file: read it, change the targeted field(s), write the
 **whole** file back preserving everything else, then **validate before proceeding**:
 ```bash
-fscli validate -f {claim-file}
+npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}
 ```
-Fix any errors before running the `lifecycle` flow. See `../reference/fscli-cookbook.md`
-for the fscli invocation idiom.
+Fix any errors before running the `lifecycle` flow. See `../reference/fs-forge-cookbook.md`
+for the fs-forge invocation idiom.
 
 Read the current file first (`gh-cookbook.md` → "Read a file"), edit, and keep
 every unrelated field intact.

@@ -1,12 +1,12 @@
 # Reference
 
 Stable platform facts carried inside the skill (portable across deployments).
-Everything org-specific comes from `organization.yaml`; everything here does not.
+Everything org-specific comes from `firestartr-config.yaml`; everything here does not.
 
-## fscli
+## fs-forge
 
-Runnable invocation and validation idioms live in `fscli-cookbook.md` (sibling of
-this file). Read it before calling fscli or writing any claim.
+Runnable invocation and validation idioms live in `fs-forge-cookbook.md` (sibling of
+this file). Read it before calling fs-forge or writing any claim.
 
 ## Kind ↔ intent ↔ path
 
@@ -46,7 +46,7 @@ GitHub-backed kinds) `providers.github.name` — GitHub teams accept Unicode.
 
 ## Validation split
 
-fscli validates syntax only (schema, types, enums) — via `fscli validate -f`.
+fs-forge validates syntax only (schema, types, enums) — via `npx @firestartr/fs-forge-cli@{version} validate -f`.
 The skill is responsible for:
 - **References** — `user:`/`group:`/`system:`/… values point at claims that
   actually exist.
@@ -57,9 +57,10 @@ The skill is responsible for:
 ## Default flag values for new claims
 
 These are logical claim-field values, not literal CLI flag names. Map them to the
-matching FlagSpec paths and use each returned `name` when calling `fscli create`.
-All default `version: "1.0"`. The `{org}` flag value (see `fscli-cookbook.md`)
-is resolved from `organization.yaml` and passed to the kind's org field flag.
+matching FlagSpec paths and use each returned `name` when calling
+`npx @firestartr/fs-forge-cli@{version} create`.
+All default `version: "1.0"`. The `{org}` flag value (see `fs-forge-cookbook.md`)
+is resolved from `firestartr-config.yaml` and passed to the kind's org field flag.
 
 - **ComponentClaim**: `type: service`, `lifecycle: production`,
   `system: system:default-system` (never `system:firestartr` unless the client

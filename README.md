@@ -66,6 +66,15 @@ cd ~/work/prefapp/skills
 
 Skills are **symlinked, never copied** — the repo is the source of truth.
 
+## Tests
+
+Run the local test entrypoints from the repository root:
+
+```sh
+./tests/test_install.sh
+./tests/test_firestartr_operation.sh
+```
+
 ### Opt-in: Firestartr operational skill set
 
 A separate, client-facing operational set (drive a Prefapp-managed Firestartr
@@ -78,7 +87,7 @@ installed separately or together with the workflow set:
 
 This creates a second namespace symlink `~/.agents/skills/prefapp-firestartr`
 (plus `~/.claude/skills/` if Claude Code is detected). On first use the skill asks
-for your organization and writes a git-ignored `organization.yaml`; nothing
+for your organization and writes a git-ignored `firestartr-config.yaml`; nothing
 client-specific is ever committed.
 
 ## Per-harness discovery details

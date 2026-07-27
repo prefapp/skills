@@ -1,10 +1,10 @@
 # Create Claim Playbook
 
-Author a new claim body via `fscli`, then hand off to `lifecycle` to land it.
-Apply defaults from `../reference/reference.md` before calling fscli. File path is
+Author a new claim body via `fs-forge`, then hand off to `lifecycle` to land it.
+Apply defaults from `../reference/reference.md` before calling fs-forge. File path is
 `claims/{dir}/{name}.yaml` in the claims repo (see the kind table in
-`../reference/reference.md`). Read `../reference/fscli-cookbook.md` before
-invoking fscli.
+`../reference/reference.md`). Read `../reference/fs-forge-cookbook.md` before
+invoking fs-forge.
 
 Ask the client only for what you can't infer or default. Show the proposed command
 and the generated file for approval, then run the `lifecycle` create flow.
@@ -13,7 +13,7 @@ and the generated file for approval, then run the `lifecycle` create flow.
 
 1. **Discover flags** for the target kind:
    ```bash
-   fscli create <Kind> --help --json
+   npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json
    ```
    Map client answers + policy defaults from `../reference/reference.md` onto the
    logical claim-field paths returned in the FlagSpec. **Never hardcode a CLI flag
@@ -21,7 +21,7 @@ and the generated file for approval, then run the `lifecycle` create flow.
 
 2. **Create the claim file:**
    ```bash
-   fscli create <Kind> \
+   npx @firestartr/fs-forge-cli@{version} create <Kind> \
      --<org-flag>={org} \
      --<flag>=<value> \
      ... \
@@ -33,7 +33,7 @@ and the generated file for approval, then run the `lifecycle` create flow.
 
 3. **Validate:**
    ```bash
-   fscli validate -f claims/{dir}/{name}.yaml
+   npx @firestartr/fs-forge-cli@{version} validate -f claims/{dir}/{name}.yaml
    ```
    Fix any errors before proceeding.
 
@@ -86,8 +86,10 @@ naming normalization rules in `../reference/reference.md`: `name` gets the slug,
 
 ## Other kinds
 
-Same flow — discover flags, fill from client answers + policy defaults, `fscli create`, `fscli validate -f`.
-Pull defaults from `../reference/reference.md`:
+Same flow — discover flags, fill from client answers + policy defaults,
+`npx @firestartr/fs-forge-cli@{version} create`,
+`npx @firestartr/fs-forge-cli@{version} validate -f`. Pull defaults from
+`../reference/reference.md`:
 
 - **SystemClaim** `claims/systems/` — `domain=domain:{org}-domain`.
 - **DomainClaim** `claims/domains/` — top-level business area; no special defaults.
