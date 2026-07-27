@@ -20,11 +20,18 @@ grep -q "npx @firestartr/fs-forge-cli" "$SKILL_DIR/reference/fs-forge-cookbook.m
 grep -q "when.*on PATH" "$SKILL_DIR/reference/fs-forge-cookbook.md" \
   && fail "cookbook still has 'when on PATH' fallback"
 
-# SKILL.md must reference firestartr-config.yaml, not organization.yaml.
+# SKILL.md must reference firestartr-config.yaml, not organization.yaml, and
+# parse npm's latest dist-tag independently of whitespace width.
 grep -q "firestartr-config.yaml" "$SKILL_DIR/SKILL.md" \
   || fail "SKILL.md missing 'firestartr-config.yaml'"
 grep -q "organization\.yaml" "$SKILL_DIR/SKILL.md" \
   && fail "SKILL.md still references 'organization.yaml'"
+grep -Fq "awk '\$1 == \"latest:\" { print \$2 }'" "$SKILL_DIR/SKILL.md" \
+  || fail "SKILL.md latest dist-tag parsing is whitespace-sensitive"
+
+# Command examples must retain the npx package and version prefix.
+grep -Eq '`fs-forge (create|validate)' "$SKILL_DIR/playbooks/create-claim.md" \
+  && fail "create-claim.md contains a bare fs-forge command"
 
 # firestartr-config.example.yaml must exist and contain cli_version.
 [ -f "$SKILL_DIR/firestartr-config.example.yaml" ] \

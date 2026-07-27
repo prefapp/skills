@@ -86,8 +86,10 @@ naming normalization rules in `../reference/reference.md`: `name` gets the slug,
 
 ## Other kinds
 
-Same flow — discover flags, fill from client answers + policy defaults, `fs-forge create`, `fs-forge validate -f`.
-Pull defaults from `../reference/reference.md`:
+Same flow — discover flags, fill from client answers + policy defaults,
+`npx @firestartr/fs-forge-cli@{version} create`,
+`npx @firestartr/fs-forge-cli@{version} validate -f`. Pull defaults from
+`../reference/reference.md`:
 
 - **SystemClaim** `claims/systems/` — `domain=domain:{org}-domain`.
 - **DomainClaim** `claims/domains/` — top-level business area; no special defaults.

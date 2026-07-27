@@ -36,7 +36,7 @@ Do not touch any repository until the organization resolves to a concrete value.
 1. If `cli_version` is set in `firestartr-config.yaml`, use that value as `{version}`.
 2. Otherwise, run:
    ```bash
-   npm dist-tag ls @firestartr/fs-forge-cli | grep "latest:" | cut -d" " -f2
+   npm dist-tag ls @firestartr/fs-forge-cli | awk '$1 == "latest:" { print $2 }'
    ```
    If the result is empty or contains `snapshot`, no stable release is available:
    list all published versions with `npm view @firestartr/fs-forge-cli versions`,
