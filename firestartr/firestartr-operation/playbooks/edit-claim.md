@@ -94,11 +94,12 @@ field's kind, level, and format.
 Don't recompute the whole `features[]` array by hand — use the dedicated
 `features add`/`edit`/`remove`/`list` subcommands (`../reference/fs-forge-cookbook.md`
 → "Feature CRUD"), which mutate one reference at a time and derive `args.*`
-flags from the Feature's own schema. Each still needs the same dry-run
-(without `--commit`) → client approval → `--commit` sequence as any other
-edit. Use inline `edit --add-feature`/`--remove-feature` only when you already
-know valid `args` and don't need schema-derived flags — then run `validate`
-with `--source`/`--refresh` to catch bad `args` before landing.
+flags from the Feature's own schema. `add`/`edit`/`remove` each still need the
+same dry-run (without `--commit`) → client approval → `--commit` sequence as
+any other edit; `list` is read-only and needs no `--commit`. Use inline
+`edit --add-feature`/`--remove-feature` only when you already know valid
+`args` and don't need schema-derived flags — then run `validate` with
+`--source`/`--refresh` to catch bad `args` before landing.
 
 ## Manual fallback
 

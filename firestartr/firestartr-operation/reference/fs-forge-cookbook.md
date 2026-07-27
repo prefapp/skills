@@ -252,9 +252,11 @@ against the latest schema before landing the change.
 
 ### Deep validation
 
-Plain `validate -f {claim-file}` only checks claim structure. Add
-`--source`/`--refresh` to also validate every attached Feature's `args`
-against its latest schema:
+Plain `validate -f {claim-file}` ("Validate a claim file (syntactic only)"
+above) checks the claim's own schema, types, and enums, but not Feature
+`args` against their schemas. Add `--source`/`--refresh` to also validate
+every attached Feature's `args` against its latest schema (`--refresh`
+bypasses the schema cache):
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} validate -f {claim-file} --source <source> --refresh

@@ -61,12 +61,13 @@ GitHub provider `visibility=private`, `branchStrategy.name=none`,
 `deleteBranchOnMerge=true`, `sync.enabled=true`, `sync.period=24h`. Map each to
 its discovered FlagSpec path and `name`.
 
-For `features`, use the repeatable `--feature name@version:{...}` /
-`name#ref:{...}` inline flag (see `../reference/fs-forge-cookbook.md` →
-"Feature CRUD") instead of the general `.json` escape hatch — one flag per
-Feature, `{...}` is a raw JSON `args` object and may be omitted. This skips
-schema validation of `args`; run `validate` with `--source`/`--refresh`
-afterward to check them against each Feature's latest schema.
+For `features`, use the repeatable `--feature 'name@version:{...}'` /
+`--feature 'name#ref:{...}'` inline flag (see `../reference/fs-forge-cookbook.md`
+→ "Feature CRUD") instead of the general `.json` escape hatch — one flag per
+Feature, quoted so the shell doesn't split on the JSON, with `{...}` a raw
+JSON `args` object that may be omitted. This skips schema validation of
+`args`; run `validate` with `--source`/`--refresh` afterward to check them
+against each Feature's latest schema.
 
 ## User → UserClaim  →  `claims/users/{name}.yaml`
 
