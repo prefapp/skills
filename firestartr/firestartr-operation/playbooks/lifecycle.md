@@ -1,18 +1,47 @@
 # Lifecycle Playbook
 
-The one flow every mutating operation follows. `create-claim` and `edit-claim`
-produce the file body; this playbook lands it. All bash idioms live in
-`../reference/gh-cookbook.md`.
+The one flow every mutating operation follows. `create-claim`, `edit-claim`,
+and `clone-claim` produce or fetch the claim body; this playbook lands it.
+All bash idioms live in `../reference/gh-cookbook.md`.
+
+Two landing paths — pick by how the claim was produced:
+
+- **fs-forge-managed** — `edit`/`clone --commit` (the primary path for
+  `edit-claim`/`clone-claim`). Go to "fs-forge-managed flow" below.
+- **Manual** — `create` (always), or a `gh`-based edit/clone fallback. Go to
+  "Manual flow" below.
 
 ## Governance — read once, applies everywhere
 
 - **PR-only. Never commit to `main`.** Every change is a branch → PR → merge.
-- Show the client the proposed change and get approval before opening the PR.
-- Prefer host composite tools when present (`create_claim_pr`,
-  `github_create_pr_with_changes`, `github_propose_changes_dry_run`); fall back to
-  the raw `gh` idioms in the cookbook when they aren't wired.
+- Show the client the proposed change and get approval **before** opening a
+  PR or running `--commit`.
+- Tool preference: try `fs-forge-cli` first; the raw `gh` idioms in the
+  cookbook (and host composite tools like `create_claim_pr`,
+  `github_create_pr_with_changes`, `github_propose_changes_dry_run`, when
+  present) are the fallback for what it doesn't cover.
 
-## Create / edit flow
+## fs-forge-managed flow (`edit`/`clone --commit`)
+
+1. **Capture the goal as an issue** — same as the manual flow's step 0 below,
+   for the audit trail.
+2. **Dry-run** the `edit`/`clone` command with `--diff` (no `--commit`); fix
+   any validation errors; show the diff to the client and get approval.
+3. **Re-run with `--commit`.** Per the cookbook's `--commit` warning, this one
+   command creates the branch, commits the claim, opens/merges the PR,
+   dispatches and waits for hydration, and merges the resulting wet PR — all
+   without further input.
+4. **Report the outcome to the client.** Do **not** poll for the workflow, run
+   a separate hydrate, or merge a wet PR yourself — it already happened. If
+   the client asks for status, check the dispatched `provision-claim.yaml`
+   run; only trigger a manual hydrate (manual flow's step 5) if they
+   explicitly ask for one.
+
+A `--commit` that fails (invalid claim, existing `fs-forge/{kind}-{name}`
+branch, etc.) surfaces as a CLI error before anything is dispatched — fix the
+reported problem and re-run.
+
+## Manual flow (`create`, or a `gh`-based edit/clone fallback)
 
 0. **Capture the goal as an issue** before touching branches. Fill in the issue
    template at `../templates/claim-issue.md` (client's terms, not "claim") and open

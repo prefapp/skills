@@ -47,10 +47,14 @@ GitHub-backed kinds) `providers.github.name` — GitHub teams accept Unicode.
 ## Validation split
 
 fs-forge validates syntax only (schema, types, enums) — via `npx @firestartr/fs-forge-cli@{version} validate -f`.
-The skill is responsible for:
+`edit`/`clone` run this same validation automatically before `--commit` and
+refuse to commit an invalid claim; `clone` also checks name-uniqueness itself
+(errors if the target `<Kind>-<name>` already exists). The skill is still
+responsible for:
 - **References** — `user:`/`group:`/`system:`/… values point at claims that
   actually exist.
-- **Uniqueness** — a create would not duplicate an existing claim.
+- **Uniqueness** — a `create` (file-based, no claims-map lookup) would not
+  duplicate an existing claim.
 - **Naming normalization** — the slug, displayName, and github.name rules
   described above.
 

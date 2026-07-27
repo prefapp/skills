@@ -18,6 +18,12 @@ Run these steps in order.
 — one at a time, each with your recommended answer. Prefer exploring the repos
 over asking.
 
+**Tool preference:** always try `fs-forge-cli` first for a claim operation — it
+knows the schemas, the claims-map, and (via `edit`/`clone --commit`) how to land
+a change on its own. Fall back to raw `gh` (`reference/gh-cookbook.md`) only for
+what the CLI doesn't cover: the manual create-then-PR flow, Terraform module
+discovery, and any edit a claim's flags can't express.
+
 ## Step 1 — Resolve the target platform
 
 Read `firestartr-config.yaml` from this skill's directory.
@@ -56,6 +62,7 @@ loads `lifecycle` in addition to its authoring playbook.
 | The client wants to… | Load |
 |---|---|
 | create a repo, team, user, system, domain, secret, webhook, or TF workspace | `create-claim` + `lifecycle` |
+| duplicate an existing repo/team/etc. as the starting point for a new one | `clone-claim` + `lifecycle` |
 | add or remove members of a team | `edit-claim` + `lifecycle` |
 | set a repo's owner, maintainers, platform owner, CODEOWNERS, or collaborators | `edit-claim` + `lifecycle` |
 | change any other field of an existing repo/team/user | `edit-claim` + `lifecycle` |
@@ -74,10 +81,11 @@ ask one clarifying question before proceeding.
 ## Step 3 — Load and execute
 
 Read the chosen playbook file(s) from `playbooks/` and follow them end to end.
-`reference/reference.md` and `reference/gh-cookbook.md` are pulled in on demand when
-a playbook points at them. Report
+`reference/reference.md`, `reference/fs-forge-cookbook.md`, and `reference/gh-cookbook.md`
+are pulled in on demand when a playbook points at them. Report
 back to the client in their own terms — repos, teams, users, PRs — never the word
 "claim."
 
-**Completion:** the change is landed (PR merged, hydrated, state PR merged) or the
-question is answered, and the client has a plain-language summary.
+**Completion:** the change is landed — fs-forge-managed (`--commit` dispatched and
+reported) or manual (PR merged, hydrated, state PR merged) — or the question is
+answered, and the client has a plain-language summary.
