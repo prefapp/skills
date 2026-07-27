@@ -30,7 +30,7 @@ grep -Fq "awk '\$1 == \"latest:\" { print \$2 }'" "$SKILL_DIR/SKILL.md" \
   || fail "SKILL.md latest dist-tag parsing is whitespace-sensitive"
 
 # Command examples must retain the npx package and version prefix.
-grep -rEq '`fs-forge (create|validate)' "$SKILL_DIR" \
+grep -rEq '(^|[^@[:alnum:]_/-])fs-forge[[:space:]]+(create|validate)([[:space:]]|$)' "$SKILL_DIR" \
   && fail "skill files contain a bare fs-forge command"
 grep -Fq 'claims_repo` is `{org}/claims' "$SKILL_DIR/SKILL.md" \
   || fail "SKILL.md default claims repo does not use the resolved org placeholder"
