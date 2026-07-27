@@ -9,6 +9,10 @@ invoking fs-forge.
 Ask the client only for what you can't infer or default. Show the proposed command
 and the generated file for approval, then run the `lifecycle` create flow.
 
+If the client wants "one like an existing X but with Y different", use
+`clone-claim` instead — it's less work than building from scratch and
+overriding most of the fields.
+
 ## General flow (all kinds)
 
 1. **Discover flags** for the target kind:
