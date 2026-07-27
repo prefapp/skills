@@ -65,6 +65,7 @@ loads `lifecycle` in addition to its authoring playbook.
 | duplicate an existing repo/team/etc. as the starting point for a new one | `clone-claim` + `lifecycle` |
 | add or remove members of a team | `edit-claim` + `lifecycle` |
 | set a repo's owner, maintainers, platform owner, CODEOWNERS, or collaborators | `edit-claim` + `lifecycle` |
+| add, edit, remove, or list a Feature on a repo | `edit-claim` + `lifecycle` |
 | change any other field of an existing repo/team/user | `edit-claim` + `lifecycle` |
 | delete a repo, team, or user | `lifecycle` |
 | know if a repo/team is in sync, drifted, orphaned, or stale | `reconciliation` |

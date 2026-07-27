@@ -89,11 +89,22 @@ Same procedure for any existing claim of any kind: read (step 1), dry-run the
 flag change, get approval, commit. Consult `../reference/reference.md` for the
 field's kind, level, and format.
 
+## Features (ComponentClaim)
+
+Don't recompute the whole `features[]` array by hand — use the dedicated
+`features add`/`edit`/`remove`/`list` subcommands (`../reference/fs-forge-cookbook.md`
+→ "Feature CRUD"), which mutate one reference at a time and derive `args.*`
+flags from the Feature's own schema. Each still needs the same dry-run
+(without `--commit`) → client approval → `--commit` sequence as any other
+edit. Use inline `edit --add-feature`/`--remove-feature` only when you already
+know valid `args` and don't need schema-derived flags — then run `validate`
+with `--source`/`--refresh` to catch bad `args` before landing.
+
 ## Manual fallback
 
 Only when the field you need to change isn't reachable through `edit`'s
-flags (e.g. rewriting one element inside an array of objects without
-recomputing the whole array via the `.json` escape hatch): read the file
+flags (e.g. rewriting one element inside an array of objects that has no
+dedicated CRUD subcommand, via the `.json` escape hatch): read the file
 (`gh-cookbook.md` → "Read a file"), edit it, write the **whole** file back
 preserving everything else, validate
 (`npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}`), then land
