@@ -91,9 +91,9 @@ responsibility (see the validation split in `reference.md`).
 Unlike `create` (local, deterministic, no network), `edit` and `clone` read and
 write the claims repo directly over the GitHub API. Both need:
 
-- `GITHUB_TOKEN` in the environment — separate from `gh`'s own auth token;
-  export it once per session if it isn't already set:
-  `export GITHUB_TOKEN=$(gh auth token)`.
+- `GITHUB_TOKEN` in the environment — `fs-forge` reads this env var directly,
+  it doesn't share `gh`'s internal auth store. Populate it from `gh` once per
+  session if it isn't already set: `export GITHUB_TOKEN=$(gh auth token)`.
 - `--org={org}` on every invocation — the GitHub org whose `claims` repo to
   talk to. This is a different flag from the claim's own
   `providers.github.org` schema field (only relevant if you're deliberately
