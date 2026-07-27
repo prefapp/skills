@@ -66,6 +66,15 @@ cd ~/work/prefapp/skills
 
 Skills are **symlinked, never copied** — the repo is the source of truth.
 
+## Tests
+
+Run the local test entrypoints from the repository root:
+
+```sh
+./tests/test_install.sh
+./tests/test_firestartr_operation.sh
+```
+
 ### Opt-in: Firestartr operational skill set
 
 A separate, client-facing operational set (drive a Prefapp-managed Firestartr

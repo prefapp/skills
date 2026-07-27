@@ -27,7 +27,7 @@ grep -q "firestartr-config.yaml" "$SKILL_DIR/SKILL.md" \
 grep -q "organization\.yaml" "$SKILL_DIR/SKILL.md" \
   && fail "SKILL.md still references 'organization.yaml'"
 grep -Fq "awk '\$1 == \"latest:\" { print \$2 }'" "$SKILL_DIR/SKILL.md" \
-  || fail "SKILL.md latest dist-tag parsing is whitespace-sensitive"
+  || fail "SKILL.md missing whitespace-safe latest dist-tag parsing"
 
 # Command examples must retain the npx package and version prefix.
 grep -rEq '(^|[^@[:alnum:]_/-])fs-forge[[:space:]]+(create|validate)([[:space:]]|$)' "$SKILL_DIR" \
