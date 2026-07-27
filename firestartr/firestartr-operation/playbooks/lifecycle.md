@@ -36,6 +36,10 @@ Two landing paths — pick by how the claim was produced:
    the client asks for status, check the dispatched `provision-claim.yaml`
    run; only trigger a manual hydrate (manual flow's step 5) if they
    explicitly ask for one.
+5. **Close the audit-trail issue**, linking the merged claim PR in the closing
+   comment. `--commit`'s auto-generated PR has no `Closes #N` footer (there's
+   no flag for it), so the issue is only linked back to the change if you do
+   it here.
 
 A `--commit` that fails (invalid claim, existing `fs-forge/{kind}-{name}`
 branch, etc.) surfaces as a CLI error before anything is dispatched — fix the
