@@ -98,7 +98,7 @@ write the claims repo directly over the GitHub API. Both need:
   talk to. This is a different flag from the claim's own
   `providers.github.org` schema field (only relevant if you're deliberately
   changing that field); always pass `--org={org}` explicitly rather than
-  relying on `FSCRT_ORG` being set.
+  relying on an env var default.
 
 Claims are addressed as `<Kind>-<name>` (e.g. `ComponentClaim-my-repo`) — the
 same key the claims-map uses. Use this notation everywhere you need to name an

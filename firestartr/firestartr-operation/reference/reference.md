@@ -46,7 +46,7 @@ GitHub-backed kinds) `providers.github.name` — GitHub teams accept Unicode.
 
 ## Validation split
 
-fs-forge validates syntax only (schema, types, enums) — via `npx @firestartr/fs-forge-cli@{version} validate -f`.
+fs-forge validates syntax only (schema, types, enums) — via `npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}`.
 `edit`/`clone` run this same validation automatically before `--commit` and
 refuse to commit an invalid claim; `clone` also checks name-uniqueness itself
 (errors if the target `<Kind>-<name>` already exists). The skill is still

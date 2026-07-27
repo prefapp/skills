@@ -7,9 +7,10 @@ see `../reference/fs-forge-cookbook.md` for the invocation idiom.
 ## Flow
 
 1. **Identify the source and the new name.** Source is `<Kind>-<source-name>`
-   (an existing claim); confirm what should differ in the new one (the client
-   rarely wants an exact duplicate — at minimum the name changes, usually
-   also owner/visibility/members/etc.).
+   (an existing claim); `--from` below takes only the `<source-name>` part,
+   since `<Kind>` is already a separate argument. Confirm what should differ
+   in the new one (the client rarely wants an exact duplicate — at minimum
+   the name changes, usually also owner/visibility/members/etc.).
 2. **Read the source** (optional but recommended when you don't already know
    its fields): `edit <Kind>-<source-name> --org={org}` with no mutating flags.
 3. **Discover flags** for the kind via `create <Kind> --help --json` (same
