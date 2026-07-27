@@ -10,8 +10,9 @@ Ask the client only for what you can't infer or default. Show the proposed comma
 and the generated file for approval, then run the `lifecycle` create flow.
 
 If the client wants "one like an existing X but with Y different", use
-`clone-claim` instead — it's less work than building from scratch and
-overriding most of the fields.
+`clone-claim` instead. For a **repo** specifically, check `clone-claim.md`'s
+"When to clone vs. create" first — it's the default there, not the exception,
+since `create` never lands the change on its own.
 
 ## General flow (all kinds)
 

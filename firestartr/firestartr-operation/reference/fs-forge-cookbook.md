@@ -86,6 +86,11 @@ fs-forge validates schema, types, and enum constraints. It does **not** check
 cross-claim references, duplicates, or naming rules — those are the skill's
 responsibility (see the validation split in `reference.md`).
 
+Schema lookup is relative to the current working directory (`{cwd}/schemas/`).
+Run `validate`/`create`/`edit`/`clone` from a directory that has one — e.g. a
+clone of `{claims_repo}` (which ships it), or a `schemas/` symlink to the CLI's
+bundled copy — not an arbitrary scratch directory like `/tmp`.
+
 ## Claims-repo commands: read, edit, clone (network-bound)
 
 Unlike `create` (local, deterministic, no network), `edit` and `clone` read and
