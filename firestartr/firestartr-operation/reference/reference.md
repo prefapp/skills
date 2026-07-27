@@ -57,7 +57,8 @@ The skill is responsible for:
 ## Default flag values for new claims
 
 These are logical claim-field values, not literal CLI flag names. Map them to the
-matching FlagSpec paths and use each returned `name` when calling `fs-forge create`.
+matching FlagSpec paths and use each returned `name` when calling
+`npx @firestartr/fs-forge-cli@{version} create`.
 All default `version: "1.0"`. The `{org}` flag value (see `fs-forge-cookbook.md`)
 is resolved from `firestartr-config.yaml` and passed to the kind's org field flag.
 

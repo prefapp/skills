@@ -23,8 +23,8 @@ over asking.
 Read `firestartr-config.yaml` from this skill's directory.
 
 - If it exists and `organization.name` is a concrete value (not `{organization}`,
-  empty, or missing), use it. `claims_repo` is `{organization}/claims` unless the
-  file overrides it.
+  empty, or missing), use it. `claims_repo` is `{org}/claims` unless the file
+  overrides it.
 - If it is **missing or unresolved**, this is a first-time setup: ask the client
   for their organization name (and claims repo full-name if it differs from
   `{org}/claims`), then write `firestartr-config.yaml` from the shape in

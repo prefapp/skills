@@ -59,7 +59,8 @@ npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json \
   | jq -r '.[] | select(.path == "providers.github.org" or .path == "providers.github.orgName") | "--\(.name)=\("{org}")"'
 ```
 
-Pass the resulting `--<flag>=<value>` to `fs-forge create`.
+Pass the resulting `--<flag>=<value>` to
+`npx @firestartr/fs-forge-cli@{version} create`.
 
 ## Create a claim file
 

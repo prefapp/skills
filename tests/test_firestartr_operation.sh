@@ -30,8 +30,10 @@ grep -Fq "awk '\$1 == \"latest:\" { print \$2 }'" "$SKILL_DIR/SKILL.md" \
   || fail "SKILL.md latest dist-tag parsing is whitespace-sensitive"
 
 # Command examples must retain the npx package and version prefix.
-grep -Eq '`fs-forge (create|validate)' "$SKILL_DIR/playbooks/create-claim.md" \
-  && fail "create-claim.md contains a bare fs-forge command"
+grep -rEq '`fs-forge (create|validate)' "$SKILL_DIR" \
+  && fail "skill files contain a bare fs-forge command"
+grep -Fq 'claims_repo` is `{org}/claims' "$SKILL_DIR/SKILL.md" \
+  || fail "SKILL.md default claims repo does not use the resolved org placeholder"
 
 # firestartr-config.example.yaml must exist and contain cli_version.
 [ -f "$SKILL_DIR/firestartr-config.example.yaml" ] \
