@@ -39,10 +39,18 @@ cookbook), it doesn't merge with the source's values.
 
 ## When to clone vs. create
 
-Clone when the client wants "one like X but with Y different" and an existing
-claim of that kind already has most of the desired shape. Otherwise use
-`create-claim` — building from schema defaults is simpler than cloning and
-overriding most of the fields anyway.
+For a **repo** (ComponentClaim), clone by default — even when the client
+never said "like X". `create` has no `--commit`; it always falls through to
+lifecycle's manual PR/hydrate/state-merge flow. `clone --commit` lands the
+same change — branch, PR, hydrate, state PR — in one shot, and its fields
+(system, owner, features, …) inherit from a known-good existing component
+instead of risking an invalid default. Pick any component close enough in
+shape as `--from`; only fall back to `create-claim` when nothing in the org
+is worth diffing against.
+
+For every other kind, clone when the client wants "one like X but with Y
+different" and an existing claim already has most of the desired shape —
+otherwise `create-claim`'s manual flow is cheap enough to use directly.
 
 ## Manual fallback
 

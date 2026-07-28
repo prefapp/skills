@@ -10,8 +10,9 @@ Ask the client only for what you can't infer or default. Show the proposed comma
 and the generated file for approval, then run the `lifecycle` create flow.
 
 If the client wants "one like an existing X but with Y different", use
-`clone-claim` instead — it's less work than building from scratch and
-overriding most of the fields.
+`clone-claim` instead. For a **repo** specifically, check `clone-claim.md`'s
+"When to clone vs. create" first — it's the default there, not the exception,
+since `create` never lands the change on its own.
 
 ## General flow (all kinds)
 
@@ -60,8 +61,13 @@ GitHub provider `visibility=private`, `branchStrategy.name=none`,
 `deleteBranchOnMerge=true`, `sync.enabled=true`, `sync.period=24h`. Map each to
 its discovered FlagSpec path and `name`.
 
-For `features`, write the array to a temporary JSON file and use the discovered
-FlagSpec name for its `.json` escape-hatch flag, as described above.
+For `features`, use the repeatable `--feature 'name@version:{...}'` /
+`--feature 'name#ref:{...}'` inline flag (see `../reference/fs-forge-cookbook.md`
+→ "Feature CRUD") instead of the general `.json` escape hatch — one flag per
+Feature, quoted so the shell doesn't split on the JSON, with `{...}` a raw
+JSON `args` object that may be omitted. This skips schema validation of
+`args`; run `validate` with `--source`/`--refresh` afterward to check them
+against each Feature's latest schema.
 
 ## User → UserClaim  →  `claims/users/{name}.yaml`
 
