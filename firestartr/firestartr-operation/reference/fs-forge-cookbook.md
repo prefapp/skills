@@ -91,6 +91,24 @@ Run `validate`/`create`/`edit`/`clone` from a directory that has one — e.g. a
 clone of `{claims_repo}` (which ships it), or a `schemas/` symlink to the CLI's
 bundled copy — not an arbitrary scratch directory like `/tmp`.
 
+## Discover an org's elements
+
+List every claim in an org's claims repo straight from the claims-map — no
+clone, no `gh api` path-walking:
+
+```bash
+npx @firestartr/fs-forge-cli@{version} discovery org-elements --org={org}
+```
+
+Read-only, one API call. Prints an aligned KIND/NAME/FILE PATH table. Add
+`--json` for a JSON object shaped like `{"org": ..., "claimsRepo": ...,
+"claimsMapSha": ..., "claims": {"<Kind>": [{"name": ..., "filePath": ...}]}}`
+grouped by kind, or repeatable `--kind <kind>` to filter (e.g. `--kind
+component --kind group`). `--claims-repo` overrides the default `claims`
+repo name. This is the fast path for "what does this org have" — prefer it
+over `catalog`'s hydrated view when raw claim inventory is enough and the
+catalog may be stale.
+
 ## Claims-repo commands: read, edit, clone (network-bound)
 
 Unlike `create` (local, deterministic, no network), `edit` and `clone` read and

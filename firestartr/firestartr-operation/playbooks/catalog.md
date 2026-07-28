@@ -22,6 +22,14 @@ ComponentClaim, `Group` ← GroupClaim, `User` ← UserClaim, `Resource` ← inf
 - **Show the org structure.** Domain → System → Component, hierarchically.
 - **Search.** Match names/fields across entities and present hits with their owners.
 
+## Raw inventory, no relations
+
+For a flat "what claims exist" listing (not entity ownership/topology), or when
+the catalog is stale, `fs-forge discovery org-elements` reads the claims-map
+directly — faster and always current. See `../reference/fs-forge-cookbook.md`.
+Use the catalog entities above whenever the question involves ownership,
+system membership, or hierarchy.
+
 ## Freshness
 
 The catalog hydrates every ~6h, so it can lag recent claim changes. When the latest
