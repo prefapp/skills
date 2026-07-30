@@ -89,9 +89,9 @@ always loads `lifecycle` in addition to its authoring playbook.
 
 | The client wants to… | Load |
 |---|---|
-| create a repo | `clone-claim` + `lifecycle` — default; see "When to clone vs. create" there for the fallback |
+| create a repo | `clone-claim` + `lifecycle` + proactive `feature-advisor` — default; see "When to clone vs. create" there for the fallback |
 | create a team, user, system, domain, secret, webhook, or TF workspace | `create-claim` + `lifecycle` |
-| duplicate an existing repo/team/etc. as the starting point for a new one | `clone-claim` + `lifecycle` |
+| duplicate an existing repo/team/etc. as the starting point for a new one | `clone-claim` + `lifecycle` + proactive `feature-advisor` |
 | add or remove members of a team | `edit-claim` + `lifecycle` |
 | set a repo's owner, maintainers, platform owner, CODEOWNERS, or collaborators | `edit-claim` + `lifecycle` |
 | add, edit, remove, or list a Feature on a repo | `edit-claim` + `lifecycle` |
@@ -99,6 +99,7 @@ always loads `lifecycle` in addition to its authoring playbook.
 | delete a repo, team, or user | `lifecycle` |
 | know if a repo/team is in sync, drifted, orphaned, or stale | `reconciliation` |
 | know who owns a service, what's in a system, or browse/search topology | `catalog` |
+| want a capability in a repo without naming a specific feature | `feature-advisor` (+ `edit-claim` + `lifecycle` if accepted) |
 | know a field, default, feature, or naming rule | `reference/reference.md` |
 
 Pick the claim **kind** from the intent yourself — the client never chooses
