@@ -15,11 +15,15 @@ ComponentClaim, `Group` ← GroupClaim, `User` ← UserClaim, `Resource` ← inf
 
 - **What services do we have?** List `Component` entities → name, type, lifecycle,
   owner, system as a table.
-- **Who owns service X?** Find the `Component`, read its `owner` (a group), find that
-  `Group`, list its members — return the full ownership chain.
-- **What's in system Y?** Find the `System`, then every `Component` referencing it —
-  present the system's topology.
-- **Show the org structure.** Domain → System → Component, hierarchically.
+- **Who owns service X? What's in system Y? Show the org structure.** Prefer
+  `fs-forge discovery map` (`../reference/fs-forge-cookbook.md`) over walking
+  catalog entities by hand — it renders the ownership/grouping tree
+  (`owner`, `maintainedBy`, `platformOwner`, `system`, `domain`, `members`, …)
+  straight from the claims repo in one call, always current. Filter with
+  `--kind` (e.g. `--kind system --kind component`) to scope to one
+  system's topology or one owner's chain. Fall back to the catalog entities
+  below only for relations `discovery map` doesn't track (e.g. hydrated
+  `Resource` entities) or when a rendered ownership tree isn't what's asked.
 - **Search.** Match names/fields across entities and present hits with their owners.
 
 ## Raw inventory, no relations
@@ -27,8 +31,8 @@ ComponentClaim, `Group` ← GroupClaim, `User` ← UserClaim, `Resource` ← inf
 For a flat "what claims exist" listing (not entity ownership/topology), or when
 the catalog is stale, `fs-forge discovery org-elements` reads the claims-map
 directly — faster and always current. See `../reference/fs-forge-cookbook.md`.
-Use the catalog entities above whenever the question involves ownership,
-system membership, or hierarchy.
+Use the catalog entities above whenever the question involves relations
+`discovery map` doesn't cover, such as hydrated infra `Resource`s.
 
 ## Freshness
 

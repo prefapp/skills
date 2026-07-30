@@ -76,6 +76,10 @@ Flags and their names come from the FlagSpec discovery step above — never
 constructed by hand. The skill sets only the flags it knows values for;
 required flags with no available value are gathered from the client first.
 
+Add `--diff` (offline, no network) to preview the new claim's own one-hop
+relation tree before writing it — same renderer as `discovery map`/`edit`'s
+`--diff`, just with no "before" side. `--ascii` swaps in bracket icons.
+
 ## Validate a claim file (syntactic only)
 
 ```bash
@@ -108,6 +112,32 @@ component --kind group`). `--claims-repo` overrides the default `claims`
 repo name. This is the fast path for "what does this org have" — prefer it
 over `catalog`'s hydrated view when raw claim inventory is enough and the
 catalog may be stale.
+
+## Discover an org's relation map (topology, ownership)
+
+Render the ownership/grouping tree derived from claim references — not a
+hydrated catalog view, the live claims-repo relations:
+
+```bash
+npx @firestartr/fs-forge-cli@{version} discovery map --org={org}
+```
+
+Read-only but network-bound (downloads one claims-repo tarball; needs
+`GITHUB_TOKEN` like `edit`/`clone` below). Recognizes only `owner`,
+`maintainedBy`, `platformOwner`, `subComponentOf`, `system`, `domain`,
+`parent`, `children`, and `members` — API references and inline Features are
+never part of this graph. This is the tool for "show the org structure" /
+"what's in system Y" / topology questions — prefer it over the catalog
+playbook whenever the catalog might be stale, since this reads the claims
+repo directly with no ~6h hydration lag.
+
+Options: repeatable `--kind <kind>` filters to one or more kinds (short ID
+like `component` or the full `ComponentClaim` — both spellings work here and
+for `clone`'s kind argument below), `--ref <branch|tag|commit>` pins the
+claims repo revision, `--ascii` swaps emoji icons for bracket tags (`[CMP]`,
+`[GRP]`, …), `--json` returns the structured graph (`{"nodes": [...],
+"edges": [...]}`) instead of the rendered tree — use `--json` when the result
+feeds another step rather than the client's eyes.
 
 ## Claims-repo commands: read, edit, clone (network-bound)
 
@@ -156,8 +186,15 @@ npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
   --diff
 ```
 
-Show the printed diff to the client and get approval. Only then re-run the
-same command with `--commit` appended:
+`--diff` prints a one-hop **relation diff** to stderr — the same tree
+renderer as `discovery map`, scoped to the edited claim and its direct
+references, with `+`/`-`/`~` markers for added/removed/changed nodes and
+edges (not a plain field-by-field YAML diff). Add `--json` for the
+structured diff (`{"nodes": [...], "edges": [...]}` with a `status` on each
+changed entry) or `--ascii` for bracket icons instead of emoji. Dangling
+references (pointing at a claim that doesn't exist) are flagged using the
+already-loaded claims-map. Show the printed diff to the client and get
+approval. Only then re-run the same command with `--commit` appended:
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
@@ -192,12 +229,17 @@ npx @firestartr/fs-forge-cli@{version} clone <Kind> --org={org} \
   --diff
 ```
 
-`--name` must differ from `--from`. `TFWorkspaceClaim`/`SecretsClaim` also
-need `--path claims/{...}/{new-name}.yaml` (same rule as `create`'s
-deterministic path). Same dry-run → approve → `--commit` sequence and the same
-`--commit` warning as `edit` above. `clone --commit` additionally errors if
-`<Kind>-<new-name>` already exists — no separate uniqueness check needed. See
-`../playbooks/clone-claim.md` for the full flow.
+`<Kind>` here takes either the short ID (`component`) or the full name
+(`ComponentClaim`) — unlike `edit`'s `<Kind>-<name>` reference, which still
+requires the full name. `--name` must differ from `--from`.
+`TFWorkspaceClaim`/`SecretsClaim` also need
+`--path claims/{...}/{new-name}.yaml` (same rule as `create`'s deterministic
+path). Same dry-run → approve → `--commit` sequence and the same `--commit`
+warning as `edit` above; `--diff`/`--json`/`--ascii` behave the same as
+`edit`'s relation diff too (compared against nothing, since the clone target
+is new). `clone --commit` additionally errors if `<Kind>-<new-name>` already
+exists — no separate uniqueness check needed. See `../playbooks/clone-claim.md`
+for the full flow.
 
 ## Feature CRUD (ComponentClaim only)
 

@@ -13,8 +13,11 @@ isn't reachable through `edit`'s flags.
    `create <Kind> --help --json` (never `edit --help --json` — see the
    cookbook).
 3. **Dry-run** the change: same command with the relevant `--<flag>=<value>`
-   / `--unset <path>` and `--diff`, no `--commit`. Fix any validation errors.
-4. **Show the diff to the client and get approval.**
+   / `--unset <path>` and `--diff` (add `--ascii` for plain-text icons). Fix
+   any validation errors.
+4. **Show the relation diff to the client and get approval.** `--diff` renders
+   the one-hop relation tree around the claim with `+`/`-`/`~` markers, not a
+   plain field diff (`../reference/fs-forge-cookbook.md` has the format).
 5. **Re-run with `--commit`.** Read the cookbook's `--commit` warning first —
    it commits *and* provisions *and* hydrates the claim in one shot; there is
    nothing left to do afterward unless the client asks for status or a manual
