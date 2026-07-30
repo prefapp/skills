@@ -139,6 +139,10 @@ claims repo revision, `--ascii` swaps emoji icons for bracket tags (`[CMP]`,
 "edges": [...]}`) instead of the rendered tree — use `--json` when the result
 feeds another step rather than the client's eyes.
 
+Each edge carries its `relation` (`owner`, `parent`, `system`, …), so a chain
+question ("who owns X, all the way up") is answered by walking `edges` from
+the target node until none remain — the whole graph is in this one payload.
+
 ## Claims-repo commands: read, edit, clone (network-bound)
 
 Unlike `create` (local, deterministic, no network), `edit` and `clone` read and

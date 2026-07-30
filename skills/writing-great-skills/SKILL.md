@@ -56,7 +56,7 @@ Keep each meaning in a **single source of truth**: one authoritative place, so c
 
 Check every line for **relevance**: does it still bear on what the skill does?
 
-Then hunt **no-ops** sentence by sentence, not just line by line: run the no-op test on each sentence in isolation, and when one fails, delete the whole sentence rather than trim words from it. Be aggressive — most prose that fails should go, not be rewritten.
+Then hunt **no-ops** sentence by sentence: run the no-op test on each sentence in isolation, and when one fails, delete the whole sentence rather than trim words from it. Be aggressive — delete most prose that fails rather than rewrite it.
 
 ## Leading words
 
