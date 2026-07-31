@@ -143,6 +143,29 @@ Each edge carries its `relation` (`owner`, `parent`, `system`, …), so a chain
 question ("who owns X, all the way up") is answered by walking `edges` from
 the target node until none remain — the whole graph is in this one payload.
 
+## Render an arbitrary relation graph
+
+Same tree renderer as `discovery map`/`--diff`, but for a graph that has nothing
+to do with claims — e.g. one assembled by hand, by another tool, or by merging
+`discovery map --json` with catalog-only nodes it doesn't track (`Resource`
+entities):
+
+```bash
+npx @firestartr/fs-forge-cli@{version} diagram print --file {graph.json}
+cat {graph.json} | npx @firestartr/fs-forge-cli@{version} diagram print
+```
+
+Local and offline — no `--org`, no network. Input is the same `RelationGraph`
+shape `discovery map --json`/`--diff --json` already produce:
+`{"nodes": [{"id", "kind", "name", "dangling?", "status?"}], "edges":
+[{"from", "to", "relation", "status?"}]}`. It's schema-validated; malformed
+JSON or a graph that fails the schema errors with a message instead of a
+crash or a silent misrender. A `kind` that isn't a real claim kind (the normal
+case here) renders with the generic fallback icon (`❓` / `[???]` with
+`--ascii`) — there's no per-kind custom icon for non-claim input. Reach for
+this only when the graph isn't claims data; `discovery map` is still the tool
+for an org's own topology.
+
 ## Claims-repo commands: read, edit, clone (network-bound)
 
 Unlike `create` (local, deterministic, no network), `edit` and `clone` read and
