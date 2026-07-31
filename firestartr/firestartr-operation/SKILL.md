@@ -20,9 +20,13 @@ over asking.
 
 **Tool preference:** always try `fs-forge-cli` first for a claim operation — it
 knows the schemas, the claims-map, and (via `edit`/`clone --commit`) how to land
-a change on its own. Fall back to raw `gh` (`reference/gh-cookbook.md`) only for
-what the CLI doesn't cover: the manual create-then-PR flow, Terraform module
-discovery, and any edit a claim's flags can't express.
+a change on its own. Exhaust what a command's own output already answers before
+reaching for another tool — a structured response (JSON, a rendered tree, a
+table) usually carries more than the one field the immediate question named.
+Fall back to raw `gh` (`reference/gh-cookbook.md`) only for what the CLI
+doesn't cover: the manual create-then-PR flow, Terraform module discovery, and
+any edit a claim's flags can't express — never to re-derive something already
+sitting in a prior response.
 
 ## Step 1 — Resolve the target platform
 

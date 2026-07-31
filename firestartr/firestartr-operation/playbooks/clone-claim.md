@@ -8,7 +8,8 @@ see `../reference/fs-forge-cookbook.md` for the invocation idiom.
 
 1. **Identify the source and the new name.** Source is `<Kind>-<source-name>`
    (an existing claim); `--from` below takes only the `<source-name>` part,
-   since `<Kind>` is already a separate argument. Confirm what should differ
+   since `<Kind>` is already a separate argument (short ID like `component`
+   or the full `ComponentClaim` — both work here). Confirm what should differ
    in the new one (the client rarely wants an exact duplicate — at minimum
    the name changes, usually also owner/visibility/members/etc.).
 2. **Read the source** (optional but recommended when you don't already know
@@ -26,7 +27,10 @@ see `../reference/fs-forge-cookbook.md` for the invocation idiom.
    `TFWorkspaceClaim`/`SecretsClaim` also need
    `--path claims/{...}/{new-name}.yaml` (the deterministic-path rule from
    `create-claim.md` applies here too). Fix any validation errors.
-5. **Show the diff to the client and get approval.**
+5. **Show the relation diff to the client and get approval.** `--diff` renders
+   the new claim's one-hop relation tree (add `--ascii` for plain-text icons,
+   `--json` for the structured form) — not a plain field diff
+   (`../reference/fs-forge-cookbook.md` has the format).
 6. **Re-run with `--commit`.** Read the cookbook's `--commit` warning first —
    it commits *and* provisions *and* hydrates the new claim in one shot;
    nothing else to do afterward unless the client asks for status or a manual

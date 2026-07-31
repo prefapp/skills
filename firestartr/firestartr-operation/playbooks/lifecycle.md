@@ -26,7 +26,9 @@ Two landing paths — pick by how the claim was produced:
 1. **Capture the goal as an issue** — same as the manual flow's step 0 below,
    for the audit trail.
 2. **Dry-run** the `edit`/`clone` command with `--diff` (no `--commit`); fix
-   any validation errors; show the diff to the client and get approval.
+   any validation errors; show the relation diff to the client (a one-hop
+   tree, not a field diff — `../reference/fs-forge-cookbook.md`) and get
+   approval.
 3. **Re-run with `--commit`.** Per the cookbook's `--commit` warning, this one
    command creates the branch, commits the claim, opens/merges the PR,
    dispatches and waits for hydration, and merges the resulting wet PR — all
