@@ -30,8 +30,12 @@ config found — let's set one up") and treat it as unset. Never migrate or
 carry forward old values silently.
 
 **Path resolution.** Normalize the current working directory (expand `~`,
-strip any trailing slash) and match it against every `paths` entry across
-every organization by longest prefix. That organization is the target.
+strip any trailing slash) and normalize every organization's `paths` entries
+the same way before comparing — stored paths may be in `~`-form. Match on
+path-segment boundaries: a stored path matches when it equals the directory
+or is a prefix of it ending on a `/` (so `/home/me/proj` never matches
+`/home/me/projectX`). The organization with the longest matching path is the
+target.
 
 - **Ambiguity** (two organizations tie — only reachable by hand-editing the
   file inconsistent): show the whole file highlighting the conflict, ask the
@@ -53,7 +57,8 @@ every organization by longest prefix. That organization is the target.
    or a different path.
 4. Show-before-write.
 
-**Show-before-write:** before writing any change to `firestartr-config.yaml`,
+**Show-before-write:** before writing any change to `firestartr-config.yaml`
+— collapsing any path back to `~`-form when it's under the home directory —
 display the whole resulting file and wait for confirmation. Declining writes
 nothing; the same prompt reappears next run. Warn, don't block, if a new path
 doesn't exist on disk yet.
