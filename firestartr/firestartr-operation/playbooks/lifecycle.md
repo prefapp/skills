@@ -29,15 +29,11 @@ Two landing paths — pick by how the claim was produced:
    any validation errors; show the relation diff to the client (a one-hop
    tree, not a field diff — `../reference/fs-forge-cookbook.md`) and get
    approval.
-3. **Re-run with `--commit`.** Per the cookbook's `--commit` warning, this one
-   command creates the branch, commits the claim, opens/merges the PR,
-   dispatches and waits for hydration, and merges the resulting wet PR — all
-   without further input.
-4. **Report the outcome to the client.** Do **not** poll for the workflow, run
-   a separate hydrate, or merge a wet PR yourself — it already happened. If
-   the client asks for status, check the dispatched `provision-claim.yaml`
-   run; only trigger a manual hydrate (manual flow's step 5) if they
-   explicitly ask for one.
+3. **Re-run with `--commit`** — see the cookbook's `--commit` warning.
+4. **Report the outcome.** Don't poll, hydrate, or merge the wet PR yourself
+   — `--commit` already did it. Status check: the dispatched
+   `provision-claim.yaml` run. Manual hydrate only if the client explicitly
+   asks (manual flow step 5).
 5. **Close the audit-trail issue**, linking the merged claim PR in the closing
    comment. `--commit`'s auto-generated PR has no `Closes #N` footer (there's
    no flag for it), so the issue is only linked back to the change if you do

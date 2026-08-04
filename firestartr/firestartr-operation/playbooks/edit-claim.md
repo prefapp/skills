@@ -18,10 +18,7 @@ isn't reachable through `edit`'s flags.
 4. **Show the relation diff to the client and get approval.** `--diff` renders
    the one-hop relation tree around the claim with `+`/`-`/`~` markers, not a
    plain field diff (`../reference/fs-forge-cookbook.md` has the format).
-5. **Re-run with `--commit`.** Read the cookbook's `--commit` warning first —
-   it commits *and* provisions *and* hydrates the claim in one shot; there is
-   nothing left to do afterward unless the client asks for status or a manual
-   re-hydrate.
+5. **Re-run with `--commit`** — see the cookbook's `--commit` warning.
 
 Array fields (e.g. `members`) are **replaced**, not appended to — always
 compute the full desired array from what step 1 read before passing it.
