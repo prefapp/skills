@@ -31,11 +31,8 @@ see `../reference/fs-forge-cookbook.md` for the invocation idiom.
    the new claim's one-hop relation tree (add `--ascii` for plain-text icons,
    `--json` for the structured form) — not a plain field diff
    (`../reference/fs-forge-cookbook.md` has the format).
-6. **Re-run with `--commit`.** Read the cookbook's `--commit` warning first —
-   it commits *and* provisions *and* hydrates the new claim in one shot;
-   nothing else to do afterward unless the client asks for status or a manual
-   re-hydrate. `clone --commit` also errors on its own if `<Kind>-<new-name>`
-   already exists — no separate uniqueness check needed.
+6. **Re-run with `--commit`** — see the cookbook's `--commit` warning (it
+   also covers the uniqueness check `clone --commit` runs on its own).
 
 Array fields (e.g. `members`, `additionalRules`) come across **as-is** from the
 source unless you override them; overriding replaces the whole array (see the

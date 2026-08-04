@@ -49,17 +49,19 @@ keeps it up to date automatically.
 Invoke `/firestartr-operation` (or explicitly ask your agent to use the
 `firestartr-operation` skill), then just describe what you want.
 
-On first run the skill asks for your organization name and writes a
+On first run the skill asks for your organization's GitHub org slug and
+proposes your current directory as its `paths` entry, then writes a
 git-ignored `firestartr-config.yaml` beside `SKILL.md` — nothing
-client-specific is ever committed. Subsequent runs skip the question. To set
-or fix the config yourself, copy `firestartr-config.example.yaml` to
-`firestartr-config.yaml` and fill it in:
-
-- `organization.name` — your bootstrapped GitHub org (required)
-- `cli_version` — pin the CLI to a specific version (optional; the latest
-  stable release is resolved automatically otherwise)
-- `claims_repo`, `state_github_repo`, `state_infra_repo`, `catalog_repo` —
-  only if your platform deviates from the standard layout (optional)
+client-specific is ever committed. The whole file is shown to you before it's
+written. Subsequent runs from that folder skip the question; running the
+skill from a folder it doesn't recognize offers to attach it to an existing
+organization or create a new one, so you can work across several
+Firestartr-managed platforms from one install. A missing, empty, or
+unrecognized-shape config — including the old single-organization format —
+is never migrated or carried forward; the skill treats it as unset and walks
+you through setup fresh. To set or fix the config yourself, copy
+`firestartr-config.example.yaml` to `firestartr-config.yaml` and fill it in
+per the schema in `reference/config-schema.md`.
 
 If details are missing from your request, the skill interviews you one
 question at a time, each with a recommended answer — it prefers exploring the
@@ -67,8 +69,9 @@ repos over asking.
 
 ## ⚙️ How it works
 
-1. 🔍 **Resolve** — the skill reads `firestartr-config.yaml` to pin down your
-   org, claims repo, and CLI version.
+1. 🔍 **Resolve** — the skill reads `firestartr-config.yaml`, matches your
+   current directory against each organization's registered `paths` (longest
+   prefix wins), and pins down your org, claims repo, and CLI version.
 2. 🧭 **Classify** — your request is mapped to one of its playbooks (create,
    clone, edit, delete, reconcile, browse).
 3. 🛠️ **Execute** — changes land through `fs-forge-cli` when possible, falling

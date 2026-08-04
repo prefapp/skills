@@ -46,71 +46,46 @@ since `create` never lands the change on its own.
 
 ## Repository → ComponentClaim  →  `claims/components/{name}.yaml`
 
-**Ask for:** description, owner (a team or user), system (default
-`system:default-system`), visibility (default private), branch strategy (default
-`none`), features to install (default none).
+**Ask for:** description, owner, system (default `system:default-system`),
+visibility (default private), branch strategy (default `none`), features
+(default none).
 
-**Verify first:** the referenced `owner` group and `system` exist; if not, offer to
-create them in the same change. **Never** use `system:firestartr` unless the client
-explicitly names it.
+**Verify first:** `owner` and `system` exist; offer to create them if not.
+Never use `system:firestartr` unless the client names it.
 
-**Default flag values** (see `../reference/reference.md`; these are logical
-values, not literal CLI flag names): `type=service`, `lifecycle=production`,
-GitHub provider `visibility=private`, `branchStrategy.name=none`,
-`branchStrategy.defaultBranch=main`, `allowAutoMerge=true`,
-`deleteBranchOnMerge=true`, `sync.enabled=true`, `sync.period=24h`. Map each to
-its discovered FlagSpec path and `name`.
+Default flag values: `../reference/reference.md`.
 
-For `features`, use the repeatable `--feature 'name@version:{...}'` /
-`--feature 'name#ref:{...}'` inline flag (see `../reference/fs-forge-cookbook.md`
-→ "Feature CRUD") instead of the general `.json` escape hatch — one flag per
-Feature, quoted so the shell doesn't split on the JSON, with `{...}` a raw
-JSON `args` object that may be omitted. This skips schema validation of
-`args`; run `validate` with `--source`/`--refresh` afterward to check them
-against each Feature's latest schema.
+`features`: use the repeatable `--feature 'name@version:{...}'` or
+`--feature 'name#ref:{...}'` inline flag (`../reference/fs-forge-cookbook.md` →
+"Feature CRUD"), not the `.json` escape hatch — one per Feature. Skips
+schema validation; run `validate --source`/`--refresh` after.
 
 ## User → UserClaim  →  `claims/users/{name}.yaml`
 
-**Ask for:** display name, email, role (`admin`/`member`, default `member`), and
-which teams to add them to.
+**Ask for:** display name, email, role (`admin`/`member`, default `member`),
+teams to add.
 
-If teams are named, add the user to each `GroupClaim`'s root-level `members` in the
-**same** PR (see `edit-claim`), and hydrate the user before the groups.
+Teams named → add the user to each `GroupClaim`'s root-level `members` in the
+**same** PR (`edit-claim`), hydrate the user before the groups.
 
-**Default flag values:** GitHub provider `role=member`, `sync.enabled=true`,
-`sync.period=24h`; map each to its discovered FlagSpec path and `name`.
+Default flag values: `../reference/reference.md`.
 
 ## Team → GroupClaim  →  `claims/groups/{name}.yaml`
 
-A group may be created with **no members** — `members` is optional. Omit the
-`members` flag entirely for an empty team; only pass it when the client names members.
+`members` is optional — omit the flag for an empty team, only pass it when
+the client names members.
 
-Do **not** set `sync` unless the client explicitly asks for it.
+Don't set `sync` unless the client asks.
 
-If the desired team name isn't a valid slug (uppercase, spaces, non-ASCII), see the
-naming normalization rules in `../reference/reference.md`: `name` gets the slug,
-`profile.displayName` and `providers.github.name` keep the original.
+Non-slug name (uppercase, spaces, non-ASCII): naming normalization rules in
+`../reference/reference.md` — `name` gets the slug, `profile.displayName`/
+`providers.github.name` keep the original.
 
-**Default flag values:** `type=business-unit`, GitHub provider
-`privacy=closed`; map each to its discovered FlagSpec path and `name`.
+Default flag values: `../reference/reference.md`.
 
 ## Other kinds
 
 Same flow — discover flags, fill from client answers + policy defaults,
-`npx @firestartr/fs-forge-cli@{version} create`,
-`npx @firestartr/fs-forge-cli@{version} validate -f`. Pull defaults from
-`../reference/reference.md`:
-
-- **SystemClaim** `claims/systems/` — `domain=domain:{org}-domain`.
-- **DomainClaim** `claims/domains/` — top-level business area; no special defaults.
-- **SecretsClaim** `claims/secrets/` — `lifecycle=production`, external-secrets
-  provider `refreshInterval=24h`.
-- **OrgWebhookClaim** `claims/orgwebhooks/` — GitHub-provider
-  `webhook.active=true`, `webhook.contentType=json`.
-- **TFWorkspaceClaim** `claims/tfworkspaces/` — Terraform-provider
-  `source=remote`, `policy=apply`, `sync.policy=observe`, `sync.period=24h`,
-  `sync.enabled=true`, `backend=firestartr-terraform-state`. For a **remote**
-  module, discover it from `prefapp/tfm` (always the `prefapp` org, regardless of
-  client's org): list
-  modules, read the module's `variables.tf` for inputs, pin the latest
-  `{module}-vX.Y.Z` tag. Commands in `../reference/gh-cookbook.md`.
+`create`, `validate -f`. Paths, default flag values, and TFWorkspaceClaim's
+remote-module discovery are all in `../reference/reference.md`. DomainClaim
+has no special defaults.

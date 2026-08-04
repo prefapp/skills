@@ -6,62 +6,86 @@ disable-model-invocation: true
 
 # Firestartr Operation
 
-You operate a Prefapp-managed Firestartr platform on behalf of a client developer
-who describes what they want in plain language. Turn that request into the right
-platform change, executed safely — the client never has to know how the platform
-is structured internally.
+Turn a client's plain-language platform request into the right change, executed
+safely. The client never hears "claim" or sees platform internals. Run these
+steps in order.
 
-Run these steps in order.
+**Asking the client:** use `grilling` if available — one question at a time,
+each with a recommended answer. Prefer exploring the repos over asking.
 
-**Asking the client:** whenever you need to ask the client anything, if a
-`grilling` skill is present in your available skills, use it to drive the questions
-— one at a time, each with your recommended answer. Prefer exploring the repos
-over asking.
-
-**Tool preference:** always try `fs-forge-cli` first for a claim operation — it
-knows the schemas, the claims-map, and (via `edit`/`clone --commit`) how to land
-a change on its own. Exhaust what a command's own output already answers before
-reaching for another tool — a structured response (JSON, a rendered tree, a
-table) usually carries more than the one field the immediate question named.
-Fall back to raw `gh` (`reference/gh-cookbook.md`) only for what the CLI
-doesn't cover: the manual create-then-PR flow, Terraform module discovery, and
-any edit a claim's flags can't express — never to re-derive something already
-sitting in a prior response.
+**Tool preference:** try `fs-forge-cli` first — it knows the schemas, the
+claims-map, and lands changes itself via `edit`/`clone --commit`. Read a
+command's own output fully before reaching for another tool. Fall back to raw
+`gh` (`reference/gh-cookbook.md`) only for what the CLI can't do: manual
+create-then-PR, Terraform module discovery, edits its flags can't express.
 
 ## Step 1 — Resolve the target platform
 
-Read `firestartr-config.yaml` from this skill's directory.
+Read `firestartr-config.yaml` from this skill's directory — schema:
+`reference/config-schema.md`.
 
-- If it exists and `organization.name` is a concrete value (not `{organization}`,
-  empty, or missing), use it. `claims_repo` is `{org}/claims` unless the file
-  overrides it.
-- If it is **missing or unresolved**, this is a first-time setup: ask the client
-  for their organization name (and claims repo full-name if it differs from
-  `{org}/claims`), then write `firestartr-config.yaml` from the shape in
-  `firestartr-config.example.yaml`. Do this once; subsequent runs skip the question.
+If the file is missing, empty, or doesn't match that schema (e.g. the old
+single `organization: { name }` shape), tell the client (e.g. "no usable
+config found — let's set one up") and treat it as unset. Never migrate or
+carry forward old values silently.
 
-Do not touch any repository until the organization resolves to a concrete value.
+**Path resolution.** Normalize the current working directory (expand `~`,
+strip any trailing slash) and normalize every organization's `paths` entries
+the same way before comparing — stored paths may be in `~`-form. Match on
+path-segment boundaries: a stored path matches when it equals the directory
+or is a prefix of it ending on a `/` (so `/home/me/proj` never matches
+`/home/me/projectX`). The organization with the longest matching path is the
+target.
 
-**Resolve the CLI version** after the organization is known:
-1. If `cli_version` is set in `firestartr-config.yaml`, use that value as `{version}`.
-2. Otherwise, run:
+- **Ambiguity** (two organizations tie — only reachable by hand-editing the
+  file inconsistent): show the whole file highlighting the conflict, ask the
+  client which organization should own that path, remove it from the losing
+  entry, show-before-write.
+- **No match** (unset, or the directory matches nothing registered): present
+  a numbered list of configured organization names plus "new organization"
+  (the only option when unset). Existing org → append the current directory
+  to its `paths`, show-before-write. "New organization" → the flow below. The
+  client may decline instead; nothing is written, the same prompt reappears
+  next run.
+
+**New-organization flow:**
+1. Ask for the GitHub org slug (`name`).
+2. Ask once: do the repos follow the default names (`{name}/claims`,
+   `{name}/state-github`, `{name}/state-infra`, `{name}/catalog`)? Collect
+   overrides for any that differ.
+3. Propose the current directory as the `paths` entry; wait for confirmation
+   or a different path.
+4. Show-before-write.
+
+**Show-before-write:** before writing any change to `firestartr-config.yaml`
+— collapsing any path back to `~`-form when it's under the home directory —
+display the whole resulting file and wait for confirmation. Declining writes
+nothing; the same prompt reappears next run. Warn, don't block, if a new path
+doesn't exist on disk yet.
+
+Do not touch any repository until the organization resolves to a concrete
+value.
+
+**Resolve the CLI version** once the organization is known:
+1. If `cli_version` is set, use it as `{version}`.
+2. Otherwise:
    ```bash
    npm dist-tag ls @firestartr/fs-forge-cli | awk '$1 == "latest:" { print $2 }'
    ```
-   If the result is empty or contains `snapshot`, no stable release is available:
-   list all published versions with `npm view @firestartr/fs-forge-cli versions`,
-   ask the client to choose one, then persist the choice as `cli_version` in
-   `firestartr-config.yaml` before proceeding.
+   Empty or `snapshot` → no stable release: list versions with
+   `npm view @firestartr/fs-forge-cli versions`, ask the client to pick one,
+   persist as `cli_version` (show-before-write).
 
-Emit a single line confirming the resolved context, e.g.:
-> `Using org: prefapp-demo | fs-forge: 0.1.0`
+Emit one line confirming the resolved context, e.g.:
+> `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 0.1.0`
 
-**Completion:** you hold a concrete `{org}`, `{claims_repo}`, and `{version}`.
+**Completion:** you hold a concrete `{org}`, `{claims_repo}`, `{version}`, and
+the matched path.
 
 ## Step 2 — Classify the intent
 
-Map the request to one or more playbooks in `playbooks/`. A mutating request always
-loads `lifecycle` in addition to its authoring playbook.
+Map the request to one or more playbooks in `playbooks/`. A mutating request
+always loads `lifecycle` in addition to its authoring playbook.
 
 | The client wants to… | Load |
 |---|---|
@@ -77,21 +101,20 @@ loads `lifecycle` in addition to its authoring playbook.
 | know who owns a service, what's in a system, or browse/search topology | `catalog` |
 | know a field, default, feature, or naming rule | `reference/reference.md` |
 
-Pick the claim **kind** yourself from the intent — the client never chooses one:
-repo → ComponentClaim, team → GroupClaim, user → UserClaim, and so on
-(`reference/reference.md` has the full kind↔intent map). If the intent is ambiguous,
-ask one clarifying question before proceeding.
+Pick the claim **kind** from the intent yourself — the client never chooses
+one (`reference/reference.md` has the full kind↔intent map). Ask one
+clarifying question if the intent is ambiguous.
 
 **Completion:** you know which playbook(s) this request needs.
 
 ## Step 3 — Load and execute
 
-Read the chosen playbook file(s) from `playbooks/` and follow them end to end.
-`reference/reference.md`, `reference/fs-forge-cookbook.md`, and `reference/gh-cookbook.md`
-are pulled in on demand when a playbook points at them. Report
-back to the client in their own terms — repos, teams, users, PRs — never the word
-"claim."
+Read the chosen playbook file(s) from `playbooks/` and follow them end to
+end. `reference/reference.md`, `reference/fs-forge-cookbook.md`, and
+`reference/gh-cookbook.md` are pulled in on demand when a playbook points at
+them. Report back to the client in their own terms — repos, teams, users,
+PRs — never the word "claim."
 
-**Completion:** the change is landed — fs-forge-managed (`--commit` dispatched and
-reported) or manual (PR merged, hydrated, state PR merged) — or the question is
-answered, and the client has a plain-language summary.
+**Completion:** the change is landed — fs-forge-managed (`--commit`
+dispatched and reported) or manual (PR merged, hydrated, state PR merged) —
+or the question is answered, and the client has a plain-language summary.
