@@ -55,8 +55,8 @@ Never use `system:firestartr` unless the client names it.
 
 Default flag values: `../reference/reference.md`.
 
-`features`: use the repeatable `--feature 'name@version:{...}'` /
-`'name#ref:{...}'` inline flag (`../reference/fs-forge-cookbook.md` →
+`features`: use the repeatable `--feature 'name@version:{...}'` or
+`--feature 'name#ref:{...}'` inline flag (`../reference/fs-forge-cookbook.md` →
 "Feature CRUD"), not the `.json` escape hatch — one per Feature. Skips
 schema validation; run `validate --source`/`--refresh` after.
 
