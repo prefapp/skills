@@ -72,7 +72,6 @@ Run the local test entrypoints from the repository root:
 
 ```sh
 ./tests/test_install.sh
-./tests/test_firestartr_operation.sh
 ```
 
 ### Opt-in: Firestartr operational skill set
