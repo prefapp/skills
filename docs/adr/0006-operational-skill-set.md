@@ -43,5 +43,5 @@ The workflow charter stays untouched. Clients get one command; Prefapp developer
 maintain single-sourced playbooks. No client-specific data can be committed (it's
 git-ignored). The install default is unaffected, so developers who don't opt in
 never see the operational group. Conformance of the skill markdown to
-`writing-great-skills` is checked via the `review` skill, not unit tests; the one
+`writing-for-agents` is checked via the `review` skill, not unit tests; the one
 automated check covers the `install.sh` opt-in seam (`tests/test_install.sh`).

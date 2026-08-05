@@ -3,7 +3,7 @@
 Write `SKILL.md` and the reference/playbook files a skill discloses (anywhere
 in `skills/` or `firestartr/`) with the minimum text an agent needs to
 understand the concepts and carry out the tasks — no more. See
-`skills/writing-great-skills/SKILL.md` for the pruning technique (no-ops,
+`skills/writing-for-agents/SKILL.md` for the pruning technique (no-ops,
 sediment, single source of truth).
 
 This does not apply to files written for a human reader — `README.md` (root
