@@ -1,7 +1,8 @@
 # Create Claim Playbook
 
-Author a new claim body via `fs-forge`, then hand off to `lifecycle` to land it.
-Apply defaults from `../reference/reference.md` before calling fs-forge. File path is
+Author a new claim body via `fs-forge`, then land it — immediately via
+`--commit`, or as an offline file handed to `lifecycle`'s manual flow. Apply
+defaults from `../reference/reference.md` before calling fs-forge. File path is
 `claims/{dir}/{name}.yaml` in the claims repo (see the kind table in
 `../reference/reference.md`). Read `../reference/fs-forge-cookbook.md` before
 invoking fs-forge.
@@ -11,8 +12,7 @@ and the generated file for approval, then run the `lifecycle` create flow.
 
 If the client wants "one like an existing X but with Y different", use
 `clone-claim` instead. For a **repo** specifically, check `clone-claim.md`'s
-"When to clone vs. create" first — it's the default there, not the exception,
-since `create` never lands the change on its own.
+"When to clone vs. create" first — it's the default there, not the exception.
 
 ## General flow (all kinds)
 
@@ -22,27 +22,63 @@ since `create` never lands the change on its own.
    ```
    Map client answers + policy defaults from `../reference/reference.md` onto the
    logical claim-field paths returned in the FlagSpec. **Never hardcode a CLI flag
-   name** — derive the `name` from the FlagSpec for each value.
+   name** for a schema field — derive the `name` from the FlagSpec for each value
+   (`../reference/fs-forge-mutation-shared.md` lists the fixed flags that are safe to
+   hardcode).
 
-2. **Create the claim file:**
+2. **Pre-check uniqueness:** confirm `<Kind>-<name>` doesn't already exist
+   (`../reference/fs-forge-discovery.md`'s discovery commands) before building a
+   plan — tell the client and suggest `edit` instead if it does.
+
+3. **Build the claim, previewing its relation tree, in one invocation:**
    ```bash
    npx @firestartr/fs-forge-cli@{version} create <Kind> \
-     --<org-flag>={org} \
+     --org={org} \
+     --<schema-org-flag>={org} \
      --<flag>=<value> \
      ... \
-     -o claims/{dir}/{name}.yaml
+     --diff \
+     > claims/{dir}/{name}.yaml
    ```
-   For complex arrays and union values, write the value to a temporary JSON file
-   and use the `name` from the relevant FlagSpec for its `.json` escape-hatch
-   flag. Pass that discovered flag name verbatim; never construct or hardcode it.
-
-3. **Validate:**
+   `--org` is the control-plane flag (harmless here, required once step 5
+   adds `--commit`); `--<schema-org-flag>` is the kind's own schema org
+   field, if it has one — both are explained in
+   `../reference/fs-forge-mutation-shared.md`'s "{org} passthrough". There's no
+   output flag — the redirect above is the only way to save it. `--diff`
+   prints the new claim's one-hop relation tree to stderr with no "before"
+   side (same renderer as `discovery map`) and combines with the redirect in
+   one call; add `--json` (requires `--diff`) for the structured graph or
+   `--ascii` for bracket icons. TFWorkspaceClaim/
+   SecretsClaim also need `--path claims/{...}/{name}.yaml` (rejected for
+   every other kind; only required once `--commit` is added). For complex
+   arrays and union values, write the value to a temporary JSON file and use
+   the `name` from the relevant FlagSpec for its `.json` escape-hatch flag —
+   pass that discovered name verbatim, never construct or hardcode it. Then
+   validate:
    ```bash
    npx @firestartr/fs-forge-cli@{version} validate -f claims/{dir}/{name}.yaml
    ```
    Fix any errors before proceeding.
 
-4. Show the generated file to the client for approval, then run the `lifecycle` flow.
+4. **Offer to preview the org's repo-level claim defaults** — needs network
+   and `--org`, so skip it if the client wants a fully offline artifact and
+   declines. `create` never applies these itself, committed or not:
+   ```bash
+   npx @firestartr/fs-forge-cli@{version} defaults apply -f claims/{dir}/{name}.yaml --org={org}
+   ```
+   Compare its output against step 3's file and tell the client what the
+   platform will additionally fill in (`../reference/fs-forge-mutation-shared.md` →
+   "Claim defaults"), distinct from the file itself.
+
+5. **Show the client the file, its relation tree, and any defaults preview,
+   then land it:**
+   - **Landing now** — re-run step 3's command **without the redirect** (so
+     its output — including the dispatched provisioning URL — stays
+     visible) with `--commit` appended (see
+     `../reference/fs-forge-mutation-shared.md`'s `--commit` warning); the
+     `lifecycle` playbook's fs-forge-managed flow takes it from there.
+   - **Offline artifact instead** — hand off step 3's validated file to
+     `lifecycle`'s manual flow.
 
 ## Repository → ComponentClaim  →  `claims/components/{name}.yaml`
 
@@ -56,7 +92,7 @@ Never use `system:firestartr` unless the client names it.
 Default flag values: `../reference/reference.md`.
 
 `features`: use the repeatable `--feature 'name@version:{...}'` or
-`--feature 'name#ref:{...}'` inline flag (`../reference/fs-forge-cookbook.md` →
+`--feature 'name#ref:{...}'` inline flag (`../reference/fs-forge-features.md` →
 "Feature CRUD"), not the `.json` escape hatch — one per Feature. Skips
 schema validation; run `validate --source`/`--refresh` after.
 

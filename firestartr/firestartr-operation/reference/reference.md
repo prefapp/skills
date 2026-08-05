@@ -48,23 +48,34 @@ GitHub-backed kinds) `providers.github.name` — GitHub teams accept Unicode.
 
 fs-forge validates syntax only (schema, types, enums) — via `npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}`.
 `edit`/`clone` run this same validation automatically before `--commit` and
-refuse to commit an invalid claim; `clone` also checks name-uniqueness itself
-(errors if the target `<Kind>-<name>` already exists). The skill is still
-responsible for:
+refuse to commit an invalid claim; `clone --commit`/`create --commit` also
+check name-uniqueness themselves (error if the target `<Kind>-<name>` already
+exists). The skill is still responsible for:
 - **References** — `user:`/`group:`/`system:`/… values point at claims that
   actually exist.
-- **Uniqueness** — a `create` (file-based, no claims-map lookup) would not
-  duplicate an existing claim.
+- **Uniqueness** — `create` without `--commit` is file-based, no claims-map
+  lookup, so the skill must pre-check itself; the CLI's own guard on
+  `create --commit`/`clone --commit` (`fs-forge-mutation-shared.md`'s
+  `--commit` warning) doesn't replace this — pre-checking first is a
+  friendlier, earlier catch than waiting for that error.
 - **Naming normalization** — the slug, displayName, and github.name rules
   described above.
 
 ## Default flag values for new claims
 
+These are the skill's own portable, baked-in per-kind recommendations — a
+fallback starting point for `create`, not a live mirror of any org's actual
+configuration. For the org's real, current repo-level claim defaults
+(auto-applied by `edit`/`clone`, previewable for `create`; see
+`fs-forge-mutation-shared.md`'s "Claim defaults" section), run
+`npx @firestartr/fs-forge-cli@{version} defaults show <kind> --org={org}`.
+
 These are logical claim-field values, not literal CLI flag names. Map them to the
 matching FlagSpec paths and use each returned `name` when calling
 `npx @firestartr/fs-forge-cli@{version} create`.
-All default `version: "1.0"`. The `{org}` flag value (see `fs-forge-cookbook.md`)
-is resolved from `firestartr-config.yaml` and passed to the kind's org field flag.
+All default `version: "1.0"`. The `{org}` flag value (see
+`fs-forge-mutation-shared.md`) is resolved from `firestartr-config.yaml` and
+passed to the kind's org field flag.
 
 - **ComponentClaim**: `type: service`, `lifecycle: production`,
   `system: system:default-system` (never `system:firestartr` unless the client
@@ -130,6 +141,10 @@ Each entry: `name` + (`version` XOR `ref`), optional `repo`, `args`.
 `full-control` (create+update+delete+sync) → `apply` (create+update+sync, alias
 create-update-only) → `create-only` (create+sync) → `observe` (sync/plan only).
 The sync policy may never exceed the general policy.
+
+Repo-level claim defaults fill TFWorkspaceClaim's `sync` block
+all-or-nothing, not field-by-field — `fs-forge-mutation-shared.md`'s "Claim
+defaults" section has the rule.
 
 ## Claim → state mapping
 
