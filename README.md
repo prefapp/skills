@@ -25,7 +25,8 @@ Extracted from a proven, repo-specific skill set and generalized to work anywher
 | `research` | Delegate reading/investigation against primary sources to a background agent; capture findings as a Markdown file. |
 | `prototype` | Build throwaway code (logic TUI or UI variants) to answer a design question, then delete or absorb it. |
 | `handoff` | Compact the conversation into a handoff doc for another agent. |
-| `writing-great-skills` | Reference vocabulary + principles for authoring/editing skills predictably. |
+| `wizard` | Generate an interactive bash wizard that walks a human through steps only they can perform (credentials, third-party dashboards, migrations). |
+| `writing-for-agents` | Reference for writing any document an agent consumes — skills, `AGENTS.md`/`CLAUDE.md` — predictably. |
 
 ## Typical flow
 
@@ -44,8 +45,8 @@ setup-workflow            (once per repo)
 ```
 
 Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
-`improve-codebase-architecture`, `handoff`, `research`, `prototype`,
-`writing-great-skills`. For an effort too big to hold in one session, start with
+`improve-codebase-architecture`, `handoff`, `research`, `prototype`, `wizard`,
+`writing-for-agents`. For an effort too big to hold in one session, start with
 `wayfinder`. To move incoming issues/PRs through a triage state machine, use
 `triage`.
 
