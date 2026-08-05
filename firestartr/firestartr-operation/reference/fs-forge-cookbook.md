@@ -268,6 +268,21 @@ is new). `clone --commit` additionally errors if `<Kind>-<new-name>` already
 exists — no separate uniqueness check needed. See `../playbooks/clone-claim.md`
 for the full flow.
 
+## Discover the feature catalog
+
+```bash
+npx @firestartr/fs-forge-cli@{version} features discover --json
+npx @firestartr/fs-forge-cli@{version} features discover --readme <feature-name>
+npx @firestartr/fs-forge-cli@{version} features discover --schema <feature-name>@<feature-version>
+```
+
+Reads the Feature source (`--source`, defaults to `firestartr-pro/docs`), not
+a claim or component — no `--org`/`--commit`. `--json` lists every published
+feature with its latest version; `--readme` prints what a feature does;
+`--schema` prints its `args.*` FlagSpecs for `<feature-name>@<feature-version>`.
+`--versions <feature-name>`/`--changelog <feature-name>` are also available.
+Feeds `../playbooks/feature-advisor.md`.
+
 ## Feature CRUD (ComponentClaim only)
 
 Dedicated subcommands mutate one `features[]` entry at a time — no more
