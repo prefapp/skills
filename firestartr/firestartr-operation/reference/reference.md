@@ -112,23 +112,23 @@ RDS → `aws-rds`, EKS → `aws-eks` / `aws-eks`, AKS → `azure-aks`, VPC → `
 
 Each entry: `name` + (`version` XOR `ref`), optional `repo`, `args`.
 
-| Feature | Version | Purpose |
-|---|---|---|
-| claims_repo | 1.19.2 | hydrate / delete / import workflows |
-| catalog_repo | 1.3.2 | catalog hydration |
-| state_github | 1.2.0 | state-github hydration |
-| state_infra | 1.2.0 | state-infra hydration |
-| state_repo_apps | 3.8.3 | K8s app state repos (ArgoCD) |
+| Feature | Purpose |
+|---|
+| claims_repo | hydrate / delete / import workflows |
+| catalog_repo | catalog hydration |
+| state_github | state-github hydration |
+| state_infra | state-infra hydration |
+| state_repo_apps | K8s app state repos (ArgoCD) |
 | build_and_dispatch_docker_images | 5.3.2 | Docker CI/CD |
-| charts_repo | 1.4.3 | Helm charts |
-| tech_docs | 0.10.2 | technical docs |
-| release_please | 1.4.1 | automated releases |
-| issue_templates | 1.3.0 | issue templates |
-| terraform-infra | 1.8.2 | terraform infra |
-| state_repo | 2.2.2 | general state repo |
-| state_repo_sys_services | 2.3.8 | cluster sys-services state |
-| features_repo | 0.3.1 | features repo |
-| cloudfront_s3_build_and_deploy | 0.2.0 | CloudFront/S3 deploy |
+| charts_repo | Helm charts |
+| tech_docs | technical docs |
+| release_please | automated releases |
+| issue_templates | issue templates |
+| terraform-infra | terraform infra |
+| state_repo | general state repo |
+| state_repo_sys_services | cluster sys-services state |
+| features_repo | features repo |
+| cloudfront_s3_build_and_deploy | CloudFront/S3 deploy |
 
 ## Branch strategies
 
