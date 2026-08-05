@@ -31,9 +31,10 @@ manual.
    for the audit trail.
 2. **Dry-run** the `create`/`edit`/`clone` command with `--diff` (no
    `--commit`); fix any validation errors; show the relation diff to the
-   client (a one-hop tree, not a field diff — `../reference/fs-forge-discovery.md`)
+   client (a one-hop tree, not a field diff — `../reference/fs-forge-edit-clone.md`)
    and get approval.
-3. **Re-run with `--commit`** — see the cookbook's `--commit` warning.
+3. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
+   `--commit` warning.
 4. **Report the outcome.** Don't poll, hydrate, or merge the wet PR yourself
    — `--commit` already did it. Status check: the dispatched
    `provision-claim.yaml` run. Manual hydrate only if the client explicitly
