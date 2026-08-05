@@ -14,8 +14,8 @@ steps in order.
 each with a recommended answer. Prefer exploring the repos over asking.
 
 **Tool preference:** try `fs-forge-cli` first — it knows the schemas, the
-claims-map, and lands changes itself via `edit`/`clone --commit`. Read a
-command's own output fully before reaching for another tool. Fall back to raw
+claims-map, and lands changes itself via `create`/`edit`/`clone --commit`. Read
+a command's own output fully before reaching for another tool. Fall back to raw
 `gh` (`reference/gh-cookbook.md`) only for what the CLI can't do: manual
 create-then-PR, Terraform module discovery, edits its flags can't express.
 
@@ -79,6 +79,15 @@ value.
 Emit one line confirming the resolved context, e.g.:
 > `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 0.1.0`
 
+Before relying on `create --commit` or the `defaults` command family, confirm
+`{version}` actually has them — its own `--help`/`--help --json` output shows
+the flag/subcommand — rather than trusting a previously resolved or pinned
+version to still be current. Missing and unpinned: re-resolve latest and
+retry. Missing and pinned (`cli_version` set): tell the client the pin
+predates this capability and ask whether to bump it (show-before-write)
+before falling back to the older flow — never override an explicit pin
+silently.
+
 **Completion:** you hold a concrete `{org}`, `{claims_repo}`, `{version}`, and
 the matched path.
 
@@ -111,10 +120,10 @@ clarifying question if the intent is ambiguous.
 ## Step 3 — Load and execute
 
 Read the chosen playbook file(s) from `playbooks/` and follow them end to
-end. `reference/reference.md`, `reference/fs-forge-cookbook.md`, and
-`reference/gh-cookbook.md` are pulled in on demand when a playbook points at
-them. Report back to the client in their own terms — repos, teams, users,
-PRs — never the word "claim."
+end. Reference material in `reference/` — `reference.md`, `fs-forge-cookbook.md`
+and its topic-specific siblings, `gh-cookbook.md` — is pulled in on demand
+when a playbook points at it. Report back to the client in their own terms —
+repos, teams, users, PRs — never the word "claim."
 
 **Completion:** the change is landed — fs-forge-managed (`--commit`
 dispatched and reported) or manual (PR merged, hydrated, state PR merged) —

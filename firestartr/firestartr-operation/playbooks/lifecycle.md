@@ -6,10 +6,14 @@ All bash idioms live in `../reference/gh-cookbook.md`.
 
 Two landing paths — pick by how the claim was produced:
 
-- **fs-forge-managed** — `edit`/`clone --commit` (the primary path for
-  `edit-claim`/`clone-claim`). Go to "fs-forge-managed flow" below.
-- **Manual** — `create` (always), or a `gh`-based edit/clone fallback. Go to
-  "Manual flow" below.
+- **fs-forge-managed** — `create`/`edit`/`clone --commit`. The primary path
+  for `edit-claim`/`clone-claim`. Go to "fs-forge-managed flow" below.
+- **Manual** — `create` without `--commit`, or a `gh`-based edit/clone
+  fallback. Go to "Manual flow" below.
+
+For `create-claim`, the client's own choice of ending decides the path: landing
+immediately routes here to fs-forge-managed; an offline artifact routes to
+manual.
 
 ## Governance — read once, applies everywhere
 
@@ -21,15 +25,16 @@ Two landing paths — pick by how the claim was produced:
   `github_create_pr_with_changes`, `github_propose_changes_dry_run`, when
   present) are the fallback for what it doesn't cover.
 
-## fs-forge-managed flow (`edit`/`clone --commit`)
+## fs-forge-managed flow (`create`/`edit`/`clone --commit`)
 
 1. **Capture the goal as an issue** — same as the manual flow's step 0 below,
    for the audit trail.
-2. **Dry-run** the `edit`/`clone` command with `--diff` (no `--commit`); fix
-   any validation errors; show the relation diff to the client (a one-hop
-   tree, not a field diff — `../reference/fs-forge-cookbook.md`) and get
-   approval.
-3. **Re-run with `--commit`** — see the cookbook's `--commit` warning.
+2. **Dry-run** the `create`/`edit`/`clone` command with `--diff` (no
+   `--commit`); fix any validation errors; show the relation diff to the
+   client (a one-hop tree, not a field diff — `../reference/fs-forge-edit-clone.md`)
+   and get approval.
+3. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
+   `--commit` warning.
 4. **Report the outcome.** Don't poll, hydrate, or merge the wet PR yourself
    — `--commit` already did it. Status check: the dispatched
    `provision-claim.yaml` run. Manual hydrate only if the client explicitly
@@ -39,11 +44,12 @@ Two landing paths — pick by how the claim was produced:
    no flag for it), so the issue is only linked back to the change if you do
    it here.
 
-A `--commit` that fails (invalid claim, existing `fs-forge/{kind}-{name}`
-branch, etc.) surfaces as a CLI error before anything is dispatched — fix the
-reported problem and re-run.
+A `--commit` that fails (invalid claim, an already-existing target claim for
+`create`/`clone`, existing `fs-forge/{kind}-{name}` branch, etc.) surfaces as
+a CLI error before anything is dispatched — fix the reported problem and
+re-run.
 
-## Manual flow (`create`, or a `gh`-based edit/clone fallback)
+## Manual flow (`create` without `--commit`, or a `gh`-based edit/clone fallback)
 
 0. **Capture the goal as an issue** before touching branches. Fill in the issue
    template at `../templates/claim-issue.md` (client's terms, not "claim") and open

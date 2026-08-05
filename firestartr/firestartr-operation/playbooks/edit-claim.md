@@ -1,7 +1,7 @@
 # Edit Claim Playbook
 
 Change an existing claim, then land it via `lifecycle`. Prefer `fs-forge edit`
-over hand-editing the file — see `../reference/fs-forge-cookbook.md` for the
+over hand-editing the file — see `../reference/fs-forge-edit-clone.md` for the
 invocation idiom. Fall back to the manual `gh`-based edit only when a field
 isn't reachable through `edit`'s flags.
 
@@ -11,14 +11,17 @@ isn't reachable through `edit`'s flags.
    mutating flags prints the full current YAML.
 2. **Discover flags** for the target kind via
    `create <Kind> --help --json` (never `edit --help --json` — see the
-   cookbook).
+   cookbook's mutation-shared reference).
 3. **Dry-run** the change: same command with the relevant `--<flag>=<value>`
-   / `--unset <path>` and `--diff` (add `--ascii` for plain-text icons). Fix
-   any validation errors.
+   / `--unset <path>`, `--diff`, and `--show-defaults` (unconditionally — add
+   `--ascii` for plain-text icons). Fix any validation errors.
 4. **Show the relation diff to the client and get approval.** `--diff` renders
    the one-hop relation tree around the claim with `+`/`-`/`~` markers, not a
-   plain field diff (`../reference/fs-forge-cookbook.md` has the format).
-5. **Re-run with `--commit`** — see the cookbook's `--commit` warning.
+   plain field diff; `--show-defaults` adds the org's repo-level claim
+   defaults as a separate, labeled section
+   (`../reference/fs-forge-edit-clone.md` has the format for both).
+5. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
+   `--commit` warning.
 
 Array fields (e.g. `members`) are **replaced**, not appended to — always
 compute the full desired array from what step 1 read before passing it.
@@ -92,7 +95,7 @@ field's kind, level, and format.
 ## Features (ComponentClaim)
 
 Don't recompute the whole `features[]` array by hand — use the dedicated
-`features add`/`edit`/`remove`/`list` subcommands (`../reference/fs-forge-cookbook.md`
+`features add`/`edit`/`remove`/`list` subcommands (`../reference/fs-forge-features.md`
 → "Feature CRUD"), which mutate one reference at a time and derive `args.*`
 flags from the Feature's own schema. `add`/`edit`/`remove` each still need the
 same dry-run (without `--commit`) → client approval → `--commit` sequence as

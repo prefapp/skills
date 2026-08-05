@@ -2,7 +2,7 @@
 
 Create a new claim by copying an existing one and changing what differs, then
 land it via `lifecycle`. Prefer `fs-forge clone` over hand-copying a file —
-see `../reference/fs-forge-cookbook.md` for the invocation idiom.
+see `../reference/fs-forge-edit-clone.md` for the invocation idiom.
 
 ## Flow
 
@@ -22,32 +22,35 @@ see `../reference/fs-forge-cookbook.md` for the invocation idiom.
    npx @firestartr/fs-forge-cli@{version} clone <Kind> --org={org} \
      --from <source-name> --name <new-name> \
      --<flag>=<value> ... \
-     --diff
+     --diff --show-defaults
    ```
    `TFWorkspaceClaim`/`SecretsClaim` also need
    `--path claims/{...}/{new-name}.yaml` (the deterministic-path rule from
    `create-claim.md` applies here too). Fix any validation errors.
 5. **Show the relation diff to the client and get approval.** `--diff` renders
    the new claim's one-hop relation tree (add `--ascii` for plain-text icons,
-   `--json` for the structured form) — not a plain field diff
-   (`../reference/fs-forge-cookbook.md` has the format).
-6. **Re-run with `--commit`** — see the cookbook's `--commit` warning (it
-   also covers the uniqueness check `clone --commit` runs on its own).
+   `--json` for the structured form) — not a plain field diff; `--show-defaults`
+   (pass it unconditionally) adds the org's repo-level claim defaults as a
+   separate, labeled section (`../reference/fs-forge-edit-clone.md` has the
+   format for both).
+6. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
+   `--commit` warning (it also covers the uniqueness check `clone --commit`
+   runs on its own).
 
 Array fields (e.g. `members`, `additionalRules`) come across **as-is** from the
-source unless you override them; overriding replaces the whole array (see the
-cookbook), it doesn't merge with the source's values.
+source unless you override them; overriding replaces the whole array (see
+`../reference/fs-forge-mutation-shared.md`), it doesn't merge with the
+source's values.
 
 ## When to clone vs. create
 
 For a **repo** (ComponentClaim), clone by default — even when the client
-never said "like X". `create` has no `--commit`; it always falls through to
-lifecycle's manual PR/hydrate/state-merge flow. `clone --commit` lands the
-same change — branch, PR, hydrate, state PR — in one shot, and its fields
-(system, owner, features, …) inherit from a known-good existing component
-instead of risking an invalid default. Pick any component close enough in
-shape as `--from`; only fall back to `create-claim` when nothing in the org
-is worth diffing against.
+never said "like X". Both `clone --commit` and `create --commit` land the
+change the same way (branch, PR, hydrate, state PR, in one shot), but
+`clone`'s fields (system, owner, features, …) inherit from a known-good
+existing component instead of risking an invalid guess at defaults. Pick any
+component close enough in shape as `--from`; only fall back to `create-claim`
+when nothing in the org is worth diffing against.
 
 For every other kind, clone when the client wants "one like X but with Y
 different" and an existing claim already has most of the desired shape —
