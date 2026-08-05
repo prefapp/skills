@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 > **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it — repo rules override this skill.
 
-This skill takes the current conversation context and codebase understanding and produces a spec (you may know this document as a PRD). Do NOT run a fresh interview — synthesize what you already know, with at most the seam confirmation below.
+This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT run a fresh interview — synthesize what you already know, with at most the seam confirmation below.
 
 Specs and tickets live as GitHub issues in the current repo (use the `gh` CLI). For exact conventions, see [setup-workflow/issue-tracker-github.md](../setup-workflow/issue-tracker-github.md).
 
