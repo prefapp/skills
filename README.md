@@ -9,7 +9,7 @@ Extracted from a proven, repo-specific skill set and generalized to work anywher
 | Skill | What it does |
 |---|---|
 | `setup-workflow` | One-time repo bootstrap: detect doc layout (single vs multi-context), scaffold `CONTEXT`/`docs/adr`, wire routing. Run first on a fresh repo. |
-| `grilling` | Relentless one-question-at-a-time interview to stress-test a plan before building. |
+| `grilling` | Relentless round-by-round interview to stress-test a plan before building. |
 | `grill-with-docs` | `grilling` that also writes CONTEXT/ADRs as it goes (runs `domain-modeling`). |
 | `domain-modeling` | Build/sharpen the glossary + ADRs. Single- and multi-context aware. |
 | `codebase-design` | Deep-module vocabulary (module / interface / depth / seam) + testability principles. |

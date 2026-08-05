@@ -98,7 +98,7 @@ the skill.
 | Skill | Invocation | What it does |
 |---|---|---|
 | `setup-workflow` | explicit | One-time repo bootstrap: detect doc layout (single vs multi-context), scaffold `CONTEXT`/`docs/adr`, wire routing. Run first on a fresh repo. |
-| `grilling` | auto | One-question-at-a-time interview to stress-test a plan before building. |
+| `grilling` | auto | Round-by-round interview to stress-test a plan before building. |
 | `grill-with-docs` | explicit | `grilling` that also writes CONTEXT/ADRs as it goes (runs `domain-modeling`). |
 | `domain-modeling` | auto | Build/sharpen the glossary + ADRs. Single- and multi-context aware. |
 | `codebase-design` | auto | Deep-module vocabulary (module / interface / depth / seam) + testability. |
