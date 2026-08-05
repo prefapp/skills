@@ -34,7 +34,7 @@ If the client wants "one like an existing X but with Y different", use
    ```bash
    npx @firestartr/fs-forge-cli@{version} create <Kind> \
      --org={org} \
-     --<schema-org-flag>={org} \
+     [--<schema-org-flag>={org}] \
      --<flag>=<value> \
      ... \
      --diff \
