@@ -79,13 +79,14 @@ value.
 Emit one line confirming the resolved context, e.g.:
 > `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 0.1.0`
 
-Before relying on `create --commit` or the `defaults` command family, confirm
-`{version}` actually has them — its own `--help`/`--help --json` output shows
-the flag/subcommand — rather than trusting a previously resolved or pinned
-version to still be current. Missing and unpinned: re-resolve latest and
-retry. Missing and pinned (`cli_version` set): tell the client the pin
-predates this capability and ask whether to bump it (show-before-write)
-before falling back to the older flow — never override an explicit pin
+Before relying on `create --commit`, the `defaults` command family, or
+`delete`, confirm `{version}` actually has them — its own `--help`/`--help
+--json` output shows the flag/subcommand — rather than trusting a previously
+resolved or pinned version to still be current. Missing and unpinned:
+re-resolve latest and retry. Missing and pinned (`cli_version` set): tell the
+client the pin predates this capability and ask whether to bump it
+(show-before-write) before falling back to the older flow (`delete`'s is in
+`playbooks/lifecycle.md`'s Delete flow) — never override an explicit pin
 silently.
 
 **Completion:** you hold a concrete `{org}`, `{claims_repo}`, `{version}`, and
