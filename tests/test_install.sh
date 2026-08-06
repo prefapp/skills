@@ -38,4 +38,33 @@ run --all >/dev/null
 [ "$(readlink "$WORKFLOW_LINK")" = "$REPO_DIR/skills" ] || { echo "FAIL: --all workflow symlink wrong"; exit 1; }
 [ "$(readlink "$FIRESTARTR_LINK")" = "$REPO_DIR/firestartr" ] || { echo "FAIL: --all Firestartr symlink wrong"; exit 1; }
 
+# Claude Code gets one flat link per skill, never a namespace dir.
+reset
+mkdir -p "$TMP/.claude"
+run --all >/dev/null
+CLAUDE="$TMP/.claude/skills"
+[ ! -e "$CLAUDE/prefapp-workflow" ] || { echo "FAIL: claude got a namespace dir"; exit 1; }
+for src in "$REPO_DIR"/skills/*/ "$REPO_DIR"/firestartr/*/; do
+  src="${src%/}"
+  [ -f "$src/SKILL.md" ] || continue
+  name="$(basename "$src")"
+  [ "$(readlink "$CLAUDE/$name")" = "$src" ] || { echo "FAIL: claude link missing/wrong for $name"; exit 1; }
+  [ -f "$CLAUDE/$name/SKILL.md" ] || { echo "FAIL: claude link for $name does not resolve"; exit 1; }
+done
+
+# Re-running is idempotent and does not warn about its own links.
+ERR="$(HOME="$TMP" "$INSTALL" --all 2>&1 >/dev/null)"
+[ -z "$ERR" ] || { echo "FAIL: rerun warned: $ERR"; exit 1; }
+
+# An unrelated pre-existing skill dir is preserved, not clobbered.
+mkdir -p "$CLAUDE/review-mine" && rm -f "$CLAUDE/review"
+mkdir -p "$CLAUDE/review" && touch "$CLAUDE/review/SKILL.md"
+run --workflow >/dev/null 2>&1
+[ ! -L "$CLAUDE/review" ] || { echo "FAIL: clobbered a real skill dir"; exit 1; }
+
+# A link whose source vanished is cleaned up on the next run.
+ln -sfn "$REPO_DIR/skills/gone-away" "$CLAUDE/gone-away"
+run --workflow >/dev/null 2>&1
+[ ! -L "$CLAUDE/gone-away" ] || { echo "FAIL: stale link not removed"; exit 1; }
+
 echo "PASS: install.sh options"

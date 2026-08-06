@@ -86,7 +86,7 @@ installed separately or together with the workflow set:
 ```
 
 This creates a second namespace symlink `~/.agents/skills/prefapp-firestartr`
-(plus `~/.claude/skills/` if Claude Code is detected). On first use the skill asks
+(plus flat per-skill links in `~/.claude/skills/` if Claude Code is detected). On first use the skill asks
 for your organization and writes a git-ignored `firestartr-config.yaml`; nothing
 client-specific is ever committed.
 
@@ -105,15 +105,15 @@ client-specific is ever committed.
 ### Claude Code
 
 - Skills location: `~/.claude/skills/`
-- Install: `~/.claude/skills/prefapp-workflow → <repo>/skills`
-- Recursive discovery: **unconfirmed** — same caveat as OpenCode.
-
-  **Fallback:** create per-skill symlinks directly in the skills root:
-  ```sh
-  for skill in ~/work/prefapp/skills/skills/*/; do
-    ln -sfn "$skill" ~/.claude/skills/"$(basename "$skill")"
-  done
-  ```
+- Install: one symlink **per skill**, flat — `~/.claude/skills/tdd → <repo>/skills/tdd`
+- Recursive discovery: **no** — Claude Code only reads `<skills-root>/<skill>/SKILL.md`,
+  one level deep. A namespace-dir symlink hides everything inside it, so `install.sh`
+  links each skill individually here. Skill names therefore share one flat namespace
+  with your personal skills.
+- Re-running `install.sh` removes the old `prefapp-workflow` / `prefapp-firestartr`
+  namespace links and prunes per-skill links whose source is gone.
+- If a name is already taken by something that isn't ours, that skill is skipped with a
+  warning rather than overwritten. Rename or remove the existing one, then re-run.
 
 ## Getting the most out of these skills
 
