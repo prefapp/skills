@@ -43,12 +43,15 @@ tied to that repo's build). These stay behind in their home repo and are *not*
 extracted here.
 
 **Namespace dir**:
-The single nested directory (`prefapp-workflow/`) under a harness's skills
-location into which this repo is symlinked, so company skills never collide
-with a developer's personal skills.
+A single nested directory (`prefapp-workflow/`) under a harness's skills
+location, used by older versions of `install.sh`. Superseded by flat per-skill
+symlinks (see Install) because VS Code Copilot rejects namespaced skill
+`name:` values; `install.sh` still detects and removes stale namespace links
+left by those older versions.
 
 **Harness**:
-An agent runtime that discovers and runs skills — pi, OpenCode, or Claude Code.
+An agent runtime that discovers and runs skills — pi, OpenCode, Claude Code, or
+VS Code Copilot.
 
 **Upstream** (a.k.a. Matt's repo):
 `github.com/mattpocock/skills`, the repository our workflow set was generalized
@@ -142,15 +145,14 @@ issues/PRs through a triage state machine, use `triage`.
 ## Install
 
 Skills are **symlinked** (not copied) so `git pull` updates everyone instantly.
-They land in a `prefapp-workflow/` namespace dir under each harness's skills
-location:
+`install.sh` links each skill flat, one symlink per skill, directly into every
+harness's skills location — no namespace-dir wrapper:
 
-- pi: `~/.agents/skills/prefapp-workflow → <repo>/skills` (recursive discovery, confirmed)
-- OpenCode / Claude Code: same idea into their skills dir; recursion not yet
-  confirmed — README documents the per-harness config edge cases.
+- pi, OpenCode, VS Code Copilot: `~/.agents/skills/<skill> → <repo>/skills/<skill>`
+- Claude Code: same flat layout under `~/.claude/skills/`
 
-The **operational skill set** is opt-in: `./install.sh --fs` adds a second
-symlink `~/.agents/skills/prefapp-firestartr → <repo>/firestartr`. Use
+The **operational skill set** is opt-in: `./install.sh --fs` links each
+Firestartr skill the same way, from `<repo>/firestartr`. Use
 `--workflow` for the workflow set or `--all` for both; no arguments shows help.
 
 ## Decisions

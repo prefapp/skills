@@ -54,10 +54,10 @@ Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
 
 Run `./install.sh` from the repo root to see the available options. Use
 `--workflow` for the workflow set, `--fs` for the Firestartr operational skill,
-or `--all` for both. The selected skills are linked into the canonical
-`~/.agents/skills/` location — which both pi and OpenCode read — plus
-`~/.claude/skills/` if Claude Code is detected. `git pull` keeps everyone up to
-date automatically.
+or `--all` for both. The selected skills are linked, one flat symlink per
+skill, into the canonical `~/.agents/skills/` location — which pi, OpenCode,
+and VS Code Copilot all read — plus `~/.claude/skills/` if Claude Code is
+detected. `git pull` keeps everyone up to date automatically.
 
 ```sh
 git clone https://github.com/prefapp/skills.git ~/work/prefapp/skills
@@ -85,35 +85,46 @@ installed separately or together with the workflow set:
 ./install.sh --fs  # or: ./install.sh --all
 ```
 
-This creates a second namespace symlink `~/.agents/skills/prefapp-firestartr`
-(plus flat per-skill links in `~/.claude/skills/` if Claude Code is detected). On first use the skill asks
+This links each Firestartr skill flat into `~/.agents/skills/` (plus
+`~/.claude/skills/` if Claude Code is detected). On first use the skill asks
 for your organization and writes a git-ignored `firestartr-config.yaml`; nothing
 client-specific is ever committed.
 
 ## Per-harness discovery details
 
-### `~/.agents/skills` (canonical — always linked, covers pi + OpenCode)
+### `~/.agents/skills` (canonical — always linked, covers pi + OpenCode + VS Code Copilot)
 
 - Skills location: `~/.agents/skills/`
-- Workflow install: `~/.agents/skills/prefapp-workflow → <repo>/skills`
-- Recursive discovery: **confirmed** — nested directories are walked, so a single
-  namespace-dir symlink exposes every skill.
-- Both pi and OpenCode read this location, so no separate OpenCode symlink is
-  needed. (OpenCode also reads `~/.config/opencode/skills`, but `~/.agents/skills`
+- Install: one symlink **per skill**, flat — `~/.agents/skills/tdd → <repo>/skills/tdd`
+- pi and OpenCode discover skills recursively, so a namespace-dir symlink would
+  have worked for them; VS Code Copilot's discovery is strictly one level deep
+  (`<skills-root>/<skill>/SKILL.md`) and explicitly rejects namespaced `name`
+  values, so `install.sh` links each skill individually here too — one shared
+  behavior that all three harnesses agree on.
+  (OpenCode also reads `~/.config/opencode/skills`, but `~/.agents/skills`
   already covers it.)
+- Re-running `install.sh` removes any stale `prefapp-workflow` /
+  `prefapp-firestartr` namespace links left by older versions of this script,
+  and prunes per-skill links whose source is gone.
+- If a name is already taken by something that isn't ours, that skill is skipped with a
+  warning rather than overwritten. Rename or remove the existing one, then re-run.
+  The one exception: a real (non-symlink) directory whose own `SKILL.md`
+  frontmatter `name:` matches both the directory name and the managed skill
+  being installed (e.g. a stale manual-copy workaround) is recognized as ours
+  and replaced with the correct symlink automatically.
 
 ### Claude Code
 
 - Skills location: `~/.claude/skills/`
 - Install: one symlink **per skill**, flat — `~/.claude/skills/tdd → <repo>/skills/tdd`
 - Recursive discovery: **no** — Claude Code only reads `<skills-root>/<skill>/SKILL.md`,
-  one level deep. A namespace-dir symlink hides everything inside it, so `install.sh`
-  links each skill individually here. Skill names therefore share one flat namespace
+  one level deep. Skill names therefore share one flat namespace
   with your personal skills.
 - Re-running `install.sh` removes the old `prefapp-workflow` / `prefapp-firestartr`
   namespace links and prunes per-skill links whose source is gone.
-- If a name is already taken by something that isn't ours, that skill is skipped with a
-  warning rather than overwritten. Rename or remove the existing one, then re-run.
+- Same collision policy as `~/.agents/skills` above: an unrecognized name is
+  skipped with a warning; a stale manual-copy with a matching `SKILL.md`
+  `name:` is replaced automatically.
 
 ## Getting the most out of these skills
 
