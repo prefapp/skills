@@ -115,6 +115,20 @@ client-specific is ever committed.
 - If a name is already taken by something that isn't ours, that skill is skipped with a
   warning rather than overwritten. Rename or remove the existing one, then re-run.
 
+### VSCode Agent (GitHub Copilot)
+
+- Skills location: `~/.agents/skills/`
+- Install: one symlink **per skill**, flat — `~/.agents/skills/tdd → <repo>/skills/tdd`
+- Recursive discovery: **no** — VSCode Agent only reads `<skills-root>/<skill>/SKILL.md`,
+  one level deep. A namespace-dir symlink such as `prefapp-workflow/` hides every skill
+  inside it, so `install.sh` adds flat per-skill links alongside the namespace dir
+  whenever `code` is installed or `~/.vscode` exists. Skill names therefore share one
+  flat namespace with your personal skills.
+- The namespace dir is kept for pi/OpenCode compatibility; VSCode Agent ignores it.
+- Re-running `install.sh` prunes per-skill links whose source is gone.
+- If a name is already taken by something that isn't ours, that skill is skipped with a
+  warning rather than overwritten. Rename or remove the existing one, then re-run.
+
 ## Getting the most out of these skills
 
 - **Start every new repo with `setup-workflow`** to scaffold the domain doc layout the

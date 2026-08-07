@@ -52,19 +52,46 @@ for src in "$REPO_DIR"/skills/*/ "$REPO_DIR"/firestartr/*/; do
   [ -f "$CLAUDE/$name/SKILL.md" ] || { echo "FAIL: claude link for $name does not resolve"; exit 1; }
 done
 
+# VSCode Agent gets one flat link per skill directly in ~/.agents/skills.
+reset
+mkdir -p "$TMP/.vscode"
+run --all >/dev/null
+AGENTS="$TMP/.agents/skills"
+for src in "$REPO_DIR"/skills/*/ "$REPO_DIR"/firestartr/*/; do
+  src="${src%/}"
+  [ -f "$src/SKILL.md" ] || continue
+  name="$(basename "$src")"
+  [ "$(readlink "$AGENTS/$name")" = "$src" ] || { echo "FAIL: vscode flat link missing/wrong for $name"; exit 1; }
+  [ -f "$AGENTS/$name/SKILL.md" ] || { echo "FAIL: vscode flat link for $name does not resolve"; exit 1; }
+done
+# Namespace dirs must still coexist.
+[ "$(readlink "$AGENTS/prefapp-workflow")" = "$REPO_DIR/skills" ] || { echo "FAIL: namespace dir missing alongside flat links"; exit 1; }
+[ "$(readlink "$AGENTS/prefapp-firestartr")" = "$REPO_DIR/firestartr" ] || { echo "FAIL: firestartr namespace dir missing"; exit 1; }
+
 # Re-running is idempotent and does not warn about its own links.
 ERR="$(HOME="$TMP" "$INSTALL" --all 2>&1 >/dev/null)"
 [ -z "$ERR" ] || { echo "FAIL: rerun warned: $ERR"; exit 1; }
 
-# An unrelated pre-existing skill dir is preserved, not clobbered.
+# An unrelated pre-existing skill dir is preserved, not clobbered (Claude).
 mkdir -p "$CLAUDE/review-mine" && rm -f "$CLAUDE/review"
 mkdir -p "$CLAUDE/review" && touch "$CLAUDE/review/SKILL.md"
 run --workflow >/dev/null 2>&1
-[ ! -L "$CLAUDE/review" ] || { echo "FAIL: clobbered a real skill dir"; exit 1; }
+[ ! -L "$CLAUDE/review" ] || { echo "FAIL: clobbered a real skill dir (claude)"; exit 1; }
 
-# A link whose source vanished is cleaned up on the next run.
+# An unrelated pre-existing skill dir is preserved, not clobbered (VSCode Agent).
+rm -f "$AGENTS/review"
+mkdir -p "$AGENTS/review" && touch "$AGENTS/review/SKILL.md"
+run --workflow >/dev/null 2>&1
+[ ! -L "$AGENTS/review" ] || { echo "FAIL: clobbered a real skill dir (vscode)"; exit 1; }
+
+# A link whose source vanished is cleaned up on the next run (Claude).
 ln -sfn "$REPO_DIR/skills/gone-away" "$CLAUDE/gone-away"
 run --workflow >/dev/null 2>&1
-[ ! -L "$CLAUDE/gone-away" ] || { echo "FAIL: stale link not removed"; exit 1; }
+[ ! -L "$CLAUDE/gone-away" ] || { echo "FAIL: stale link not removed (claude)"; exit 1; }
+
+# A link whose source vanished is cleaned up on the next run (VSCode Agent).
+ln -sfn "$REPO_DIR/skills/gone-away" "$AGENTS/gone-away"
+run --workflow >/dev/null 2>&1
+[ ! -L "$AGENTS/gone-away" ] || { echo "FAIL: stale link not removed (vscode)"; exit 1; }
 
 echo "PASS: install.sh options"

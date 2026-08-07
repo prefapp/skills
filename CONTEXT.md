@@ -48,7 +48,7 @@ location into which this repo is symlinked, so company skills never collide
 with a developer's personal skills.
 
 **Harness**:
-An agent runtime that discovers and runs skills — pi, OpenCode, or Claude Code.
+An agent runtime that discovers and runs skills — pi, OpenCode, Claude Code, or VSCode Agent (GitHub Copilot).
 
 **Upstream** (a.k.a. Matt's repo):
 `github.com/mattpocock/skills`, the repository our workflow set was generalized

@@ -71,6 +71,39 @@ link_into_claude() {
   done
 }
 
+# VSCode Agent only discovers <skills-root>/<skill>/SKILL.md — one level deep,
+# so a namespace-dir symlink hides every skill inside it. Link each skill
+# individually, flat, directly under ~/.agents/skills — just as we do for Claude
+# Code. The namespace dir created by link_into_harnesses coexists harmlessly;
+# pi/OpenCode ignore the extra flat links because they walk recursively.
+link_into_vscode_agent() {
+  local src="$1" ns="$2" dest="$HOME/.agents/skills" skill name
+  mkdir -p "$dest"
+
+  # Drop per-skill links from previous runs whose source no longer exists.
+  for skill in "$dest"/*; do
+    [ -L "$skill" ] || continue
+    case "$(readlink "$skill")" in
+      "$src"/*) [ -e "$skill" ] || { rm -f "$skill"; echo "  agents(vscode): removed stale link ~/.agents/skills/$(basename "$skill")"; } ;;
+    esac
+  done
+
+  for skill in "$src"/*/; do
+    skill="${skill%/}"
+    name="$(basename "$skill")"
+    [ -f "$skill/SKILL.md" ] || continue
+    # Never clobber a real directory or a link owned by something else.
+    if [ -e "$dest/$name" ] || [ -L "$dest/$name" ]; then
+      if ! [ -L "$dest/$name" ] || [ "$(readlink "$dest/$name")" != "$skill" ]; then
+        echo "  agents(vscode): SKIP $name — ~/.agents/skills/$name already exists" >&2
+        continue
+      fi
+    fi
+    ln -sfn "$skill" "$dest/$name"
+    echo "  agents(vscode): ~/.agents/skills/$name → $skill"
+  done
+}
+
 # Link one source dir into every harness skills location under $namespace.
 link_into_harnesses() {
   local src="$1" ns="$2"
@@ -79,6 +112,9 @@ link_into_harnesses() {
   echo "  agents: ~/.agents/skills/$ns → $src"
   if command -v claude >/dev/null 2>&1 || [ -d "$HOME/.claude" ]; then
     link_into_claude "$src" "$ns"
+  fi
+  if command -v code >/dev/null 2>&1 || [ -d "$HOME/.vscode" ]; then
+    link_into_vscode_agent "$src" "$ns"
   fi
 }
 
