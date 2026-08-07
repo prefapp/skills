@@ -35,23 +35,34 @@ case "${1:-}" in
 esac
 [ "$#" -eq 1 ] || { echo "expected one option" >&2; usage >&2; exit 2; }
 
-# Claude Code only discovers <skills-root>/<skill>/SKILL.md — one level deep, so a
-# namespace-dir symlink hides every skill inside it. Link each skill individually.
-link_into_claude() {
-  local src="$1" ns="$2" dest="$HOME/.claude/skills" skill name
+# Read the `name:` field from a skill's SKILL.md frontmatter (empty if absent).
+skill_frontmatter_name() {
+  awk '
+    NR == 1 && $0 != "---" { exit }
+    NR > 1 && $0 == "---" { exit }
+    NR > 1 && /^name:[ \t]*/ { sub(/^name:[ \t]*/, ""); sub(/[ \t\r]+$/, ""); print; exit }
+  ' "$1" 2>/dev/null
+}
+
+# Some harnesses (Claude Code, VS Code Copilot) only discover
+# <skills-root>/<skill>/SKILL.md — one level deep — and reject namespaced
+# names, so a namespace-dir symlink hides every skill inside it. Link each
+# skill individually into $dest instead.
+link_flat() {
+  local src="$1" ns="$2" dest="$3" label="$4" skill name existing_name
   mkdir -p "$dest"
 
   # Drop the namespace dir left by older versions of this script.
   if [ -L "$dest/$ns" ]; then
     rm -f "$dest/$ns"
-    echo "  claude: removed stale namespace link ~/.claude/skills/$ns"
+    echo "  $label: removed stale namespace link $dest/$ns"
   fi
 
   # Drop per-skill links from previous runs whose source no longer exists.
   for skill in "$dest"/*; do
     [ -L "$skill" ] || continue
     case "$(readlink "$skill")" in
-      "$src"/*) [ -e "$skill" ] || { rm -f "$skill"; echo "  claude: removed stale link ~/.claude/skills/$(basename "$skill")"; } ;;
+      "$src"/*) [ -e "$skill" ] || { rm -f "$skill"; echo "  $label: removed stale link $dest/$(basename "$skill")"; } ;;
     esac
   done
 
@@ -59,26 +70,33 @@ link_into_claude() {
     skill="${skill%/}"
     name="$(basename "$skill")"
     [ -f "$skill/SKILL.md" ] || continue
-    # Never clobber a real directory or a link owned by something else.
+    # Never clobber a real directory or a link owned by something else —
+    # unless it's a real dir whose own SKILL.md unambiguously declares itself
+    # as this managed skill (e.g. a stale manual-copy workaround).
     if [ -e "$dest/$name" ] || [ -L "$dest/$name" ]; then
-      if ! [ -L "$dest/$name" ] || [ "$(readlink "$dest/$name")" != "$skill" ]; then
-        echo "  claude: SKIP $name — ~/.claude/skills/$name already exists" >&2
+      if [ -L "$dest/$name" ] && [ "$(readlink "$dest/$name")" = "$skill" ]; then
+        : # already correctly linked
+      elif [ -d "$dest/$name" ] && ! [ -L "$dest/$name" ] && [ -f "$dest/$name/SKILL.md" ] \
+        && existing_name="$(skill_frontmatter_name "$dest/$name/SKILL.md")" \
+        && [ "$existing_name" = "$name" ]; then
+        rm -rf "${dest:?}/${name:?}"
+        echo "  $label: replaced stale copy $dest/$name with a symlink"
+      else
+        echo "  $label: SKIP $name — $dest/$name already exists" >&2
         continue
       fi
     fi
     ln -sfn "$skill" "$dest/$name"
-    echo "  claude: ~/.claude/skills/$name → $skill"
+    echo "  $label: $dest/$name → $skill"
   done
 }
 
-# Link one source dir into every harness skills location under $namespace.
+# Link one source dir into every harness skills location, flat per-skill.
 link_into_harnesses() {
   local src="$1" ns="$2"
-  mkdir -p "$HOME/.agents/skills"
-  ln -sfn "$src" "$HOME/.agents/skills/$ns"
-  echo "  agents: ~/.agents/skills/$ns → $src"
+  link_flat "$src" "$ns" "$HOME/.agents/skills" "agents"
   if command -v claude >/dev/null 2>&1 || [ -d "$HOME/.claude" ]; then
-    link_into_claude "$src" "$ns"
+    link_flat "$src" "$ns" "$HOME/.claude/skills" "claude"
   fi
 }
 
