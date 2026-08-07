@@ -29,10 +29,10 @@ manual.
 
 1. **Capture the goal as an issue** — same as the manual flow's step 0 below,
    for the audit trail.
-2. **Dry-run** the `create`/`edit`/`clone` command with `--diff` (no
-   `--commit`); fix any validation errors; show the relation diff to the
-   client (a one-hop tree, not a field diff — `../reference/fs-forge-edit-clone.md`)
-   and get approval.
+2. **Dry-run** the `edit`/`clone` command with `--diff` (no `--commit`); fix
+   any validation errors; show the Claim diff to the client (a unified YAML
+   diff, not a relation tree — `../reference/fs-forge-edit-clone.md`) and get
+   approval.
 3. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
    `--commit` warning.
 4. **Report the outcome.** Don't poll, hydrate, or merge the wet PR yourself
@@ -83,19 +83,73 @@ reconcile until hydration runs and its state PR merges. Do not stop early.
 
 ## Delete flow
 
-Deletion is governed the same way — it does not just remove the file.
+Deletion is governed the same way — it does not just remove the file. Kind
+support differs from every other operation, so check it before planning:
 
-1. Confirm the target claim exists; identify its `kind` and `name`.
-2. Run the platform's delete workflow (it removes the claim and its state
-   resources together):
+- **Supported** — ComponentClaim, GroupClaim, UserClaim, OrgWebhookClaim,
+  TFWorkspaceClaim, SecretsClaim.
+- **Not supported** — SystemClaim, DomainClaim have no delete workflow, old
+  or new. Tell the client, then go straight to "No delete workflow exists"
+  below.
+
+### Primary path — `fs-forge-cli delete` (current CLI version)
+
+1. **Capture the goal as an issue** — same as the fs-forge-managed flow's
+   step 1 above, for the audit trail.
+2. **Decide flags before dry-running,** so the dry-run previews the exact
+   command you'll later add `--commit` to:
+   - Always include `--wait-for-checks` — it overrides the CLI's own
+     `false` default so the claims-repo PR also waits for its checks before
+     merging (the state-repo PR always waits regardless).
+   - For TFWorkspaceClaim, ask the client whether to keep variant CRs and
+     pass `--include-variants`/`--no-include-variants` accordingly; every
+     other kind has no variants, so leave this flag off.
+3. **Dry-run** (no `--commit`) with those flags, to confirm the claim
+   exists and preview the dispatch:
    ```bash
-   gh workflow run "GitHub claim: delete" --repo {claims_repo} \
-     --field kind={ClaimKind} --field name={claim-name}
+   npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
+     --wait-for-checks [--include-variants|--no-include-variants]
    ```
-   If that workflow isn't present, open a PR removing the claim file, merge it,
-   then hydrate so the reconciler prunes the orphaned state.
-3. Wait for the run to finish, then merge the resulting state PR.
-4. Confirm removal to the client.
+   Show the client the printed plan — kind, name, `includeVariants`,
+   `waitForClaimChecks` — it should match the flags chosen in step 2.
+4. **Get approval**, then re-run the identical command with `--commit`
+   added:
+   ```bash
+   npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
+     --wait-for-checks [--include-variants|--no-include-variants] --commit
+   ```
+   `--commit` dispatches `unprovision-claim.yaml`, which fully self-services
+   — it merges both the state-repo PR and the claims-repo PR itself. Don't
+   poll or merge anything yourself; report the dispatched run.
+5. **Close the audit-trail issue**, linking the merged claim PR in the
+   closing comment (`--commit` has no `Closes #N` footer to do this
+   automatically).
+
+### Manual fallback (older CLI, supported kind)
+
+When `{version}` predates the `delete` command (Step 1's version-check
+paragraph), dispatch the platform's per-kind delete workflow directly —
+it removes the claim and its state resources but does **not** merge the
+resulting state PR itself:
+
+```bash
+gh workflow run "GitHub claim: delete" --repo {claims_repo} \
+  --field kind={ClaimKind} --field name={claim-name}
+```
+
+This covers ComponentClaim/GroupClaim/UserClaim/OrgWebhookClaim only —
+TFWorkspaceClaim/SecretsClaim each have their own per-kind delete workflow
+instead; `gh workflow list --repo {claims_repo} --all` finds it
+(`../reference/gh-cookbook.md` has the general workflow-dispatch idiom). Wait
+for the run to finish, then merge the resulting state PR yourself.
+
+### No delete workflow exists
+
+For SystemClaim/DomainClaim, or any kind if no delete workflow is reachable:
+do not remove the claim file yourself. Tell the client there is no automated
+delete path for this claim kind and they'll need to remove it by hand.
+
+Otherwise, confirm removal to the client once the change has landed.
 
 ## Kind → hydration name
 

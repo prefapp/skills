@@ -59,8 +59,7 @@ npx @firestartr/fs-forge-cli@{version} features remove <component> --org={org} -
 npx @firestartr/fs-forge-cli@{version} features list <component> --org={org} --json
 ```
 
-`remove` needs no `--source`/schema fetch. `list` is read-only and needs no
-`--commit`.
+`remove` needs no `--source`/schema fetch.
 
 ## Inline, unvalidated alternative — `create`/`edit`
 

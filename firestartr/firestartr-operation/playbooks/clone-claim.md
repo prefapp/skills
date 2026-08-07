@@ -26,14 +26,10 @@ see `../reference/fs-forge-edit-clone.md` for the invocation idiom.
    ```
    `TFWorkspaceClaim`/`SecretsClaim` also need
    `--path claims/{...}/{new-name}.yaml` (the deterministic-path rule from
-   `create-claim.md` applies here too). Fix any validation errors.
-5. **Show the relation diff to the client and get approval.** `--diff` renders
-   the new claim's one-hop relation tree (add `--ascii` for plain-text icons,
-   `--json` for the structured form) — not a plain field diff; `--show-defaults`
-   (pass it unconditionally) adds the org's repo-level claim defaults as a
-   separate, labeled section (`../reference/fs-forge-edit-clone.md` has the
-   format for both).
-6. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
+   `create-claim.md` applies here too). Fix any validation errors, then show
+   the printed Claim diff to the client and get approval
+   (`../reference/fs-forge-edit-clone.md` has the diff/defaults format).
+5. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
    `--commit` warning (it also covers the uniqueness check `clone --commit`
    runs on its own).
 
