@@ -35,6 +35,42 @@ case "${1:-}" in
 esac
 [ "$#" -eq 1 ] || { echo "expected one option" >&2; usage >&2; exit 2; }
 
+# Claude Code only discovers <skills-root>/<skill>/SKILL.md — one level deep, so a
+# namespace-dir symlink hides every skill inside it. Link each skill individually.
+link_into_claude() {
+  local src="$1" ns="$2" dest="$HOME/.claude/skills" skill name
+  mkdir -p "$dest"
+
+  # Drop the namespace dir left by older versions of this script.
+  if [ -L "$dest/$ns" ]; then
+    rm -f "$dest/$ns"
+    echo "  claude: removed stale namespace link ~/.claude/skills/$ns"
+  fi
+
+  # Drop per-skill links from previous runs whose source no longer exists.
+  for skill in "$dest"/*; do
+    [ -L "$skill" ] || continue
+    case "$(readlink "$skill")" in
+      "$src"/*) [ -e "$skill" ] || { rm -f "$skill"; echo "  claude: removed stale link ~/.claude/skills/$(basename "$skill")"; } ;;
+    esac
+  done
+
+  for skill in "$src"/*/; do
+    skill="${skill%/}"
+    name="$(basename "$skill")"
+    [ -f "$skill/SKILL.md" ] || continue
+    # Never clobber a real directory or a link owned by something else.
+    if [ -e "$dest/$name" ] || [ -L "$dest/$name" ]; then
+      if ! [ -L "$dest/$name" ] || [ "$(readlink "$dest/$name")" != "$skill" ]; then
+        echo "  claude: SKIP $name — ~/.claude/skills/$name already exists" >&2
+        continue
+      fi
+    fi
+    ln -sfn "$skill" "$dest/$name"
+    echo "  claude: ~/.claude/skills/$name → $skill"
+  done
+}
+
 # Link one source dir into every harness skills location under $namespace.
 link_into_harnesses() {
   local src="$1" ns="$2"
@@ -42,9 +78,7 @@ link_into_harnesses() {
   ln -sfn "$src" "$HOME/.agents/skills/$ns"
   echo "  agents: ~/.agents/skills/$ns → $src"
   if command -v claude >/dev/null 2>&1 || [ -d "$HOME/.claude" ]; then
-    mkdir -p "$HOME/.claude/skills"
-    ln -sfn "$src" "$HOME/.claude/skills/$ns"
-    echo "  claude: ~/.claude/skills/$ns → $src"
+    link_into_claude "$src" "$ns"
   fi
 }
 
