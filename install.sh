@@ -92,12 +92,14 @@ link_into_vscode_agent() {
     skill="${skill%/}"
     name="$(basename "$skill")"
     [ -f "$skill/SKILL.md" ] || continue
-    # Never clobber a real directory or a link owned by something else.
-    if [ -e "$dest/$name" ] || [ -L "$dest/$name" ]; then
-      if ! [ -L "$dest/$name" ] || [ "$(readlink "$dest/$name")" != "$skill" ]; then
-        echo "  agents(vscode): SKIP $name — ~/.agents/skills/$name already exists" >&2
-        continue
-      fi
+    # Skip if we already own this link; warn and skip if something else is there.
+    if [ -L "$dest/$name" ]; then
+      [ "$(readlink "$dest/$name")" = "$skill" ] && continue
+      echo "  agents(vscode): SKIP $name — ~/.agents/skills/$name already exists" >&2
+      continue
+    elif [ -e "$dest/$name" ]; then
+      echo "  agents(vscode): SKIP $name — ~/.agents/skills/$name already exists" >&2
+      continue
     fi
     ln -sfn "$skill" "$dest/$name"
     echo "  agents(vscode): ~/.agents/skills/$name → $skill"
