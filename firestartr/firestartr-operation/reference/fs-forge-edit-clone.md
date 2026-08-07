@@ -43,22 +43,17 @@ npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
   --diff
 ```
 
-`--diff` prints a one-hop **relation diff** to stderr — the same tree
-renderer as `discovery map` (`fs-forge-discovery.md`), scoped to the edited
-claim and its direct references, with `+`/`-`/`~` markers for added/removed/
-changed nodes and edges (not a plain field-by-field YAML diff). Add `--json`
-for the structured diff (`{"nodes": [...], "edges": [...]}` with a `status`
-on each changed entry) or `--ascii` for bracket icons instead of emoji.
-Dangling references (pointing at a claim that doesn't exist) are flagged
-using the already-loaded claims-map.
+`--diff` prints a **Claim diff** to stderr (not a relation/topology tree —
+that's `discovery map`'s job, `fs-forge-discovery.md`). Add `--json` for the
+structured form: a flat `ClaimDiff[]` array.
 
 Add `--show-defaults` **unconditionally, every time** — it implies `--diff`
 and fetches the same repo-level claim defaults `edit`/`clone` already apply
-automatically (`fs-forge-mutation-shared.md`'s "Claim defaults"), rendering
-them as a separate "Defaults applied:" section after the client's own field
-changes (or nothing, when there's nothing to add). Combined with `--json`,
-the structured shape becomes `{"changes": [...], "defaults": {...}}` instead
-of the plain `{"nodes"/"edges"}` graph — `--diff --json` alone, without
+automatically (`fs-forge-mutation-shared.md`'s "Claim defaults"), widening
+the diff's "after" side to the fully-defaulted claim: defaults show up as
+ordinary `+` lines alongside the client's own field changes. Combined with
+`--json`, the structured shape becomes `{"changes": [...], "defaults":
+{...}}` instead of the flat `ClaimDiff[]` — `--diff --json` alone, without
 `--show-defaults`, keeps that flat shape untouched. Show the printed diff to
 the client and get approval. Only then re-run the same command with
 `--commit` appended (`fs-forge-mutation-shared.md`'s `--commit` warning):
@@ -88,6 +83,6 @@ requires the full name. `--name` must differ from `--from`.
 `--path claims/{...}/{new-name}.yaml` (same rule as `create`'s deterministic
 path). Same dry-run → approve → `--commit` sequence and the same `--commit`
 warning as `edit` above (`fs-forge-mutation-shared.md`); `--diff`/`--json`/
-`--ascii`/`--show-defaults` behave the same as `edit`'s relation diff too
-(compared against nothing, since the clone target is new). See
-`../playbooks/clone-claim.md` for the full flow.
+`--show-defaults` behave the same as `edit`'s Claim diff too (the whole new
+document renders as added lines, since there's no "before" to diff against).
+See `../playbooks/clone-claim.md` for the full flow.

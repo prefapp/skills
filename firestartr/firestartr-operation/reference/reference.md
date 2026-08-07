@@ -12,16 +12,19 @@ this file). Read it before calling fs-forge or writing any claim.
 
 The client never names a kind — you pick it from the intent.
 
-| Intent | Kind | Path | Hydration name |
-|---|---|---|---|
-| a repository | ComponentClaim | `claims/components/{name}.yaml` | repo name |
-| a user / org member | UserClaim | `claims/users/{name}.yaml` | username |
-| a team | GroupClaim | `claims/groups/{name}.yaml` | team slug |
-| a system grouping | SystemClaim | `claims/systems/{name}.yaml` | claim name |
-| a business domain | DomainClaim | `claims/domains/{name}.yaml` | claim name |
-| secrets | SecretsClaim | `claims/secrets/{name}.yaml` | claim name |
-| an org webhook | OrgWebhookClaim | `claims/orgwebhooks/{name}.yaml` | claim name |
-| a terraform workspace | TFWorkspaceClaim | `claims/tfworkspaces/{name}.yaml` | claim name |
+| Intent | Kind | Path |
+|---|---|---|
+| a repository | ComponentClaim | `claims/components/{name}.yaml` |
+| a user / org member | UserClaim | `claims/users/{name}.yaml` |
+| a team | GroupClaim | `claims/groups/{name}.yaml` |
+| a system grouping | SystemClaim | `claims/systems/{name}.yaml` |
+| a business domain | DomainClaim | `claims/domains/{name}.yaml` |
+| secrets | SecretsClaim | `claims/secrets/{name}.yaml` |
+| an org webhook | OrgWebhookClaim | `claims/orgwebhooks/{name}.yaml` |
+| a terraform workspace | TFWorkspaceClaim | `claims/tfworkspaces/{name}.yaml` |
+
+`../playbooks/lifecycle.md`'s "Kind → hydration name" table has the hydration
+name per kind.
 
 ## Naming rules
 

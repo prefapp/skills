@@ -13,14 +13,11 @@ isn't reachable through `edit`'s flags.
    `create <Kind> --help --json` (never `edit --help --json` — see the
    cookbook's mutation-shared reference).
 3. **Dry-run** the change: same command with the relevant `--<flag>=<value>`
-   / `--unset <path>`, `--diff`, and `--show-defaults` (unconditionally — add
-   `--ascii` for plain-text icons). Fix any validation errors.
-4. **Show the relation diff to the client and get approval.** `--diff` renders
-   the one-hop relation tree around the claim with `+`/`-`/`~` markers, not a
-   plain field diff; `--show-defaults` adds the org's repo-level claim
-   defaults as a separate, labeled section
-   (`../reference/fs-forge-edit-clone.md` has the format for both).
-5. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
+   / `--unset <path>`, `--diff`, and `--show-defaults` (unconditionally). Fix
+   any validation errors, then show the printed Claim diff to the client and
+   get approval (`../reference/fs-forge-edit-clone.md` has the diff/defaults
+   format).
+4. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
    `--commit` warning.
 
 Array fields (e.g. `members`) are **replaced**, not appended to — always

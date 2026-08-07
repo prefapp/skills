@@ -81,9 +81,8 @@ fails HTTP 422. Proceed only when `conclusion` is `success`.
 
 ## Discover Terraform modules (TFWorkspaceClaim)
 
-Remote modules always live in **`prefapp/tfm`** — the canonical module repo, in
-the **`prefapp` org regardless of the client's organization**. Never guess a
-module URL; list what exists and pin the latest per-module release tag.
+Commands for `reference.md`'s Terraform modules rule (always `prefapp/tfm`,
+discover don't guess):
 
 ```bash
 # List available modules (dirs under modules/)

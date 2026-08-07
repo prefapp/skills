@@ -29,10 +29,10 @@ manual.
 
 1. **Capture the goal as an issue** — same as the manual flow's step 0 below,
    for the audit trail.
-2. **Dry-run** the `create`/`edit`/`clone` command with `--diff` (no
-   `--commit`); fix any validation errors; show the relation diff to the
-   client (a one-hop tree, not a field diff — `../reference/fs-forge-edit-clone.md`)
-   and get approval.
+2. **Dry-run** the `edit`/`clone` command with `--diff` (no `--commit`); fix
+   any validation errors; show the Claim diff to the client (a unified YAML
+   diff, not a relation tree — `../reference/fs-forge-edit-clone.md`) and get
+   approval.
 3. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
    `--commit` warning.
 4. **Report the outcome.** Don't poll, hydrate, or merge the wet PR yourself

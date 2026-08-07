@@ -9,26 +9,22 @@ Cross-cutting rules `create`, `edit`, and `clone` all lean on. Sibling of
 npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json
 ```
 
-This returns an array of FlagSpec objects. Each has:
-
-| Field | Meaning |
-|---|---|
-| `name` | Long CLI flag name without the leading `--`; pass it as `--<name>` |
-| `path` | Dotted path of the claim field this flag sets (e.g. `providers.github.org`) |
-| `type` | Value type (`string`, `boolean`, `number`, …) |
-| `required` | Whether the flag must be provided |
-| `options` | Allowed values (present when constrained) |
-| `multiple` | Whether the flag accepts multiple values — passing it several times **replaces** the whole array, it never appends. Read the current value first, compute the full desired list, then pass it whole |
-| `description` | Human-readable meaning, when the CLI provides one — check it before asking the client; not every flag has one |
+This returns an array of FlagSpec objects — `name` (flag name, without the
+leading `--`; pass it as `--<name>`), `path` (dotted claim-field path, e.g.
+`providers.github.org`), `type`, `required`, `options` (allowed values, when
+constrained), `multiple` (passing it several times **replaces** the whole
+array, it never appends — read the current value first, compute the full
+desired list, then pass it whole), and `description` (when the CLI provides
+one — check it before asking the client).
 
 **Never hardcode a CLI flag name for a schema field.** Derive schema-field flag
 names from the FlagSpec returned by `--help --json`. Every other flag this
-cookbook uses is already a fixed, hardcoded name, safe to keep hardcoding: the
-same six on every kind — `org`, `commit`, `path`, `diff`, `json`, `ascii` —
-ComponentClaim's own `feature`/`add-feature`/`remove-feature`
-(`fs-forge-features.md`'s "Feature CRUD"), and the two schema org-field paths
-documented next, identified by exact `path` match, never fuzzy "contains org"
-matching.
+cookbook uses is already a fixed, hardcoded name, safe to keep hardcoding:
+`org`, `commit`, and `path` on every kind; `diff` and `json` on `edit`/`clone`
+only (`create` has neither); ComponentClaim's own
+`feature`/`add-feature`/`remove-feature` (`fs-forge-features.md`'s "Feature
+CRUD"); and the two schema org-field paths documented next, identified by
+exact `path` match, never fuzzy "contains org" matching.
 
 ## `{org}` passthrough — two distinct flags
 

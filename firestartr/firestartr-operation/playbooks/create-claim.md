@@ -30,31 +30,27 @@ If the client wants "one like an existing X but with Y different", use
    (`../reference/fs-forge-discovery.md`'s discovery commands) before building a
    plan — tell the client and suggest `edit` instead if it does.
 
-3. **Build the claim, previewing its relation tree, in one invocation:**
+3. **Build the claim in one invocation:**
    ```bash
    npx @firestartr/fs-forge-cli@{version} create <Kind> \
      --org={org} \
      [--<schema-org-flag>={org}] \
      --<flag>=<value> \
      ... \
-     --diff \
      > claims/{dir}/{name}.yaml
    ```
    `--org` is the control-plane flag (harmless here, required once step 5
    adds `--commit`); `--<schema-org-flag>` is the kind's own schema org
    field, if it has one — both are explained in
    `../reference/fs-forge-mutation-shared.md`'s "{org} passthrough". There's no
-   output flag — the redirect above is the only way to save it. `--diff`
-   prints the new claim's one-hop relation tree to stderr with no "before"
-   side (same renderer as `discovery map`) and combines with the redirect in
-   one call; add `--json` (requires `--diff`) for the structured graph or
-   `--ascii` for bracket icons. TFWorkspaceClaim/
-   SecretsClaim also need `--path claims/{...}/{name}.yaml` (rejected for
-   every other kind; only required once `--commit` is added). For complex
-   arrays and union values, write the value to a temporary JSON file and use
-   the `name` from the relevant FlagSpec for its `.json` escape-hatch flag —
-   pass that discovered name verbatim, never construct or hardcode it. Then
-   validate:
+   output flag — the redirect above is the only way to save it; `create`
+   prints the full new claim, so redirecting stdout is the whole step.
+   TFWorkspaceClaim/SecretsClaim also need `--path claims/{...}/{name}.yaml`
+   (rejected for every other kind; only required once `--commit` is added).
+   For complex arrays and union values, write the value to a temporary JSON
+   file and use the `name` from the relevant FlagSpec for its `.json`
+   escape-hatch flag — pass that discovered name verbatim, never construct or
+   hardcode it. Then validate:
    ```bash
    npx @firestartr/fs-forge-cli@{version} validate -f claims/{dir}/{name}.yaml
    ```
@@ -70,8 +66,7 @@ If the client wants "one like an existing X but with Y different", use
    platform will additionally fill in (`../reference/fs-forge-mutation-shared.md` →
    "Claim defaults"), distinct from the file itself.
 
-5. **Show the client the file, its relation tree, and any defaults preview,
-   then land it:**
+5. **Show the client the file and any defaults preview, then land it:**
    - **Landing now** — re-run step 3's command **without the redirect** (so
      its output — including the dispatched provisioning URL — stays
      visible) with `--commit` appended (see

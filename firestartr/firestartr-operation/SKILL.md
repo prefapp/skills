@@ -16,8 +16,7 @@ each with a recommended answer. Prefer exploring the repos over asking.
 **Tool preference:** try `fs-forge-cli` first — it knows the schemas, the
 claims-map, and lands changes itself via `create`/`edit`/`clone --commit`. Read
 a command's own output fully before reaching for another tool. Fall back to raw
-`gh` (`reference/gh-cookbook.md`) only for what the CLI can't do: manual
-create-then-PR, Terraform module discovery, edits its flags can't express.
+`gh` (`reference/gh-cookbook.md`) only for what the CLI can't do.
 
 ## Step 1 — Resolve the target platform
 
@@ -79,15 +78,18 @@ value.
 Emit one line confirming the resolved context, e.g.:
 > `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 0.1.0`
 
-Before relying on `create --commit`, the `defaults` command family, or
-`delete`, confirm `{version}` actually has them — its own `--help`/`--help
---json` output shows the flag/subcommand — rather than trusting a previously
-resolved or pinned version to still be current. Missing and unpinned:
-re-resolve latest and retry. Missing and pinned (`cli_version` set): tell the
-client the pin predates this capability and ask whether to bump it
-(show-before-write) before falling back to the older flow (`delete`'s is in
-`playbooks/lifecycle.md`'s Delete flow) — never override an explicit pin
-silently.
+**Skill-target CLI version: `0.7.0`**.
+Compare `{version}` against it with a plain semver check (no `--help`
+call needed):
+
+- `>= {target version}` → proceed.
+- `< {target version}` and pinned (`cli_version` set): tell the client the pin
+  predates this skill's target and offer to bump it (show-before-write) — never
+  override an explicit pin silently. Declined: fall back to `{version}`'s own
+  `--help`/`--help --json` output to see what it actually supports, and use
+  whatever it reports.
+- `< {target version}` and unpinned: same as the "no stable release found" flow
+  above — ask the client to pick a version and pin it.
 
 **Completion:** you hold a concrete `{org}`, `{claims_repo}`, `{version}`, and
 the matched path.
