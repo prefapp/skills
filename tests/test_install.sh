@@ -19,12 +19,13 @@ reset() { rm -rf "$TMP/.agents" "$TMP/.claude"; }
 
 assert_flat_links() {
   # Every skill under $1 (a src dir) resolves to a flat symlink under $2 (a dest dir).
-  local src_dir="$1" dest="$2" label="$3" src name
+  local src_dir="$1" dest="$2" label="$3" src name link
   for src in "$src_dir"/*/; do
     src="${src%/}"
     [ -f "$src/SKILL.md" ] || continue
     name="$(basename "$src")"
-    [ "$(readlink "$dest/$name")" = "$src" ] || { echo "FAIL: $label link missing/wrong for $name"; exit 1; }
+    link="$(readlink "$dest/$name" 2>/dev/null || true)"
+    [ "$link" = "$src" ] || { echo "FAIL: $label link missing/wrong for $name"; exit 1; }
     [ -f "$dest/$name/SKILL.md" ] || { echo "FAIL: $label link for $name does not resolve"; exit 1; }
   done
 }
