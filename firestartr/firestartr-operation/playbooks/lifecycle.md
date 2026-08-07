@@ -96,23 +96,27 @@ support differs from every other operation, so check it before planning:
 
 1. **Capture the goal as an issue** — same as the fs-forge-managed flow's
    step 1 above, for the audit trail.
-2. **Dry-run** (no `--commit`) to confirm the claim exists and preview the
-   dispatch:
+2. **Decide flags before dry-running,** so the dry-run previews the exact
+   command you'll later add `--commit` to:
+   - Always include `--wait-for-checks` — it overrides the CLI's own
+     `false` default so the claims-repo PR also waits for its checks before
+     merging (the state-repo PR always waits regardless).
+   - For TFWorkspaceClaim, ask the client whether to keep variant CRs and
+     pass `--include-variants`/`--no-include-variants` accordingly; every
+     other kind has no variants, so leave this flag off.
+3. **Dry-run** (no `--commit`) with those flags, to confirm the claim
+   exists and preview the dispatch:
    ```bash
-   npx @firestartr/fs-forge-cli@{version} delete <kind> <name> --org={org}
+   npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
+     --wait-for-checks [--include-variants|--no-include-variants]
    ```
    Show the client the printed plan — kind, name, `includeVariants`,
-   `waitForClaimChecks`.
-3. **Flags:** always add `--wait-for-checks` — it overrides the CLI's own
-   `false` default so the claims-repo PR also waits for its checks before
-   merging (the state-repo PR always waits regardless). For
-   TFWorkspaceClaim, ask the client whether to keep variant CRs before
-   deciding `--include-variants`/`--no-include-variants`; every other kind
-   has no variants, so the default is inert there.
-4. **Get approval**, then re-run with `--commit`:
+   `waitForClaimChecks` — it should match the flags chosen in step 2.
+4. **Get approval**, then re-run the identical command with `--commit`
+   added:
    ```bash
-   npx @firestartr/fs-forge-cli@{version} delete <kind> <name> --org={org} \
-     --wait-for-checks --commit
+   npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
+     --wait-for-checks [--include-variants|--no-include-variants] --commit
    ```
    `--commit` dispatches `unprovision-claim.yaml`, which fully self-services
    — it merges both the state-repo PR and the claims-repo PR itself. Don't
