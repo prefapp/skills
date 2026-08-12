@@ -57,10 +57,13 @@ exists). The skill is still responsible for:
 - **References** — `user:`/`group:`/`system:`/… values point at claims that
   actually exist.
 - **Uniqueness** — `create` without `--commit` is file-based, no claims-map
-  lookup, so the skill must pre-check itself; the CLI's own guard on
-  `create --commit`/`clone --commit` (`fs-forge-mutation-shared.md`'s
-  `--commit` warning) doesn't replace this — pre-checking first is a
-  friendlier, earlier catch than waiting for that error.
+  lookup, so the skill must pre-check itself: `preflight`
+  (`fs-forge-preflight.md`) for ComponentClaim/GroupClaim/UserClaim/
+  TFWorkspaceClaim, the discovery commands (`fs-forge-discovery.md`) for
+  every other kind. The CLI's own guard on `create --commit`/`clone --commit`
+  (`fs-forge-mutation-shared.md`'s `--commit` warning) doesn't replace this —
+  pre-checking first is a friendlier, earlier catch than waiting for that
+  error.
 - **Naming normalization** — the slug, displayName, and github.name rules
   described above.
 

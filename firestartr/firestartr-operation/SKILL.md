@@ -113,6 +113,7 @@ always loads `lifecycle` in addition to its authoring playbook.
 | know who owns a service, what's in a system, or browse/search topology | `catalog` |
 | want a capability in a repo without naming a specific feature | `feature-advisor` (+ `edit-claim` + `lifecycle` if accepted) |
 | know a field, default, feature, or naming rule | `reference/reference.md` |
+| check if a name is available before creating something | `reference/fs-forge-preflight.md` |
 
 Pick the claim **kind** from the intent yourself — the client never chooses
 one (`reference/reference.md` has the full kind↔intent map). Ask one
@@ -182,6 +183,9 @@ These rules govern agent behavior during every invocation of this skill.
     report the issue.
 
 12. **Pre-check before planning.** Before building a plan, check for existing
-    state — duplicates, missing prerequisites, already-deleted resources. If the
+    state — duplicates, missing prerequisites, already-deleted resources. For a
+    repo, team, user, or TF workspace, use `firestartr preflight`
+    (`reference/fs-forge-preflight.md`); every other kind uses the
+    discovery-based check (`reference/fs-forge-discovery.md`). If the
     target already exists, tell the user and suggest the right action (e.g.,
     "That repo already exists — did you mean to edit it?").

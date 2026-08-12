@@ -10,6 +10,7 @@ that matches the task instead of assuming everything lives here:
 | discover a kind's flags, pass `{org}`, use `--commit`, or preview claim defaults | `fs-forge-mutation-shared.md` |
 | read, edit, or clone an existing claim | `fs-forge-edit-clone.md` |
 | list an org's claims, render its topology, or print an arbitrary relation graph | `fs-forge-discovery.md` |
+| check whether a name is free before create/edit/delete | `fs-forge-preflight.md` |
 | discover, attach, edit, or remove a Feature on a ComponentClaim | `fs-forge-features.md` |
 | author a brand-new claim with `create` | `../playbooks/create-claim.md` — the invocation lives there, not here |
 
