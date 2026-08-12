@@ -90,7 +90,7 @@ GroupClaim naming a UserClaim, confirm the user hydrated first.
 ```bash
 # Known filename (<CrKind>.<cr-name>.yaml, at the state repo's root):
 gh api repos/{org}/{state-repo}/contents/{CrKind}.{cr-name}.yaml \
-  --jq -r '.content' | base64 --decode | grep -E 'firestartr.dev/(claim-ref|last-state-pr):'
+  --jq -r '.content' | base64 -d | grep -E 'firestartr.dev/(claim-ref|last-state-pr):'
 
 gh pr view {pr_number} --repo {owner}/{repo}                          # last-state-pr is already "owner/repo#prNumber"
 gh search code '"{ClaimKind}/{claim-name}"' --repo {org}/{state-repo} # unknown filename (best-effort)
