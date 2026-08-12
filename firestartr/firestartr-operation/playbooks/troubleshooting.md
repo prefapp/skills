@@ -13,15 +13,15 @@ top to bottom.
 
 | Symptom | Failure surface |
 |---|---|
-| `npx`/`fs-forge` won't run, no network, wrong Node | `Environment & tooling` |
-| No usable org/CLI-version config, no published CLI release | `Config & CLI-version resolution` |
-| A `create`/`edit`/`clone`/`defaults` command errored | `fs-forge-cli command failures` |
-| A claims-repo PR's checks are failing (PR Verify / render) | `PR-verify / render-pipeline denial` |
-| A hydrate workflow run failed, or no state PR ever appeared | `Hydrate-workflow dispatch/execution` |
-| A state PR's `terraform_plan` check is red | `Terraform plan status check (pre-merge)` |
-| A state PR won't merge, or merges but nothing happens next | `State-PR merge` |
-| A repo/team/webhook/TF resource wasn't created, or drift has no obvious cause | `Terraform apply / operator reconciliation (post-merge)` |
-| The catalog looks stale, or reconciliation drift might be a false positive | `Read-only playbooks' own failure modes` |
+| `npx`/`fs-forge` won't run, no network, wrong Node | [Environment & tooling](#environment--tooling) |
+| No usable org/CLI-version config, no published CLI release | [Config & CLI-version resolution](#config--cli-version-resolution) |
+| A `create`/`edit`/`clone`/`defaults` command errored | [fs-forge-cli command failures](#fs-forge-cli-command-failures) |
+| A claims-repo PR's checks are failing (PR Verify / render) | [PR-verify / render-pipeline denial](#pr-verify--render-pipeline-denial) |
+| A hydrate workflow run failed, or no state PR ever appeared | [Hydrate-workflow dispatch/execution](#hydrate-workflow-dispatchexecution) |
+| A state PR's `terraform_plan` check is red | [Terraform plan status check (pre-merge)](#terraform-plan-status-check-pre-merge) |
+| A state PR won't merge, or merges but nothing happens next | [State-PR merge](#state-pr-merge) |
+| A repo/team/webhook/TF resource wasn't created, or drift has no obvious cause | [Terraform apply / operator reconciliation (post-merge)](#terraform-apply--operator-reconciliation-post-merge) |
+| The catalog looks stale, or reconciliation drift might be a false positive | [Read-only playbooks' own failure modes](#read-only-playbooks-own-failure-modes) |
 
 ## Diagnose, don't fix — with one exception
 
