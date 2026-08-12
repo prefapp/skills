@@ -74,7 +74,7 @@ zero-width-space characters before their emoji):
 
 ```bash
 RUN_ID=$(gh workflow run {hydrate-workflow-filename} --repo {claims_repo} \
-  -r {branch} -f name={claim_name} [-f kind={ClaimKind}] 2>&1 | grep -oP 'runs/\K\d+')
+  -r {branch} -f name={claim_name} [-f kind={ClaimKind}] 2>&1 | grep -oE 'runs/[0-9]+' | grep -oE '[0-9]+')
 gh run watch "$RUN_ID" --repo {claims_repo} --exit-status
 gh run view "$RUN_ID" --repo {claims_repo} --log-failed
 ```
