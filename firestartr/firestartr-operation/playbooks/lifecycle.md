@@ -39,6 +39,10 @@ manual.
    — `--commit` already did it. Status check: the dispatched
    `provision-claim.yaml` run. Manual hydrate only if the client explicitly
    asks (manual flow step 5).
+
+   > **Check this first:** if the dispatched run failed, the symptom lookup
+   > at `troubleshooting.md#symptom-lookup--start-here` routes to the right
+   > surface (PR-verify, hydrate, plan, state-PR merge, or apply).
 5. **Close the audit-trail issue**, linking the merged claim PR in the closing
    comment. `--commit`'s auto-generated PR has no `Closes #N` footer (there's
    no flag for it), so the issue is only linked back to the change if you do
@@ -48,6 +52,10 @@ A `--commit` that fails (invalid claim, an already-existing target claim for
 `create`/`clone`, existing `fs-forge/{kind}-{name}` branch, etc.) surfaces as
 a CLI error before anything is dispatched — fix the reported problem and
 re-run.
+
+> **Check this first:** the exact CLI error message — see
+> `troubleshooting.md#fs-forge-cli-command-failures` if it doesn't explain
+> the failure.
 
 ## Manual flow (`create` without `--commit`, or a `gh`-based edit/clone fallback)
 
@@ -74,8 +82,15 @@ re-run.
    Secrets/TFWorkspace take `name` only. Wait for `conclusion: success`.
    - When a create adds a new user *and* references it elsewhere (e.g. adds them to
      a team), hydrate the `UserClaim` **first**, then the dependent claim.
+
+   > **Check this first:** a failed or timed-out run — see
+   > `troubleshooting.md#hydrate-workflow-dispatchexecution` if it doesn't
+   > explain the failure.
 6. **Merge the state PR** that hydration opened — on `state-github` (GitHub claims,
    usually auto-merged) or `state-infra` (Secrets/TFWorkspace, merge it yourself).
+
+   > **Check this first:** a PR that won't merge — see
+   > `troubleshooting.md#state-pr-merge` if it doesn't explain the failure.
 7. Report the landed change to the client in plain terms.
 
 A change that stops after step 4 is only half-applied — the platform won't

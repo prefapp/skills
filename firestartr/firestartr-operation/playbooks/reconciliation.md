@@ -44,6 +44,10 @@ chase a false positive.
 | missing state | claim exists, no state resource | hydrate (kind + name) |
 | orphaned | state resource with no claim | claim was deleted; prune via delete flow |
 
+> **Check this first:** rule out the un-hydrated trap above first. Genuine
+> drift after hydration — see
+> `troubleshooting.md#terraform-apply--operator-reconciliation-post-merge`.
+
 ## Full alignment sweep
 
 For a whole-org check, list every state resource, resolve each back to its claim,

@@ -56,6 +56,10 @@ If the client wants "one like an existing X but with Y different", use
    ```
    Fix any errors before proceeding.
 
+   > **Check this first:** `validate -f` passing but `--commit` still
+   > rejecting the claim — see
+   > `troubleshooting.md#fs-forge-cli-command-failures`.
+
 4. **Offer to preview the org's repo-level claim defaults** — needs network
    and `--org`, so skip it if the client wants a fully offline artifact and
    declines. `create` never applies these itself, committed or not:

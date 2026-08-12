@@ -92,8 +92,7 @@ repos over asking.
 
 ## 🧯 Troubleshooting
 
-| Symptom | Fix |
-|---|---|
-| 📦 No stable CLI release found (`latest` empty or `snapshot`) | pick a published version (`npm view @firestartr/fs-forge-cli versions`) and pin it as `cli_version` in `firestartr-config.yaml` |
-| 🚫 `fs-forge` could not be run via `npx` | check Node ≥ 18 and network access |
-| 🔒 Claims-repo operations fail with auth errors | ensure `GITHUB_TOKEN` is exported — the CLI doesn't share `gh`'s auth store |
+Something not working? Just ask — the skill's own troubleshooting playbook
+covers everything from a failed CLI call to a stuck hydration to
+unexplained drift, symptom-first. It answers "why did that happen?"
+directly, no need to dig through GitHub Actions yourself.
