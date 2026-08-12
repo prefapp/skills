@@ -92,7 +92,8 @@ repos over asking.
 
 ## 🧯 Troubleshooting
 
-Something not working? Just ask — the skill's own troubleshooting playbook
-covers everything from a failed CLI call to a stuck hydration to
-unexplained drift, symptom-first. It answers "why did that happen?"
-directly, no need to dig through GitHub Actions yourself.
+Something not working? Just ask — the skill's own
+[troubleshooting playbook](playbooks/troubleshooting.md) covers everything from
+a failed CLI call to a stuck hydration to unexplained drift, symptom-first. It
+answers "why did that happen?" directly, no need to dig through GitHub Actions
+yourself.
