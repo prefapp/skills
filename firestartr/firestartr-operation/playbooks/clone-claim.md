@@ -16,9 +16,9 @@ see `../reference/fs-forge-edit-clone.md` for the invocation idiom.
    TFWorkspaceClaim, run `preflight --create` on the new name
    (`../reference/fs-forge-preflight.md`) before building a plan — it covers
    both a claims-map conflict and a same-named resource already at the
-   provider. Every other kind: `clone --commit`'s own uniqueness guard
-   (`../reference/fs-forge-mutation-shared.md`'s `--commit` warning) is the
-   only check.
+   provider. Every other kind: confirm `<Kind>-<new-name>` doesn't already
+   exist via `../reference/fs-forge-discovery.md`'s discovery commands
+   instead (same pre-check `create-claim.md` runs for its unsupported kinds).
 3. **Read the source** (optional but recommended when you don't already know
    its fields): `edit <Kind>-<source-name> --org={org}` with no mutating flags.
 4. **Discover flags** for the kind via `create <Kind> --help --json` (same
