@@ -52,8 +52,9 @@ process to route them to yet (see
 
 ## `--json`
 
-`{"status": "ok"|"conflict"|"not_found"|"error", "kind": "<ClaimKind>", "name": "…", "conflict"?: "claim"|"provider"}`
+`{"status": "<ok|conflict|not_found|error>", "kind": "<ClaimKind>", "name": "…", "conflict": "<claim|provider>"}`
 — `kind` is always the full claim kind, even though `--kind` takes the short
-ID. `--edition` with an actual identity change prints **two** JSON lines
-(old name's claims check, then the new name's provider check) — read every
-stdout line, don't assume a single JSON document.
+ID; `conflict` is present only when `status` is `"conflict"`. `--edition`
+with an actual identity change prints **two** JSON lines (old name's claims
+check, then the new name's provider check) — read every stdout line, don't
+assume a single JSON document.
