@@ -48,7 +48,7 @@ whether the GitHub login exists.
 A provider conflict (2): tell the client plainly that the resource already
 exists at GitHub outside Firestartr's tracking, and stop — there's no import
 process to route them to yet (see
-`../docs/adr/0009-preflight-no-import-or-rename-flow.md`).
+`../../../docs/adr/0009-preflight-no-import-or-rename-flow.md`).
 
 ## `--json`
 
