@@ -184,7 +184,7 @@ These rules govern agent behavior during every invocation of this skill.
 
 12. **Pre-check before planning.** Before building a plan, check for existing
     state — duplicates, missing prerequisites, already-deleted resources. For a
-    repo, team, user, or TF workspace, use `firestartr preflight`
+    repo, team, user, or TF workspace, use `preflight`
     (`reference/fs-forge-preflight.md`); every other kind uses the
     discovery-based check (`reference/fs-forge-discovery.md`). If the
     target already exists, tell the user and suggest the right action (e.g.,
