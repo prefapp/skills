@@ -13,19 +13,63 @@ PR-verify (`"🔍 PR Verify"`) has no check-run or PR-comment step of its own �
 it's `firestartr-cli cdk8s --render` per provider, failing the Actions run
 naturally if rendering throws. `validate-claims.yaml` (schedule/
 `workflow_dispatch`, a whole-repo sweep rather than a per-PR check) shares
-the same render step and the same failure shape.
+the same render step and the same failure shape — dispatch/wait mechanics
+for it: "Validation sweep" below.
 
 ```bash
-gh pr checks {pr} --repo {claims_repo}                                       # pass/fail + link
-gh run list --repo {claims_repo} --workflow validate-claims.yaml --limit 1   # the sweep, not tied to a PR
-gh run view {run_id} --repo {claims_repo} --log-failed                       # the thrown error, verbatim
+gh pr checks {pr} --repo {claims_repo}                     # pass/fail + link
+gh run view {run_id} --repo {claims_repo} --log-failed     # the thrown error, verbatim
 ```
 
 No automated Rego-policy evaluation exists — `.firestartr/validations/policies/*.rego`
 isn't loaded by PR-verify, the sweep, or the render CLI; the only enforcement
 is a manual `docker run ... conftest ...` step the client runs by hand. A
-failed run's error text is one of the fs-forge-cli error shapes below, or an
-unrecognized render failure.
+failed run's error text is one of the render error shapes below, or an
+unrecognized render failure — never one of `fs-forge-cli`'s own (that table
+only applies to `create`/`edit`/`clone`/`validate`/`defaults` invocations).
+
+## Validation sweep
+
+`validate-claims.yaml` renders every claim in the repo, every kind, every
+provider — unlike PR-verify, which only renders the claims one PR touches
+(except on a delete, which forces a full render there too). Dispatch by ID,
+not display name (same hidden-character caveat as every workflow here):
+
+```bash
+gh workflow list --repo {claims_repo} --all               # find the 🔍 Validate Claims workflow + ID
+
+# Reuse a recent run instead of dispatching fresh, if it's new enough:
+LATEST_SHA=$(gh api repos/{claims_repo}/git/ref/heads/main --jq '.object.sha')
+gh run list --repo {claims_repo} --workflow {workflow-id} --limit 1 \
+  --json databaseId,headSha,conclusion,createdAt          # compare headSha to $LATEST_SHA
+
+# Otherwise dispatch fresh — no inputs needed, defaults render everything:
+gh workflow run {workflow-id} --repo {claims_repo}
+sleep 30
+gh run list --repo {claims_repo} --workflow {workflow-id} --limit 1 \
+  --json databaseId,status,conclusion
+gh run view {run_id} --repo {claims_repo} --log-failed    # the thrown error, verbatim
+```
+
+Verifying a fix always dispatches fresh — a run from before the fix can't
+reflect it. Rendering halts at the first broken claim it hits (kind-sorted:
+User→Group→Component→Domain→System→Secrets→TFWorkspace→ArgoDeploy→
+OrgWebhook→OrgSettings) — a green run confirms the whole repo; a red one
+only guarantees that first claim. Fix it and re-dispatch to find the next.
+
+## Render error shapes
+
+Distinct from the `fs-forge-cli` table below — these come from the render
+step (`firestartr-cli cdk8s --render`) that PR-verify, `validate-claims.yaml`,
+and `provision-claim.yaml` all share. `fs-forge-cli`'s own `validate` is
+schema-only and never produces them.
+
+| Condition | Message | Verdict |
+|---|---|---|
+| Broken reference | `Claim <Kind>-<name> not found` | Client-fixable — the referencing claim's field names a claim that doesn't exist |
+| Cross-reference (secrets) | `CrossReference error: <Kind>/<name> references a non-existent secret key: '<secret>:<key>'` (or "...secret key inexistent: '<secret>/<key>'") | Client-fixable — the secret key isn't in the referenced `SecretsClaim` |
+| Naming collision | `Duplicate CR found for <Kind>-<name>` | Client-fixable — two claims render to the same kind+name; rename one |
+| Anything else | uncaught crash / bare stack trace | Escalate |
 
 ## `terraform_plan` check run (pre-merge)
 
@@ -100,6 +144,10 @@ gh search code '"{ClaimKind}/{claim-name}"' --repo {org}/{state-repo} # unknown 
 
 ## fs-forge-cli error shapes
 
+`create`/`edit`/`clone`/`validate`/`defaults` only — never a render; see
+"Render error shapes" above for PR-verify/`validate-claims.yaml`/
+`provision-claim.yaml` failures instead.
+
 | Condition | Message | Exit code | Verdict |
 |---|---|---|---|
 | Schema validation | AJV message, e.g. `must have required property 'owner'` / `/providers/github must have required property 'privacy'` | `validate -f` 1 · `create --commit` 2 · `edit`/`clone` 1 | Client-fixable — correct the field |
@@ -119,8 +167,8 @@ treated as "no defaults." Only *multiple* candidates is ambiguous.
 |---|---|---|
 | Environment & tooling | never | client-fixable (Node/network) |
 | Config & CLI-version resolution | `npm dist-tag ls`/`npm view` show zero published versions | client-fixable, self-service via `SKILL.md` Step 1 |
-| fs-forge-cli command failures | see the table above | see the table above |
-| PR-verify / render-pipeline denial | error doesn't match an fs-forge-cli error shape | client-fixable |
+| fs-forge-cli command failures | see the fs-forge-cli error shapes table above | see the fs-forge-cli error shapes table above |
+| PR-verify / render-pipeline denial | error doesn't match a render error shape | client-fixable |
 | Hydrate-workflow dispatch/execution | failed step's log doesn't match a recognized fs-forge/render shape | client-fixable (see the one known error string above) |
 | Terraform plan / apply / operator reconciliation | error names auth/permissions/provider-internal/state-lock/network, or is a bare crash with no claim-traceable value | client-fixable when the error names a value traceable to the claim's own fields |
 | State-PR merge | `terraform_plan` green + required checks passing but merge still blocked | not a failure if only awaiting human review |

@@ -46,6 +46,31 @@ Two axes decide "keep digging" versus "tell the client this needs Prefapp":
 Two exits only: **client-fixable** (name the specific fix) or **escalate —
 needs Prefapp** (name why). Full per-surface table: `../reference/diagnostics.md`.
 
+## Validation sweep
+
+A whole-repo `validate-claims.yaml` dispatch — distinct from a single PR's
+own PR-verify render — confirms every claim still renders, catching a
+broken reference PR-verify wouldn't (PR-verify only renders the claims one
+PR touches, except on a delete). It's a last resort before escalating, never
+the first move: reach for it only once the failing surface's own check
+below doesn't explain things, and only on PR-verify/render-pipeline denial,
+hydrate dispatch/execution, Terraform apply/operator reconciliation
+(claim-traceable-but-unclear only), or an `fs-forge-cli` `--commit`
+failure's uniqueness/stale-branch shapes.
+
+Read the latest run first; reuse it if newer than the claims repo's latest
+commit, dispatch fresh otherwise. Verifying a fix always dispatches fresh —
+a prior run can't reflect a fix that didn't exist yet. No client approval
+needed (read-only, same tier as the re-hydrate offer above), but say it's
+running: it's a multi-repo-checkout, multi-minute job.
+
+A green run confirms the whole repo. A red one only guarantees the first
+broken claim found (rendering halts there) — fix the named claim,
+re-dispatch, and report each round; never treat one pass as exhaustive.
+
+Dispatch/wait/read commands and the render error-shape table:
+`../reference/diagnostics.md#validation-sweep`.
+
 ## Environment & tooling
 
 Never escalate. Node/network/`npx` problems are
@@ -65,13 +90,23 @@ escalate.
 Four known conditions, all client-fixable except an uncaught crash. Exact
 messages, exit codes, and the verdict table: `../reference/diagnostics.md`.
 
+> **Check this first:** the uniqueness/stale-branch shapes are about the
+> shared repo's actual state — if this happened via `--commit`, a
+> [validation sweep](#validation-sweep) is worth a confirmatory dispatch.
+
 ## PR-verify / render-pipeline denial
 
 PR-verify is a plain Actions run — no dedicated check-run/PR-comment step;
 read its log (`../reference/diagnostics.md`). There is **no automated
 Rego-policy evaluation** today, so there's no separate "policy denial" mode:
-a failed render reuses the same shapes as fs-forge-cli's own validation
-above — client-fixable if it matches one of those, escalate otherwise.
+a failed render has its own error shapes — a broken reference or a naming
+collision, never fs-forge-cli's own (`validate` is schema-only and never
+runs during a render) — client-fixable if it matches one of those, escalate
+otherwise.
+
+> **Check this first:** still unclear? A [validation sweep](#validation-sweep)
+> shows whether the same claim, or another one entirely, is broken
+> repo-wide.
 
 ## Hydrate-workflow dispatch/execution
 
@@ -81,6 +116,9 @@ merged. A GroupClaim referencing an un-hydrated UserClaim fails the same way
 — hydrate the user first, then retry. Any other failed step: read it once
 (`../reference/diagnostics.md`); a recognized fs-forge/render shape is
 client-fixable, anything else escalates.
+
+> **Check this first:** still unclear? A [validation sweep](#validation-sweep)
+> confirms whether the referenced claim genuinely doesn't exist repo-wide.
 
 ## Terraform plan status check (pre-merge)
 
@@ -111,6 +149,10 @@ Read the sticky PR comment / check-run `output.summary` first
 templated message, good only to confirm *that* it failed, never *why*. This
 covers GitHub-claim kinds too: they surface through the identical check-run
 pair plus sticky PR comment, not a cluster-only failure class.
+
+> **Check this first:** claim-traceable but still unclear? A
+> [validation sweep](#validation-sweep) is worth a confirmatory dispatch
+> before escalating.
 
 ## Read-only playbooks' own failure modes
 
