@@ -21,11 +21,23 @@ dry-run → approve → commit flow is reused untouched, never reimplemented.
   follow-up once this pattern's proven live.
 - **`delete` opts out.** Never chosen autonomously as a fix — only
   suggested, and only proceeds if the client explicitly asks for it.
-- **`validate-claims.yaml` gets dispatched, not just read.** Used both as a
-  diagnostic (when a symptom isn't tied to an open PR) and as a post-fix
-  verification sweep — the latter is waited on and its pass/fail reported
-  alongside the fix, since unlike the main `--commit` dispatch, this sweep
-  has no other mechanism to surface its result.
+- **A validation sweep — `validate-claims.yaml` dispatched fresh, not just
+  read — is a last resort before escalating, never a first move.** Reserved
+  for surfaces where a broken reference could plausibly be the cause:
+  PR-verify/render-pipeline denial, hydrate dispatch/execution, Terraform
+  apply/operator reconciliation post-merge (claim-traceable-but-unclear
+  only), and an `fs-forge-cli` `--commit` failure, but only its
+  uniqueness/stale-branch shapes — schema/unknown-kind/ambiguous-defaults
+  are exactly as self-contained via `--commit` as via a dry run (`validate`
+  is schema-only, never cross-references), so a sweep adds nothing there.
+  Reuse a recent-enough existing run for diagnosis; verifying a fix always
+  dispatches fresh, since a prior run can't reflect a fix that didn't exist
+  yet. A green run confirms the whole repo; a red one only guarantees the
+  first broken claim found (rendering halts there) — fix, re-dispatch, and
+  report each round rather than treating one pass as exhaustive. No client
+  approval needed (`contents: read`, the same tier as the re-hydrate
+  exception above), but say it's running — it's a multi-repo-checkout,
+  multi-minute job.
 
 ## Consequences
 

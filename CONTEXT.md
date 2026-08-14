@@ -32,6 +32,24 @@ Firestartr's declarative desired-state unit (ComponentClaim = repo, GroupClaim =
 team, UserClaim = user, …). Internal vocabulary — the client never hears it; the
 entry skill translates intent to the right claim kind.
 
+**Validation sweep**:
+A whole-repo dispatch of `validate-claims.yaml` that renders every claim to
+confirm the claims repo is structurally sound, including that every
+cross-claim reference still resolves. Distinct from PR-verify, which only
+renders the claims touched by one PR (except on a delete, which forces a full
+render there too). A run halts at the first broken claim it finds, so green
+means the whole repo is clean but red only guarantees at least one problem.
+_Avoid_: sweep, validation run (ambiguous with fs-forge-cli's own per-file
+`validate`).
+
+**Broken reference**:
+A claim field (`user:`/`group:`/`system:`/`domain:`/`component:`/
+`ref:secretsclaim:`) that no longer resolves to an existing claim at render
+time. Only ever caught by a render — PR-verify, `validate-claims.yaml`, or
+`provision-claim.yaml` — never by fs-forge-cli's own `validate`, which is
+schema-only and doesn't look at other claims.
+_Avoid_: dangling reference, orphaned reference.
+
 **Fix hand-off**:
 `troubleshooting`'s practice of continuing straight into the playbook that
 owns a diagnosed problem's remedy (`edit-claim`/`clone-claim`/`create-claim`)
