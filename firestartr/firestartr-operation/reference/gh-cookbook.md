@@ -79,6 +79,9 @@ gh run list --repo {claims_repo} --workflow {workflow-id} --limit 1 \
 Passing an input the workflow doesn't declare (e.g. `kind` to TFWorkspace hydrate)
 fails HTTP 422. Proceed only when `conclusion` is `success`.
 
+> **Check this first:** a run that didn't reach `success` — see
+> `../playbooks/troubleshooting.md#hydrate-workflow-dispatchexecution`.
+
 ## Discover Terraform modules (TFWorkspaceClaim)
 
 Commands for `reference.md`'s Terraform modules rule (always `prefapp/tfm`,

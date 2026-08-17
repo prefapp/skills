@@ -113,6 +113,7 @@ always loads `lifecycle` in addition to its authoring playbook.
 | know who owns a service, what's in a system, or browse/search topology | `catalog` |
 | want a capability in a repo without naming a specific feature | `feature-advisor` (+ `edit-claim` + `lifecycle` if accepted) |
 | know a field, default, feature, or naming rule | `reference/reference.md` |
+| know why something failed, or isn't behaving as expected | `troubleshooting` |
 | check if a name is available before creating something | `reference/fs-forge-preflight.md` |
 
 Pick the claim **kind** from the intent yourself — the client never chooses

@@ -80,6 +80,9 @@ TFWorkspaceClaim/SecretsClaim also require `--path claims/{...}/{name}.yaml`
 `--commit` that fails for any of these reasons surfaces as a CLI error before
 anything is dispatched — fix the reported problem and re-run.
 
+> **Check this first:** the exact error text and exit code — see
+> `diagnostics.md#fs-forge-cli-error-shapes`.
+
 ## Claim defaults (`claims_defaults.yaml` in the claims repo)
 
 `edit`/`clone` automatically fetch the org's repo-level claim defaults and

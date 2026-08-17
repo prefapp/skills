@@ -36,6 +36,9 @@ see `../reference/fs-forge-edit-clone.md` for the invocation idiom.
    `create-claim.md` applies here too). Fix any validation errors, then show
    the printed Claim diff to the client and get approval
    (`../reference/fs-forge-edit-clone.md` has the diff/defaults format).
+
+   > **Check this first:** a rejected `--commit` (uniqueness, schema, stale
+   > branch) — see `troubleshooting.md#fs-forge-cli-command-failures`.
 6. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
    `--commit` warning (it also covers the uniqueness check `clone --commit`
    runs on its own).

@@ -17,6 +17,9 @@ isn't reachable through `edit`'s flags.
    any validation errors, then show the printed Claim diff to the client and
    get approval (`../reference/fs-forge-edit-clone.md` has the diff/defaults
    format).
+
+   > **Check this first:** an unexpected diff, or a rejected `--commit` —
+   > see `troubleshooting.md#fs-forge-cli-command-failures`.
 4. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
    `--commit` warning.
 

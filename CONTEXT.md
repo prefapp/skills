@@ -32,6 +32,34 @@ Firestartr's declarative desired-state unit (ComponentClaim = repo, GroupClaim =
 team, UserClaim = user, …). Internal vocabulary — the client never hears it; the
 entry skill translates intent to the right claim kind.
 
+**Validation sweep**:
+A whole-repo dispatch of `validate-claims.yaml` that renders every claim to
+confirm the claims repo is structurally sound, including that every
+cross-claim reference still resolves. Distinct from PR-verify, which only
+renders the claims touched by one PR (except on a delete, which forces a full
+render there too). A run halts at the first broken claim it finds, so green
+means the whole repo is clean but red only guarantees at least one problem.
+_Avoid_: sweep, validation run (ambiguous with fs-forge-cli's own per-file
+`validate`).
+
+**Broken reference**:
+A claim field (`user:`/`group:`/`system:`/`domain:`/`component:`/
+`ref:secretsclaim:`) that no longer resolves to an existing claim at render
+time. Only ever caught by a render — PR-verify, `validate-claims.yaml`, or
+`provision-claim.yaml` — never by fs-forge-cli's own `validate`, which is
+schema-only and doesn't look at other claims.
+_Avoid_: dangling reference, orphaned reference.
+
+**Fix hand-off**:
+`troubleshooting`'s practice of continuing straight into the playbook that
+owns a diagnosed problem's remedy (`edit-claim`/`clone-claim`/`create-claim`)
+the moment one is identified, rather than stopping at naming it — that
+playbook's own plan-then-approve-then-land flow still gates every change.
+Deleting a claim is never chosen this way: it's only ever suggested, and only
+proceeds once the client explicitly asks for it.
+_Avoid_: auto-fix, auto-remediate (both overclaim unattended action; approval
+is still required).
+
 **Workflow skill**:
 A skill that is part of the generalized workflow set and is meant to apply to
 any repository.
@@ -161,5 +189,7 @@ See [`docs/adr/`](docs/adr/) for the why behind: source-of-truth, GitHub-only
 tracker, governance banner, single/multi-context support, the install model, the
 two-category model (workflow set + opt-in operational set, ADR-0006),
 schema-drift detection over auto-sync (ADR-0007), tracking Upstream via a
-notifier Action + human-run generic sync skill (ADR-0008), and scoping
-`preflight`'s collision-handling gaps deliberately (ADR-0009).
+notifier Action + human-run generic sync skill (ADR-0008), scoping
+`preflight`'s collision-handling gaps deliberately (ADR-0009), and
+troubleshooting's move from diagnose-only to a scoped, staged fix hand-off
+(ADR-0010).
