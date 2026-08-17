@@ -24,7 +24,7 @@ The map is a single issue on this repo's issue tracker, labelled `wayfinder:map`
 
 The map is an **index**, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place — its ticket — so the map never restates it, only gists it and links.
 
-**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** These skills use **GitHub** as the issue tracker (`gh` CLI); see [setup-workflow/issue-tracker-github.md](../setup-workflow/issue-tracker-github.md)'s "Wayfinding operations" section for the exact commands. Run `/setup-workflow` first if the repo hasn't been bootstrapped.
+**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** These skills use **GitHub** as the issue tracker (`gh` CLI); see [setup-workflow/issue-tracker-github.md](../setup-workflow/issue-tracker-github.md)'s "Wayfinding operations" section for the exact commands. Tell the user to run `/setup-workflow` first if the repo hasn't been bootstrapped.
 
 ### The map body
 
