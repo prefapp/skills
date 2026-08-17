@@ -26,9 +26,14 @@ If the client wants "one like an existing X but with Y different", use
    (`../reference/fs-forge-mutation-shared.md` lists the fixed flags that are safe to
    hardcode).
 
-2. **Pre-check uniqueness:** confirm `<Kind>-<name>` doesn't already exist
-   (`../reference/fs-forge-discovery.md`'s discovery commands) before building a
-   plan — tell the client and suggest `edit` instead if it does.
+2. **Pre-check uniqueness:** for a repo, team, user, or TF workspace, run
+   `preflight --create` (`../reference/fs-forge-preflight.md`) before building
+   a plan — it covers both a claims-map conflict and a same-named resource
+   already at the provider. Every other kind: confirm `<Kind>-<name>` doesn't
+   already exist via `../reference/fs-forge-discovery.md`'s discovery commands
+   instead. Tell the client and suggest `edit` on a claim conflict; on a
+   provider conflict, stop and explain — there's no import path yet
+   (`../reference/fs-forge-preflight.md`).
 
 3. **Build the claim in one invocation:**
    ```bash

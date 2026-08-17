@@ -119,6 +119,11 @@ support differs from every other operation, so check it before planning:
    - For TFWorkspaceClaim, ask the client whether to keep variant CRs and
      pass `--include-variants`/`--no-include-variants` accordingly; every
      other kind has no variants, so leave this flag off.
+   - Optional fast check first, for ComponentClaim/GroupClaim/UserClaim/
+     TFWorkspaceClaim: `preflight --deletion`
+     (`../reference/fs-forge-preflight.md`) confirms the claim exists in one
+     sub-second call — step 3's dry-run confirms it either way, so this is a
+     scriptable shortcut, not a replacement.
 3. **Dry-run** (no `--commit`) with those flags, to confirm the claim
    exists and preview the dispatch:
    ```bash

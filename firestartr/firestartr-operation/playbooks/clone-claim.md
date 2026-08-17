@@ -12,12 +12,19 @@ see `../reference/fs-forge-edit-clone.md` for the invocation idiom.
    or the full `ComponentClaim` — both work here). Confirm what should differ
    in the new one (the client rarely wants an exact duplicate — at minimum
    the name changes, usually also owner/visibility/members/etc.).
-2. **Read the source** (optional but recommended when you don't already know
+2. **Pre-check the new name.** For ComponentClaim/GroupClaim/UserClaim/
+   TFWorkspaceClaim, run `preflight --create` on the new name
+   (`../reference/fs-forge-preflight.md`) before building a plan — it covers
+   both a claims-map conflict and a same-named resource already at the
+   provider. Every other kind: confirm `<Kind>-<new-name>` doesn't already
+   exist via `../reference/fs-forge-discovery.md`'s discovery commands
+   instead (same pre-check `create-claim.md` runs for its unsupported kinds).
+3. **Read the source** (optional but recommended when you don't already know
    its fields): `edit <Kind>-<source-name> --org={org}` with no mutating flags.
-3. **Discover flags** for the kind via `create <Kind> --help --json` (same
+4. **Discover flags** for the kind via `create <Kind> --help --json` (same
    discovery step as `create`/`edit` — never `clone --help --json`, which
    mixes every kind's flags together).
-4. **Dry-run:**
+5. **Dry-run:**
    ```bash
    npx @firestartr/fs-forge-cli@{version} clone <Kind> --org={org} \
      --from <source-name> --name <new-name> \
@@ -32,7 +39,7 @@ see `../reference/fs-forge-edit-clone.md` for the invocation idiom.
 
    > **Check this first:** a rejected `--commit` (uniqueness, schema, stale
    > branch) — see `troubleshooting.md#fs-forge-cli-command-failures`.
-5. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
+6. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
    `--commit` warning (it also covers the uniqueness check `clone --commit`
    runs on its own).
 

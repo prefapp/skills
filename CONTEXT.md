@@ -189,5 +189,7 @@ See [`docs/adr/`](docs/adr/) for the why behind: source-of-truth, GitHub-only
 tracker, governance banner, single/multi-context support, the install model, the
 two-category model (workflow set + opt-in operational set, ADR-0006),
 schema-drift detection over auto-sync (ADR-0007), tracking Upstream via a
-notifier Action + human-run generic sync skill (ADR-0008), and troubleshooting's
-move from diagnose-only to a scoped, staged fix hand-off (ADR-0009).
+notifier Action + human-run generic sync skill (ADR-0008), scoping
+`preflight`'s collision-handling gaps deliberately (ADR-0009), and
+troubleshooting's move from diagnose-only to a scoped, staged fix hand-off
+(ADR-0010).
