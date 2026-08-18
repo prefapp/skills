@@ -34,14 +34,14 @@ repeatable flag's own `description` states this rule itself), and
 `description` (when the CLI provides one — check it before asking the
 client).
 
-**Never hardcode a CLI flag name for a schema field.** Derive schema-field
-flag paths from the FlagSpec returned by `--help --json`. Every other flag
-this cookbook uses is already a fixed, hardcoded name, safe to keep
+**Never hardcode a CLI flag name for a schema field.** Derive schema-field flag
+paths from the FlagSpec entries in `--help --json`'s `.flags[]`. Every other
+flag this cookbook uses is already a fixed, hardcoded name, safe to keep
 hardcoding: `org`, `commit`, and `path` on every kind; `diff` and `json` on
 `edit`/`clone` only (`create` has neither); ComponentClaim's own
 `feature`/`add-feature`/`remove-feature` (`fs-forge-features.md`'s "Feature
-CRUD"); and the two schema org-field paths documented next, identified by
-exact `path` match, never fuzzy "contains org" matching.
+CRUD"); and the two schema org-field paths documented next, identified by exact
+`path` match, never fuzzy "contains org" matching.
 
 ## `{org}` passthrough — two distinct flags
 
