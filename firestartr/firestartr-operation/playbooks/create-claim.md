@@ -22,7 +22,7 @@ If the client wants "one like an existing X but with Y different", use
    ```
    Map client answers + policy defaults from `../reference/reference.md` onto the
    logical claim-field paths returned in the FlagSpec. **Never hardcode a CLI flag
-   name** for a schema field — derive the `name` from the FlagSpec for each value
+   name** for a schema field — derive the `path` from the FlagSpec for each value
    (`../reference/fs-forge-mutation-shared.md` lists the fixed flags that are safe to
    hardcode).
 
@@ -53,8 +53,8 @@ If the client wants "one like an existing X but with Y different", use
    TFWorkspaceClaim/SecretsClaim also need `--path claims/{...}/{name}.yaml`
    (rejected for every other kind; only required once `--commit` is added).
    For complex arrays and union values, write the value to a temporary JSON
-   file and use the `name` from the relevant FlagSpec for its `.json`
-   escape-hatch flag — pass that discovered name verbatim, never construct or
+   file and use the `path` from the relevant FlagSpec for its `.json`
+   escape-hatch flag — pass that discovered path verbatim, never construct or
    hardcode it. Then validate:
    ```bash
    npx @firestartr/fs-forge-cli@{version} validate -f claims/{dir}/{name}.yaml

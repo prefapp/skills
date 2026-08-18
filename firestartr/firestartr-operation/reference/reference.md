@@ -77,7 +77,7 @@ configuration. For the org's real, current repo-level claim defaults
 `npx @firestartr/fs-forge-cli@{version} defaults show <kind> --org={org}`.
 
 These are logical claim-field values, not literal CLI flag names. Map them to the
-matching FlagSpec paths and use each returned `name` when calling
+matching FlagSpec paths and use each returned `path` when calling
 `npx @firestartr/fs-forge-cli@{version} create`.
 All default `version: "1.0"`. The `{org}` flag value (see
 `fs-forge-mutation-shared.md`) is resolved from `firestartr-config.yaml` and

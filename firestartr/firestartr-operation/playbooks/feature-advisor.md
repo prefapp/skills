@@ -41,8 +41,8 @@ without requiring them to know features exist or what they're called.
 6. **Configure args** (if accepted): ask for values the schema doesn't
    default well for the user's context, one at a time with a recommended
    default. `features add --name <feature> --help --json` gives full
-   `args.*` FlagSpecs. Then follow the Rules in `SKILL.md` (show-plan →
-   approve → execute → show-result).
+   `args.*` FlagSpecs under `.flags[]`. Then follow the Rules in `SKILL.md`
+   (show-plan → approve → execute → show-result).
 
 ## Multiple features
 

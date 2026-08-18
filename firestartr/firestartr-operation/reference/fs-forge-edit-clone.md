@@ -30,7 +30,7 @@ unavailable.
 
 Mutation flags come from the same discovery step as `create` — run
 `npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json` for the
-target kind and reuse the returned flag `name`s (`fs-forge-mutation-shared.md`).
+target kind and reuse the returned flag `path`s (`fs-forge-mutation-shared.md`).
 `edit --help --json` mixes every kind's flags together since the kind isn't
 known until the reference argument is parsed — don't use it for discovery.
 

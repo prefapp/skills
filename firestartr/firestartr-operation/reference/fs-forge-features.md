@@ -30,11 +30,12 @@ npx @firestartr/fs-forge-cli@{version} features add --name <feature> --help --js
 ```
 
 Resolves the Feature's **latest published schema** from the Feature source
-(`--source`, defaults to `firestartr-pro/docs`) and returns FlagSpecs for
-`args.<field>` alongside the fixed `name`/`version`/`ref`/`repo` flags — same
-FlagSpec discovery idiom as `create <Kind> --help --json`
-(`fs-forge-mutation-shared.md`). The reference's own `version`/`ref` only pins
-what the claim stores; it never selects which schema validates `args`.
+(`--source`, defaults to `firestartr-pro/docs`) and returns a `CommandHelpJson`
+object whose `.flags[]` includes `args.<field>` entries alongside the fixed
+`name`/`version`/`ref`/`repo` flags — same discovery idiom as `create <Kind>
+--help --json` (`fs-forge-mutation-shared.md`). The reference's own
+`version`/`ref` only pins what the claim stores; it never selects which
+schema validates `args`.
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} features add <component> --org={org} \
