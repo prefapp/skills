@@ -45,18 +45,22 @@ npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
 
 `--diff` prints a **Claim diff** to stderr (not a relation/topology tree —
 that's `discovery map`'s job, `fs-forge-discovery.md`). Add `--json` for the
-structured form: a flat `ClaimDiff[]` array.
+structured form: a flat `ClaimDiff[]` array — `{path, before, after}` per
+changed field; no separate published schema of its own.
 
 Add `--show-defaults` **unconditionally, every time** — it implies `--diff`
 and fetches the same repo-level claim defaults `edit`/`clone` already apply
 automatically (`fs-forge-mutation-shared.md`'s "Claim defaults"), widening
 the diff's "after" side to the fully-defaulted claim: defaults show up as
 ordinary `+` lines alongside the client's own field changes. Combined with
-`--json`, the structured shape becomes `{"changes": [...], "defaults":
-{...}}` instead of the flat `ClaimDiff[]` — `--diff --json` alone, without
-`--show-defaults`, keeps that flat shape untouched. Show the printed diff to
-the client and get approval. Only then re-run the same command with
-`--commit` appended (`fs-forge-mutation-shared.md`'s `--commit` warning):
+`--json`, the structured shape becomes the published **`MutationDiff`**
+contract — `{"changes": [...], "defaults": {...}}`, same `{path, before,
+after}` items as the flat array plus the defaulted paths (schema: `schema
+show MutationDiff`, `fs-forge-cookbook.md`) — `--diff --json` alone, without
+`--show-defaults`, keeps the flat `ClaimDiff[]` shape untouched. Show the
+printed diff to the client and get approval. Only then re-run the same
+command with `--commit` appended (`fs-forge-mutation-shared.md`'s `--commit`
+warning):
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \

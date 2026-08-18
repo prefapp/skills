@@ -42,7 +42,8 @@ Options: repeatable `--kind <kind>` filters to one or more kinds (short ID
 like `component` or the full `ComponentClaim` — both spellings work here and
 for `clone`'s kind argument), `--ref <branch|tag|commit>` pins the claims repo
 revision, `--ascii` swaps emoji icons for bracket tags, `--json` returns the
-structured graph (`{"nodes": [...], "edges": [...]}`) instead of the rendered
+structured **`RelationGraph`** (`{"nodes": [...], "edges": [...]}` — schema:
+`schema show RelationGraph`, `fs-forge-cookbook.md`) instead of the rendered
 tree — use `--json` when the result feeds another step rather than the
 client's eyes.
 
