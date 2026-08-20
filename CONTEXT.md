@@ -119,6 +119,26 @@ new skill directories (net-new Upstream skills are suggestion-only), and
 conditionally advances the fork's last-checked SHA. Not distributed by
 `install.sh`.
 
+**Promote run**:
+The push-triggered GitHub Actions workflow
+(`.github/workflows/promote-firestartr-operation.yml`, path-filtered to
+`firestartr/firestartr-operation/`) that mirrors that skill into the
+`firestartr_operation` Feature package in `prefapp/features` and opens one
+reviewable **Promotion PR** there. It runs **no agent** and edits nothing
+here: copy → regenerate the package's `files:`/`schema.json` → guard → PR.
+Distinct from a **Sync run**, which only notifies about Upstream drift into
+our workflow set.
+_Avoid_: sync run, mirror job, auto-sync.
+
+**Promotion PR**:
+The PR a Promote run opens against `prefapp/features`, carrying the mirrored
+skill content. Gated by that repo's CI and a human's approval — nothing
+reaches the public catalog unattended. Titled with a `fix:`
+conventional-commit prefix by default; a reviewer bumps it to `feat:` when
+the content warrants a minor release. Distinct from a **Sync issue**, which
+is a report of pending Upstream changes, not a change itself.
+_Avoid_: sync PR, mirror PR.
+
 **Governance banner**:
 The one-line preamble at the top of each skill telling the agent to read the
 target repo's `AGENTS.md` / `CLAUDE.md` first and obey it. Repo rules override
@@ -192,4 +212,6 @@ schema-drift detection over auto-sync (ADR-0007), tracking Upstream via a
 notifier Action + human-run generic sync skill (ADR-0008), scoping
 `preflight`'s collision-handling gaps deliberately (ADR-0009), and
 troubleshooting's move from diagnose-only to a scoped, staged fix hand-off
-(ADR-0010).
+(ADR-0010), and distributing `firestartr-operation` as a public
+Feature-package mirror kept current by a push-triggered Promote run opening
+a reviewable Promotion PR (ADR-0011).

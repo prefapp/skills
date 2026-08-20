@@ -1,0 +1,134 @@
+# Promote run: mirror firestartr/firestartr-operation/ into the prefapp/features
+# `firestartr_operation` Feature package and open one reviewable Promotion PR
+# there (`fix:`-prefixed by default). No agent runs here. Hard-fails with no PR
+# when the guard finds a Mustache collision or a reference escaping the package.
+# See docs/adr/0011-promote-firestartr-operation.md.
+name: Promote firestartr-operation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "firestartr/firestartr-operation/**"
+  workflow_dispatch:
+    inputs:
+      features_ref:
+        description: "prefapp/features ref to promote into (default: main)"
+        required: false
+      dry_run:
+        description: "Stop before opening the Promotion PR; report the diff instead"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: promote-firestartr-operation
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout skills
+        uses: actions/checkout@v7
+        with:
+          path: skills
+
+      - name: Mint prefapp/features-scoped token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        # No new App: the FS_STATE App's org-shared credentials (the same
+        # vars.FS_STATE_APP_ID / secrets.FS_STATE_PEM_FILE prefapp/features'
+        # release-please uses) resolve at the org level; this step fails fast
+        # if the org does not define them.
+        with:
+          app-id: ${{ vars.FS_STATE_APP_ID }}
+          private-key: ${{ secrets.FS_STATE_PEM_FILE }}
+          owner: prefapp
+          repositories: features
+
+      - name: Checkout prefapp/features
+        uses: actions/checkout@v7
+        with:
+          repository: prefapp/features
+          path: features
+          ref: ${{ github.event.inputs.features_ref }}
+          token: ${{ steps.app-token.outputs.token }}
+
+      # Replace the skill-owned files with a fresh mirror, keeping
+      # features-owned additions (e.g. templates/docs/ catalog content) in
+      # place, then regenerate the package's files: list from the result.
+      - name: Mirror skill into the firestartr_operation package
+        run: |
+          set -euo pipefail
+          pkg="features/packages/firestartr_operation"
+          dest="$pkg/templates"
+          mkdir -p "$dest"
+          find "$dest" -mindepth 1 -maxdepth 1 ! -name docs -exec rm -rf {} +
+          cp -a skills/firestartr/firestartr-operation/. "$dest/"
+          python3 skills/.github/promote-run/regen_files_list.py \
+            --templates "$dest" --config "$pkg/config.yaml"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
+        with:
+          version: "11"
+
+      - name: Regenerate package schemas
+        working-directory: features
+        run: |
+          pnpm config set @prefapp:registry https://npm.pkg.github.com
+          pnpm config set //npm.pkg.github.com/:_authToken "${{ secrets.GITHUB_TOKEN }}"
+          pnpm install --frozen-lockfile
+          pnpm generate:schemas
+
+      # Step 2's guard: hard-fail with no PR on any violation.
+      - name: Guard the copied tree
+        run: python3 skills/.github/promote-run/guard_promotion.py \
+          --root features/packages/firestartr_operation/templates
+
+      - name: Open the Promotion PR (no-op when nothing changed)
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          pkg="packages/firestartr_operation"
+          if [ -z "$(git -C features status --porcelain -- "$pkg")" ]; then
+            echo "Mirror unchanged since the last promotion; nothing to do."
+            exit 0
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "dry_run: not opening a PR; changes vs the checked-out ref:"
+            git -C features diff --stat -- "$pkg"
+            git -C features diff -- "$pkg" | head -200
+            exit 0
+          fi
+          login="$(gh api user --jq .login)"
+          user_id="$(gh api user --jq .id)"
+          git -C features config user.name "$login"
+          git -C features config user.email "${user_id}+${login}@users.noreply.github.com"
+          branch="promote/firestartr-operation-$(date -u +%Y%m%d-%H%M%S)"
+          git -C features checkout -b "$branch"
+          git -C features add "$pkg"
+          git -C features commit -m "fix: promote firestartr-operation from prefapp/skills@${GITHUB_SHA:0:8}"
+          git -C features push -u origin "$branch"
+          {
+            echo "Mechanical mirror of \`firestartr/firestartr-operation/\` from"
+            echo "\`prefapp/skills\` at \`${GITHUB_SHA:0:8}\`."
+            echo
+            echo "The promote-run guard passed: no Mustache collisions, no"
+            echo "references escaping the package."
+            echo
+            echo "Titled \`fix:\` by default — bump to \`feat:\` if the content"
+            echo "deserves a minor release."
+            echo
+            echo '```'
+            git -C features diff --stat "main...$branch" -- "$pkg"
+            echo '```'
+          } > /tmp/promotion-pr-body.md
+          gh pr create -R prefapp/features \
+            --title "fix: promote firestartr-operation (prefapp/skills@${GITHUB_SHA:0:8})" \
+            --body-file /tmp/promotion-pr-body.md
