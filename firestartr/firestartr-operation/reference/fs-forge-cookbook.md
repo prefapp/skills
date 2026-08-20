@@ -29,6 +29,35 @@ and tell the user:
 
 Never hand-author a claim body when fs-forge is unavailable.
 
+## Discover the CLI's own machine-readable contracts
+
+Local and offline — no `--org`, no network, no claims-repo checkout:
+
+```bash
+npx @firestartr/fs-forge-cli@{version} schema list --json
+npx @firestartr/fs-forge-cli@{version} schema show CommandHelpJson
+npx @firestartr/fs-forge-cli@{version} schema show RelationGraph
+npx @firestartr/fs-forge-cli@{version} schema show MutationDiff
+```
+
+`schema list --json` prints the three published contract names; `schema show
+<Name>` prints that JSON Schema verbatim. Read one whenever a command's JSON
+output needs more certainty than this cookbook's prose gives:
+`CommandHelpJson` for `--help --json` (`fs-forge-mutation-shared.md`),
+`RelationGraph` for `discovery map --json`/`diagram print`
+(`fs-forge-discovery.md`), `MutationDiff` for `edit`/`clone --diff --json
+--show-defaults` (`fs-forge-edit-clone.md`).
+
+## List supported claim kinds
+
+```bash
+npx @firestartr/fs-forge-cli@{version} kinds --json
+```
+
+Local and offline. Each entry's `description` is the schema's own one-line
+summary — prefer it, translated to client terms (never "claim" — Rule 1,
+`../SKILL.md`), over composing your own when explaining what's available.
+
 ## Validate a claim file (syntactic only)
 
 ```bash

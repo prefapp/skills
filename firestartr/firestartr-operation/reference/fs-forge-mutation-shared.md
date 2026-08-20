@@ -9,22 +9,39 @@ Cross-cutting rules `create`, `edit`, and `clone` all lean on. Sibling of
 npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json
 ```
 
-This returns an array of FlagSpec objects — `name` (flag name, without the
-leading `--`; pass it as `--<name>`), `path` (dotted claim-field path, e.g.
-`providers.github.org`), `type`, `required`, `options` (allowed values, when
-constrained), `multiple` (passing it several times **replaces** the whole
-array, it never appends — read the current value first, compute the full
-desired list, then pass it whole), and `description` (when the CLI provides
-one — check it before asking the client).
+This (and dynamic Feature help, `fs-forge-features.md`) returns a
+**`CommandHelpJson`** object, never a root-level array — full contract:
+`npx @firestartr/fs-forge-cli@{version} schema show CommandHelpJson`
+(`fs-forge-cookbook.md`'s contract-discovery commands). Besides `flags`
+(below), read: `id`/`aliases` to confirm which command actually matched;
+`description`/`summary` — the command's own explanation; prefer these,
+translated to client terms (Rule 1, `../SKILL.md`), over composing your own
+when telling the client what an operation does; `usage`/`examples` for the
+canonical invocation; `args` for positional-argument specs (same
+`required`/`multiple` idea as flags); and `relationships` for declarative
+arg/flag constraints — e.g. `features add`'s "a component name or `--file`,
+never both" is `{"type": "exactlyOne", "args": ["component"], "flags":
+["file"]}` — read this instead of inferring the rule from prose.
+
+Read the flags themselves from **`.flags[]`**: `path` (dotted claim-field
+path, e.g. `providers.github.org` — also the flag's literal name; pass a
+value as `--<path>=<value>`), `type`, `required`, `conditionalRequired`
+(required only once its parent object/union branch is actually supplied),
+`options` (allowed values, when constrained), `default`, `multiple` (passing
+it several times **replaces** the whole array, it never appends — read the
+current value first, compute the full desired list, then pass it whole; a
+repeatable flag's own `description` states this rule itself), and
+`description` (when the CLI provides one — check it before asking the
+client).
 
 **Never hardcode a CLI flag name for a schema field.** Derive schema-field flag
-names from the FlagSpec returned by `--help --json`. Every other flag this
-cookbook uses is already a fixed, hardcoded name, safe to keep hardcoding:
-`org`, `commit`, and `path` on every kind; `diff` and `json` on `edit`/`clone`
-only (`create` has neither); ComponentClaim's own
+paths from the FlagSpec entries in `--help --json`'s `.flags[]`. Every other
+flag this cookbook uses is already a fixed, hardcoded name, safe to keep
+hardcoding: `org`, `commit`, and `path` on every kind; `diff` and `json` on
+`edit`/`clone` only (`create` has neither); ComponentClaim's own
 `feature`/`add-feature`/`remove-feature` (`fs-forge-features.md`'s "Feature
-CRUD"); and the two schema org-field paths documented next, identified by
-exact `path` match, never fuzzy "contains org" matching.
+CRUD"); and the two schema org-field paths documented next, identified by exact
+`path` match, never fuzzy "contains org" matching.
 
 ## `{org}` passthrough — two distinct flags
 
@@ -54,7 +71,7 @@ runtime:
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json \
-  | jq -r '.[] | select(.path == "providers.github.org" or .path == "providers.github.orgName") | "--\(.name)=\("{org}")"'
+  | jq -r '.flags[] | select(.path == "providers.github.org" or .path == "providers.github.orgName") | "--\(.path)=\("{org}")"'
 ```
 
 Pass the resulting `--<flag>=<value>` to `create`, `edit`, or `clone`.
