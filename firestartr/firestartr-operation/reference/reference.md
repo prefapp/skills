@@ -96,23 +96,33 @@ passed to the kind's org field flag.
 - **SystemClaim**: `domain: domain:{org}-domain`.
 - **SecretsClaim**: `lifecycle: production`, external-secrets provider:
   `refreshInterval: 24h`.
-- **TFWorkspaceClaim**: Terraform provider: `source: remote`, `policy: apply`,
+- **TFWorkspaceClaim**: Terraform provider: `source: remote` (`inline` also
+  valid — see "Terraform modules" below), `policy: apply`,
   `sync: {policy: observe, period: 24h, enabled: true}`,
   `backend: firestartr-terraform-state`.
 - **OrgWebhookClaim**: GitHub provider:
   `webhook: {active: true, contentType: json}`.
 
-## Terraform modules (TFWorkspaceClaim, remote source)
+## Terraform modules (TFWorkspaceClaim)
 
-Remote modules live in **`prefapp/tfm`** — the canonical module repo, always the
-`prefapp` org **regardless of the client's organization**. Discover, never guess
-(commands in `gh-cookbook.md`): list `modules/`, read the module's `variables.tf`
-for inputs, pin the latest per-module release tag (`{module}-vX.Y.Z`).
+`providers.terraform.source` is `remote` or `inline` — both equally valid;
+pick per claim.
 
-`module: git::https://github.com/prefapp/tfm.git//modules/{module}?ref={module}-vX.Y.Z`
+- **`remote`** — pull a module from git. `prefapp/tfm` is Prefapp's own
+  module repo: public (Apache-2.0), actively maintained, usable by anyone —
+  not a mandatory dependency. Discover, never guess (commands in
+  `gh-cookbook.md`): list `modules/`, read the module's `variables.tf` for
+  inputs, pin the latest per-module release tag (`{module}-vX.Y.Z`).
+
+  `module: git::https://github.com/prefapp/tfm.git//modules/{module}?ref={module}-vX.Y.Z`
+
+- **`inline`** — raw Terraform HCL directly in `module`; no external repo,
+  no discovery step.
 
 Common intent → module / `resourceType`: S3 bucket → `aws-s3` / `aws-s3`,
 RDS → `aws-rds`, EKS → `aws-eks` / `aws-eks`, AKS → `azure-aks`, VPC → `aws-vpc`.
+Lean `remote` (`prefapp/tfm`) for these; lean `inline` for anything else or
+genuinely bespoke.
 
 ## Features catalog (ComponentClaim)
 

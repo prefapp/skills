@@ -84,8 +84,9 @@ fails HTTP 422. Proceed only when `conclusion` is `success`.
 
 ## Discover Terraform modules (TFWorkspaceClaim)
 
-Commands for `reference.md`'s Terraform modules rule (always `prefapp/tfm`,
-discover don't guess):
+Commands for `reference.md`'s Terraform modules section, if sourcing
+`remote` from Prefapp's own `prefapp/tfm` (public; discover, don't guess —
+`inline` needs none of this):
 
 ```bash
 # List available modules (dirs under modules/)
