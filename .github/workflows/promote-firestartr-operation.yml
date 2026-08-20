@@ -45,7 +45,7 @@ jobs:
         # release-please uses) resolve at the org level; this step fails fast
         # if the org does not define them.
         with:
-          app-id: ${{ vars.FS_STATE_APP_ID }}
+          client-id: ${{ vars.FS_STATE_APP_ID }}
           private-key: ${{ secrets.FS_STATE_PEM_FILE }}
           owner: prefapp
           repositories: features
@@ -87,8 +87,10 @@ jobs:
 
       # Step 2's guard: hard-fail with no PR on any violation.
       - name: Guard the copied tree
-        run: python3 skills/.github/promote-run/guard_promotion.py \
-          --root features/packages/firestartr_operation/templates
+        run: |
+          set -euo pipefail
+          python3 skills/.github/promote-run/guard_promotion.py \
+            --root features/packages/firestartr_operation/templates
 
       - name: Open the Promotion PR (no-op when nothing changed)
         env:
