@@ -39,10 +39,13 @@ From the root of the `skills` repo:
 ./install.sh --fs
 ```
 
-This symlinks the skill into your agent harness(es) under the
-`prefapp-firestartr` namespace. See the
-[root README](../../README.md) for per-harness discovery details. `git pull`
-keeps it up to date automatically.
+This symlinks the skill flat into `~/.agents/skills/firestartr-operation` —
+the location pi, OpenCode, and VS Code Copilot all read — plus
+`~/.claude/skills/firestartr-operation` if Claude Code is detected. pi and
+OpenCode discover skills recursively, but Claude Code and VS Code Copilot only
+read one level deep (`<skills-root>/<skill>/SKILL.md`), so a flat, per-skill
+symlink is what all four agree on. `git pull` keeps it up to date
+automatically.
 
 ## 🚀 First run
 
