@@ -28,12 +28,67 @@ The skill runs inside an agent harness. If you don't have one yet, pick either:
   `curl -fsSL https://pi.dev/install.sh | sh`
   ([docs](https://pi.dev/docs/latest))
 
-Both discover skills from `~/.agents/skills/`, which is where the installer
-links this skill. Claude Code is also supported via `~/.claude/skills/`.
+Both discover skills from `~/.agents/skills/`, which is where the install
+steps below link this skill. Claude Code is also supported via
+`~/.claude/skills/`.
 
 ## 📦 Install
 
-From the root of the `skills` repo:
+The skill ships as a Firestartr Feature — `firestartr_operation`, from the
+`prefapp/features` registry — so you install it the way you install any other
+Feature: add it to a repo's claim, then take one one-time step to link it into
+your agent harness. Routine updates then arrive through the same Feature
+update flow you already use.
+
+### 1. Add the Feature to a claim
+
+Attach it to the `ComponentClaim` of a repo you control. A small dedicated
+repo (say `my-firestartr`) keeps the rendered tree tidy, because the Feature
+renders the skill's full tree — `SKILL.md`, `README.md`, `reference/`,
+`playbooks/` — into that repo's root. With `fs-forge`:
+
+```sh
+npx @firestartr/fs-forge-cli features add <component> --org=<org> \
+  --name firestartr_operation --version 0.1.0 --commit
+```
+
+(`<component>` is the repo's bare component name, `<org>` your org slug.) Or
+edit the claim YAML directly, under `providers.github.features`:
+
+```yaml
+- name: firestartr_operation
+  version: 0.1.0
+```
+
+Pin `version: 0.1.0` — or a `ref` once a major tag exists — exactly like any
+other Feature. Hydration renders the skill into the repo.
+
+### 2. One-time symlink into your harness
+
+```sh
+mkdir -p ~/.agents/skills ~/.claude/skills
+ln -s /absolute/path/to/that/repo ~/.agents/skills/firestartr-operation
+ln -s /absolute/path/to/that/repo ~/.claude/skills/firestartr-operation  # Claude Code
+```
+
+pi and OpenCode read `~/.agents/skills/`; Claude Code reads
+`~/.claude/skills/`. The rendered path is stable across version bumps, so
+this symlink keeps resolving through routine `fs-forge features update`s —
+you never recreate it.
+
+### 3. Update
+
+Bump the pinned `version`/`ref` on the claim (`fs-forge features edit`) or
+run your claims repo's Update features workflow — the same as every other
+Feature. Rendered skill files are re-rendered on update, except `.gitignore`,
+which is kept as yours to extend.
+
+---
+
+### Prefapp-internal fallback
+
+Inside Prefapp, the clone-the-whole-repo flow still works. From the root of
+the `skills` repo:
 
 ```sh
 ./install.sh --fs
