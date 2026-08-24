@@ -27,22 +27,24 @@ Override with `--state-repos` when the org uses non-default names.
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} watch-checks \
-  --org={org} --cr-name=<name> \
+  <Kind>-<name> --org={org} \
   [--current] [--timeout=<seconds>] [--json] \
-  [--state-repos=<repo1,repo2>]
+  [--cr-name=<name>] [--state-repos=<repo1,repo2>]
 ```
 
-`--cr-name` is the claim name (repo or team name). Required.
+`<Kind>-<name>` is the claim reference (e.g., `ComponentClaim-my-app`). Required.
 
 ## Flags
 
-| Flag | Default | Meaning |
+| Argument | Required | Meaning |
 |---|---|---|
-| `--org` | — | GitHub org slug (required) |
-| `--cr-name` | — | Claim name to watch (required) |
-| `--timeout` | 300 | Seconds before exit 2; watch mode only |
-| `--json` | false | Emit NDJSON instead of TTY table |
-| `--state-repos` | `<org>/state-github,<org>/state-infra` | Override state-repo names |
+| `<Kind>-<name>` | yes | Claim reference in `<Kind>-<name>` format (e.g., `ComponentClaim-my-app`) |
+| `--org` | yes | GitHub org slug |
+| `--current` | no | Point-in-time snapshot mode (default: watch mode) |
+| `--timeout` | no | Seconds before exit 2; watch mode only (default: 1800) |
+| `--json` | no | Emit NDJSON instead of TTY table |
+| `--cr-name` | no | Filter to a specific CR name (current mode only) |
+| `--state-repos` | no | Override state-repo names (default: `<org>/state-github,<org>/state-infra`) |
 
 ## Exit codes
 
@@ -51,7 +53,7 @@ npx @firestartr/fs-forge-cli@{version} watch-checks \
 | 0 | All checks passed |
 | 1 | At least one check failed — route to `../playbooks/troubleshooting.md#terraform-plan-status-check-pre-merge` |
 | 2 | Timeout reached before all checks completed (watch mode only) |
-| 3 | No open PR found for `--cr-name` |
+| 3 | No open PR found for the claim reference |
 
 ## Output formats
 
@@ -71,3 +73,20 @@ REPO                       CHECK             STATUS
 ```
 
 `status` values: `pending`, `passed`, `failed`, `timed_out`, `not_found`.
+
+## Examples
+
+**Watch mode** — streams until all checks pass or one fails:
+```bash
+npx @firestartr/fs-forge-cli@{version} watch-checks ComponentClaim-my-app --org={org}
+```
+
+**Current mode** — point-in-time snapshot:
+```bash
+npx @firestartr/fs-forge-cli@{version} watch-checks ComponentClaim-my-app --org={org} --current
+```
+
+**JSON output** — for programmatic consumption:
+```bash
+npx @firestartr/fs-forge-cli@{version} watch-checks ComponentClaim-my-app --org={org} --current --json
+```
