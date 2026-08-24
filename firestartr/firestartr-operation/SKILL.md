@@ -110,6 +110,7 @@ always loads `lifecycle` in addition to its authoring playbook.
 | change any other field of an existing repo/team/user | `edit-claim` + `lifecycle` |
 | delete a repo, team, or user | `lifecycle` |
 | know if a repo/team is in sync, drifted, orphaned, or stale | `reconciliation` |
+| watch check runs on a repo, or monitor plan-apply status | `reconciliation` |
 | know who owns a service, what's in a system, or browse/search topology | `catalog` |
 | want a capability in a repo without naming a specific feature | `feature-advisor` (+ `edit-claim` + `lifecycle` if accepted) |
 | know a field, default, feature, or naming rule | `reference/reference.md` |

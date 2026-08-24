@@ -34,7 +34,9 @@ manual.
    diff, not a relation tree — `../reference/fs-forge-edit-clone.md`) and get
    approval.
 3. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
-   `--commit` warning.
+   `--commit` warning. For CLI `>= {tbd}`, always add `--wait-for-checks` — it
+   overrides the CLI's own `false` default so the claims-repo PR also waits for
+   its checks before merging (the state-repo PR always waits regardless).
 4. **Report the outcome.** Don't poll, hydrate, or merge the wet PR yourself
    — `--commit` already did it. Status check: the dispatched
    `provision-claim.yaml` run. Manual hydrate only if the client explicitly

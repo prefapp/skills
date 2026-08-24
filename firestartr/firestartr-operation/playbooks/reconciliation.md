@@ -5,6 +5,19 @@ Answer "is my repo/team in sync?" and related drift/alignment questions. This is
 `create-claim`/`edit-claim` + `lifecycle`. Bash idioms are in
 `../reference/gh-cookbook.md`; the claim→state map is in `../reference/reference.md`.
 
+## Opening move — watch-checks --current (CLI >= {tbd})
+
+Before a manual field diff, get a point-in-time check-status snapshot:
+
+```bash
+npx @firestartr/fs-forge-cli@{version} watch-checks --org={org} --cr-name=<name> --current
+```
+
+Exit 0 (all checks passed) with no drift suspicion → report aligned, no further
+diff needed. Any other exit, or if the client suspects drift → proceed to
+[The comparison](#the-comparison) below.
+Full reference: `../reference/fs-forge-watch-checks.md`.
+
 ## The comparison
 
 Desired state = the claim. Actual reconciled state = the matching resource in the

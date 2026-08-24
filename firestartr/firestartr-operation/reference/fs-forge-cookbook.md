@@ -11,6 +11,7 @@ that matches the task instead of assuming everything lives here:
 | read, edit, or clone an existing claim | `fs-forge-edit-clone.md` |
 | list an org's claims, render its topology, or print an arbitrary relation graph | `fs-forge-discovery.md` |
 | check whether a name is free before create/edit/delete | `fs-forge-preflight.md` |
+| watch check runs on a state-repo PR, or get point-in-time check status | `fs-forge-watch-checks.md` |
 | discover, attach, edit, or remove a Feature on a ComponentClaim | `fs-forge-features.md` |
 | author a brand-new claim with `create` | `../playbooks/create-claim.md` — the invocation lives there, not here |
 

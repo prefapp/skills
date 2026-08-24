@@ -127,6 +127,9 @@ text verbatim, for Terraform-claim and GitHub-claim state PRs alike
 (`../reference/diagnostics.md`). Same client-fixable/escalate call as
 Terraform apply / operator reconciliation below.
 
+> **`watch-checks` exit code 1** (`../reference/fs-forge-watch-checks.md`)
+> means at least one check on a state-repo PR has failed — start here.
+
 ## State-PR merge
 
 `terraform_plan` green and required checks passing but the PR still won't
