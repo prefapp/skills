@@ -159,7 +159,7 @@ pair plus sticky PR comment, not a cluster-only failure class.
 
 > **Deleted claims:** destroy check runs land on the `last-state-pr` PR (from
 > the CR's `firestartr.dev/last-state-pr` annotation), not the deletion
-> wet-PR. Use `watch-checks --current` on that PR to inspect destroy status.
+> wet-PR. Inspect destroy status with `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current` (it follows `last-state-pr`).
 
 ## Read-only playbooks' own failure modes
 
