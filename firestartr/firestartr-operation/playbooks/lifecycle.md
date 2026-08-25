@@ -34,7 +34,9 @@ manual.
    diff, not a relation tree — `../reference/fs-forge-edit-clone.md`) and get
    approval.
 3. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
-   `--commit` warning.
+   `--commit` warning. For CLI `>= {tbd}`, always add `--wait-for-checks` — it
+   overrides the CLI's own `false` default so the claims-repo PR also waits for
+   its checks before merging (the state-repo PR always waits regardless).
 4. **Report the outcome.** Don't poll, hydrate, or merge the wet PR yourself
    — `--commit` already did it. Status check: the dispatched
    `provision-claim.yaml` run. Manual hydrate only if the client explicitly
@@ -141,7 +143,12 @@ support differs from every other operation, so check it before planning:
    `--commit` dispatches `unprovision-claim.yaml`, which fully self-services
    — it merges both the state-repo PR and the claims-repo PR itself. Don't
    poll or merge anything yourself; report the dispatched run.
-5. **Close the audit-trail issue**, linking the merged claim PR in the
+5. **Check run placement.** Destroy check runs and commit statuses land on the wet-PR
+   referenced by the deleted CR's `firestartr.dev/last-state-pr` annotation — not the deletion wet-PR.
+   The deletion wet-PR is merged once its CI passes; destroy feedback lives on the `last-state-pr` PR.
+   Fallback: if `last-state-pr` is missing, check runs go to the deletion wet-PR. Inspect destroy status with:
+   `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current`
+6. **Close the audit-trail issue**, linking the merged claim PR in the
    closing comment (`--commit` has no `Closes #N` footer to do this
    automatically).
 

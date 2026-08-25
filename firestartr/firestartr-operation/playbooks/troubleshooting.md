@@ -127,6 +127,9 @@ text verbatim, for Terraform-claim and GitHub-claim state PRs alike
 (`../reference/diagnostics.md`). Same client-fixable/escalate call as
 Terraform apply / operator reconciliation below.
 
+> **`watch-checks` exit code 1** (`../reference/fs-forge-watch-checks.md`)
+> means at least one check on a state-repo PR has failed — start here.
+
 ## State-PR merge
 
 `terraform_plan` green and required checks passing but the PR still won't
@@ -153,6 +156,10 @@ pair plus sticky PR comment, not a cluster-only failure class.
 > **Check this first:** claim-traceable but still unclear? A
 > [validation sweep](#validation-sweep) is worth a confirmatory dispatch
 > before escalating.
+
+> **Deleted claims:** destroy check runs land on the `last-state-pr` PR (from
+> the CR's `firestartr.dev/last-state-pr` annotation), not the deletion
+> wet-PR. Inspect destroy status with `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current` (it follows `last-state-pr`).
 
 ## Read-only playbooks' own failure modes
 
