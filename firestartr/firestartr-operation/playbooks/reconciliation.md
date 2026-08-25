@@ -10,7 +10,7 @@ Answer "is my repo/team in sync?" and related drift/alignment questions. This is
 Before a manual field diff, get a point-in-time check-status snapshot:
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} watch-checks --org={org} --cr-name=<name> --current
+npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current [--cr-name=<cr-name>]
 ```
 
 Exit 0 (all checks passed) with no drift suspicion → report aligned, no further
