@@ -1,7 +1,6 @@
 # fs-forge watch-checks Reference
 
-Monitor check runs on state-repo PRs produced by `create`/`edit`/`clone`/`delete
---commit`. Sibling of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
+Monitor check runs on state-repo PRs produced by `create`/`edit`/`clone`/`delete --commit`. Sibling of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
 `firestartr-config.yaml`.
 
 **Version guard:** requires `fs-forge-cli >= {tbd}`. Errors as an unrecognized
