@@ -157,6 +157,10 @@ pair plus sticky PR comment, not a cluster-only failure class.
 > [validation sweep](#validation-sweep) is worth a confirmatory dispatch
 > before escalating.
 
+> **Deleted claims:** destroy check runs land on the `last-state-pr` PR (from
+> the CR's `firestartr.dev/last-state-pr` annotation), not the deletion
+> wet-PR. Use `watch-checks --current` on that PR to inspect destroy status.
+
 ## Read-only playbooks' own failure modes
 
 Rule these out before treating either as a real failure:

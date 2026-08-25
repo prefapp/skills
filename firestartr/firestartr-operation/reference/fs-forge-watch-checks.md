@@ -15,7 +15,8 @@ Two modes, mutually exclusive:
   fails, or `--timeout` is reached. Exit code reflects the final outcome.
 - **`--current`** — point-in-time snapshot: reads current check-run state and
   exits immediately. Use as the opening move in `../playbooks/reconciliation.md`
-  before a manual field diff.
+  before a manual field diff. Also shows destroy check runs from deletions,
+  which land on the `last-state-pr` PR (not the deletion wet-PR).
 
 ## State-repo discovery
 

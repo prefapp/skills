@@ -143,7 +143,13 @@ support differs from every other operation, so check it before planning:
    `--commit` dispatches `unprovision-claim.yaml`, which fully self-services
    — it merges both the state-repo PR and the claims-repo PR itself. Don't
    poll or merge anything yourself; report the dispatched run.
-5. **Close the audit-trail issue**, linking the merged claim PR in the
+5. **Check run placement.** Destroy check runs and commit statuses land on the
+   wet-PR referenced by the deleted CR's `firestartr.dev/last-state-pr`
+   annotation — not the deletion wet-PR. The deletion wet-PR is merged once its
+   CI passes; destroy feedback lives on the `last-state-pr` PR. Fallback: if
+   `last-state-pr` is missing, check runs go to the deletion wet-PR. Use
+   `watch-checks --current` on the `last-state-pr` PR to inspect destroy status.
+6. **Close the audit-trail issue**, linking the merged claim PR in the
    closing comment (`--commit` has no `Closes #N` footer to do this
    automatically).
 
