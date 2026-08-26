@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 # Install prefapp-workflow skills into detected agent harnesses.
+# The workflow set is symlinked flat per-skill from skills/workflow into
+# ~/.agents/skills and, when Claude Code is detected, ~/.claude/skills.
 # Idempotent — safe to re-run. Symlinks only, never copies.
+# The Firestartr operational skill is installed via `npx skills add` — a hard
+# network dependency with no fallback, same policy as fs-forge (see
+# skills/firestartr/firestartr-operation/reference/fs-forge-cookbook.md).
 #
-# Run without arguments for usage. Install the workflow set, the opt-in
-# Firestartr operational skill, or both.
+# Run without arguments for usage. Install the workflow set, the Firestartr
+# operational skill, or both.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-SKILLS_DIR="$REPO_DIR/skills"
+SKILLS_DIR="$REPO_DIR/skills/workflow"
 NAMESPACE="prefapp-workflow"
-FIRESTARTR_DIR="$REPO_DIR/firestartr"
-FIRESTARTR_NAMESPACE="prefapp-firestartr"
 
 usage() {
   cat <<'EOF'
@@ -106,8 +109,14 @@ if [ "$INSTALL_WORKFLOW" -eq 1 ]; then
 fi
 
 if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
-  echo "prefapp-firestartr: installing from $FIRESTARTR_DIR"
-  link_into_harnesses "$FIRESTARTR_DIR" "$FIRESTARTR_NAMESPACE"
+  echo "prefapp-firestartr: installing via npx skills add"
+  rc=0
+  npx skills add prefapp/skills --skill firestartr-operation || rc=$?
+  if [ "$rc" -ne 0 ]; then
+    echo "prefapp-firestartr: 'npx skills add' failed (exit $rc) — hard dependency, no fallback." >&2
+    echo "Ensure npx is available (Node >= 18) and that you have network access. Do not proceed without it." >&2
+    exit "$rc"
+  fi
 fi
 
 echo "Done. See README.md for per-harness discovery edge cases."
