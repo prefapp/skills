@@ -42,10 +42,9 @@ update flow you already use.
 
 ### 1. Add the Feature to a claim
 
-Attach it to the `ComponentClaim` of a repo you control. A small dedicated
-repo (say `my-firestartr`) keeps the rendered tree tidy, because the Feature
-renders the skill's full tree — `SKILL.md`, `README.md`, `reference/`,
-`playbooks/` — into that repo's root. With `fs-forge`:
+Attach it to the `ComponentClaim` of any repo you control — it renders under
+`skills/firestartr-operation/` by default, so it coexists with whatever else
+that repo already has. With `fs-forge`:
 
 ```sh
 npx @firestartr/fs-forge-cli features add <component> --org=<org> \
@@ -61,20 +60,36 @@ edit the claim YAML directly, under `providers.github.features`:
 ```
 
 Pin `version: 0.1.0` — or a `ref` once a major tag exists — exactly like any
-other Feature. Hydration renders the skill into the repo.
+other Feature. Hydration renders the skill's full tree — `SKILL.md`,
+`README.md`, `reference/`, `playbooks/` — under `skills/firestartr-operation/`
+in that repo. Override the `skills/` part with an `installationPath` arg if
+you'd rather it land somewhere else:
+
+```yaml
+- name: firestartr_operation
+  version: 0.1.0
+  args:
+    installationPath: tools
+```
+
+A small dedicated repo (say `my-firestartr`) is still a reasonable way to
+keep this fully isolated from everything else you manage — just no longer
+required to avoid collisions, since the render is namespaced either way.
 
 ### 2. One-time symlink into your harness
 
 ```sh
 mkdir -p ~/.agents/skills ~/.claude/skills
-ln -s /absolute/path/to/that/repo ~/.agents/skills/firestartr-operation
-ln -s /absolute/path/to/that/repo ~/.claude/skills/firestartr-operation  # Claude Code
+ln -s /absolute/path/to/that/repo/skills/firestartr-operation ~/.agents/skills/firestartr-operation
+ln -s /absolute/path/to/that/repo/skills/firestartr-operation ~/.claude/skills/firestartr-operation  # Claude Code
 ```
 
 pi and OpenCode read `~/.agents/skills/`; Claude Code reads
 `~/.claude/skills/`. The rendered path is stable across version bumps, so
 this symlink keeps resolving through routine `fs-forge features update`s —
-you never recreate it.
+you never recreate it (an ordinary `version`/`ref` bump never touches the
+`installationPath` arg; only deliberately editing that arg would relocate
+the render).
 
 ### 3. Update
 
