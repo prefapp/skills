@@ -2,7 +2,8 @@
 # `firestartr_operation` Feature package and open one reviewable Promotion PR
 # there (`fix:`-prefixed by default). No agent runs here. Hard-fails with no PR
 # when the guard finds a Mustache collision or a reference escaping the package.
-# See docs/adr/0011-promote-firestartr-operation.md.
+# See docs/adr/0011-promote-firestartr-operation.md and
+# docs/adr/0012-namespace-firestartr-operation-installation-path.md.
 name: Promote firestartr-operation
 
 on:
@@ -61,6 +62,10 @@ jobs:
       # Replace the skill-owned files with a fresh mirror, keeping
       # features-owned additions (e.g. templates/docs/ catalog content) in
       # place, then regenerate the package's files: list from the result.
+      # Every dest is namespaced under installationPath (default "skills")
+      # plus the skill's own name, so the render lands at
+      # skills/firestartr-operation/... in the target repo instead of at its
+      # root — see docs/adr/0012-namespace-firestartr-operation-installation-path.md.
       - name: Mirror skill into the firestartr_operation package
         run: |
           set -euo pipefail
@@ -70,7 +75,8 @@ jobs:
           find "$dest" -mindepth 1 -maxdepth 1 ! -name docs -exec rm -rf {} +
           cp -a skills/firestartr/firestartr-operation/. "$dest/"
           python3 skills/.github/promote-run/regen_files_list.py \
-            --templates "$dest" --config "$pkg/config.yaml"
+            --templates "$dest" --config "$pkg/config.yaml" \
+            --namespace '{{| installationPath |}}/firestartr-operation'
 
       - name: Set up pnpm
         uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093
