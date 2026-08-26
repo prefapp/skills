@@ -1,0 +1,9 @@
+{
+  "bootstrap-sha": "6783ac142e3a42b16309923016325391a3b321e7",
+  "release-type": "simple",
+  "packages": {
+    "skills/firestartr/firestartr-operation": {
+      "package-name": "firestartr-operation"
+    }
+  }
+}
