@@ -78,24 +78,25 @@ Run the local test entrypoints from the repository root:
 ### Opt-in: Firestartr operational skill set
 
 A separate, client-facing operational set (drive a Prefapp-managed Firestartr
-platform via one `/firestartr-operation` command) ships under `firestartr/` and is
-installed separately or together with the workflow set:
+platform via one `/firestartr-operation` command) ships under
+`skills/firestartr/` and is installed separately or together with the workflow
+set:
 
 ```sh
 ./install.sh --fs  # or: ./install.sh --all
 ```
 
-This links each Firestartr skill flat into `~/.agents/skills/` (plus
-`~/.claude/skills/` if Claude Code is detected). On first use the skill asks
-for your organization and writes a git-ignored `firestartr-config.yaml`; nothing
-client-specific is ever committed.
+This installs `firestartr-operation` via the `skills` npm CLI (vercel-labs):
+`npx skills add prefapp/skills --skill firestartr-operation`. On first use the
+skill asks for your organization and writes a git-ignored
+`firestartr-config.yaml`; nothing client-specific is ever committed.
 
 ## Per-harness discovery details
 
 ### `~/.agents/skills` (canonical — always linked, covers pi + OpenCode + VS Code Copilot)
 
 - Skills location: `~/.agents/skills/`
-- Install: one symlink **per skill**, flat — `~/.agents/skills/tdd → <repo>/skills/tdd`
+- Install: one symlink **per skill**, flat — `~/.agents/skills/tdd → <repo>/skills/workflow/tdd`
 - pi and OpenCode discover skills recursively, so a namespace-dir symlink would
   have worked for them; VS Code Copilot's discovery is strictly one level deep
   (`<skills-root>/<skill>/SKILL.md`) and explicitly rejects namespaced `name`
@@ -116,7 +117,7 @@ client-specific is ever committed.
 ### Claude Code
 
 - Skills location: `~/.claude/skills/`
-- Install: one symlink **per skill**, flat — `~/.claude/skills/tdd → <repo>/skills/tdd`
+- Install: one symlink **per skill**, flat — `~/.claude/skills/tdd → <repo>/skills/workflow/tdd`
 - Recursive discovery: **no** — Claude Code only reads `<skills-root>/<skill>/SKILL.md`,
   one level deep. Skill names therefore share one flat namespace
   with your personal skills.
