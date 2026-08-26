@@ -139,6 +139,23 @@ the content warrants a minor release. Distinct from a **Sync issue**, which
 is a report of pending Upstream changes, not a change itself.
 _Avoid_: sync PR, mirror PR.
 
+**Skill README**:
+A skill's own `README.md` — prerequisites, harness install, example
+prompts, a troubleshooting pointer. For `firestartr-operation`, mirrored by
+a Promote run and rendered post-install, namespaced under
+**installationPath**. Distinct from a Feature package's own
+**Docs-catalog README** (pre-install, features-owned) and **Package README**
+(that package's repo-browsing landing page) — see `prefapp/features`'
+`packages/firestartr_operation/CONTEXT.md`.
+
+**installationPath**:
+The `firestartr_operation` Feature's `$arg` (default `"skills"`) that
+prefixes every rendered file's destination, so the skill lands at
+`{installationPath}/firestartr-operation/…` in the target repo instead of
+at its root. Unrelated to **Namespace dir** — that's a superseded
+`install.sh` harness-side layout, a different repo and a different problem.
+_Avoid_: namespace dir (that's the other concept).
+
 **Governance banner**:
 The one-line preamble at the top of each skill telling the agent to read the
 target repo's `AGENTS.md` / `CLAUDE.md` first and obey it. Repo rules override
@@ -212,6 +229,8 @@ schema-drift detection over auto-sync (ADR-0007), tracking Upstream via a
 notifier Action + human-run generic sync skill (ADR-0008), scoping
 `preflight`'s collision-handling gaps deliberately (ADR-0009), and
 troubleshooting's move from diagnose-only to a scoped, staged fix hand-off
-(ADR-0010), and distributing `firestartr-operation` as a public
-Feature-package mirror kept current by a push-triggered Promote run opening
-a reviewable Promotion PR (ADR-0011).
+(ADR-0010), distributing `firestartr-operation` as a public Feature-package
+mirror kept current by a push-triggered Promote run opening a reviewable
+Promotion PR (ADR-0011), and namespacing that render under
+`installationPath` so it can attach to any target repo without colliding
+with what's already there (ADR-0012).
