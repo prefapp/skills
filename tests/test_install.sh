@@ -58,6 +58,20 @@ HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs >/dev/null
   || { echo "FAIL: --fs npx invocation: $(cat "$NARGS")"; exit 1; }
 [ ! -e "$AGENTS/firestartr-operation" ] || { echo "FAIL: --fs created a firestartr-operation symlink"; exit 1; }
 
+# A stale prefapp-firestartr namespace link from the pre-npx script is removed
+# (it pointed at the old firestartr/ tree and is dead), and the npx call still runs.
+reset
+FIRESTARTR_NS="$AGENTS/prefapp-firestartr"
+mkdir -p "$AGENTS" "$CLAUDE"
+ln -sfn "$REPO_DIR/firestartr" "$FIRESTARTR_NS"
+ln -sfn "$REPO_DIR/firestartr" "$CLAUDE/prefapp-firestartr"
+: > "$NARGS"
+OUT="$(HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs 2>&1 >/dev/null)"
+[ ! -L "$FIRESTARTR_NS" ] || { echo "FAIL: stale agents firestartr namespace link not removed"; exit 1; }
+[ ! -L "$CLAUDE/prefapp-firestartr" ] || { echo "FAIL: stale claude firestartr namespace link not removed"; exit 1; }
+[ "$(cat "$NARGS")" = "skills add prefapp/skills --skill firestartr-operation" ] \
+  || { echo "FAIL: --fs npx invocation with stale links: $(cat "$NARGS")"; exit 1; }
+
 # npx failure is a hard dependency: propagated as-is, no fallback, no retry.
 set +e
 FS_ERR="$(HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" FAKE_NPX_EXIT=7 "$INSTALL" --fs 2>&1 >/dev/null)"

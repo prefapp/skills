@@ -110,6 +110,15 @@ fi
 
 if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
   echo "prefapp-firestartr: installing via npx skills add"
+  # Drop stale namespace links left by earlier versions of this script
+  # (pre-npx). The npx install never creates them, and they pointed at the
+  # pre-restructure firestartr/ tree, so they are dead — and now misleading.
+  for dest in "$HOME/.agents/skills" "$HOME/.claude/skills"; do
+    if [ -L "$dest/prefapp-firestartr" ]; then
+      rm -f "$dest/prefapp-firestartr"
+      echo "  prefapp-firestartr: removed stale namespace link $dest/prefapp-firestartr"
+    fi
+  done
   rc=0
   npx skills add prefapp/skills --skill firestartr-operation || rc=$?
   if [ "$rc" -ne 0 ]; then

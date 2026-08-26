@@ -194,7 +194,9 @@ every harness's skills location — no namespace-dir wrapper:
 
 The **operational skill set** is opt-in: `./install.sh --fs` installs
 `firestartr-operation` via `npx skills add prefapp/skills --skill
-firestartr-operation` (versioned release tags; see ADR-0006). Use `--workflow`
+firestartr-operation` (versioned release tags; see ADR-0006). The npx install
+is not a symlink to a local clone — updates require re-running `--fs` (or a
+pinned `--skill firestartr-operation` install). Use `--workflow`
 for the workflow set or `--all` for both; no arguments shows help.
 
 ## Decisions
