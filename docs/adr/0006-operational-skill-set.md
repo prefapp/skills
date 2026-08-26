@@ -32,9 +32,10 @@ group stays isolated from the other.
   first run.
 - **Governance.** Every change is PR-only, never committed to main — stated once
   in `lifecycle`.
-- **Opt-in install.** `install.sh --fs` (or `--all`) creates the
-  `prefapp-firestartr` symlink; the default install is unchanged (workflow set
-  only). Symlink-only, idempotent.
+- **Opt-in install.** `install.sh --fs` (or `--all`) shells out to
+  `npx skills add prefapp/skills --skill firestartr-operation`; the default
+  install is unchanged (workflow set only). Versioned independently via
+  release-please (`firestartr-operation-vX.Y.Z` tags).
 - **Operator/platform kit deferred.** Operator upgrades, image provenance,
   snapshot builds, CLI pinning, and OPA policy authoring target Prefapp
   *operators*, not clients. They stay out of the client entry and are ported on
