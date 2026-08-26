@@ -72,6 +72,19 @@ OUT="$(HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs 2>&1 >/d
 [ "$(cat "$NARGS")" = "skills add prefapp/skills --skill firestartr-operation" ] \
   || { echo "FAIL: --fs npx invocation with stale links: $(cat "$NARGS")"; exit 1; }
 
+# A stale per-skill firestartr-operation link from the old flat layout is also
+# removed — it points at the dead pre-restructure tree, where npx will install.
+reset
+mkdir -p "$AGENTS" "$CLAUDE"
+ln -sfn "$REPO_DIR/firestartr/firestartr-operation" "$AGENTS/firestartr-operation"
+ln -sfn "$REPO_DIR/firestartr/firestartr-operation" "$CLAUDE/firestartr-operation"
+: > "$NARGS"
+OUT="$(HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs 2>&1 >/dev/null)"
+[ ! -L "$AGENTS/firestartr-operation" ] || { echo "FAIL: stale agents firestartr-operation link not removed"; exit 1; }
+[ ! -L "$CLAUDE/firestartr-operation" ] || { echo "FAIL: stale claude firestartr-operation link not removed"; exit 1; }
+[ "$(cat "$NARGS")" = "skills add prefapp/skills --skill firestartr-operation" ] \
+  || { echo "FAIL: --fs npx invocation with stale skill links: $(cat "$NARGS")"; exit 1; }
+
 # npx failure is a hard dependency: propagated as-is, no fallback, no retry.
 set +e
 FS_ERR="$(HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" FAKE_NPX_EXIT=7 "$INSTALL" --fs 2>&1 >/dev/null)"
