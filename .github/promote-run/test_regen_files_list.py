@@ -3,8 +3,10 @@
 
 Covers: regenerating a files: block from a nested tree (dotfiles included,
 sorted), preserving an existing entry's per-file flags, defaulting new files
-to user_managed: true, dropping entries whose files are gone, and failing on
-a config without a top-level files: key.
+to user_managed: true, dropping entries whose files are gone, failing on a
+config without a top-level files: key, prefixing dest with --namespace, and
+matching existing entries by src (not dest) so a dest already carrying a
+Mustache tag from a prior namespaced run still keeps its flags.
 """
 import os
 import sys
@@ -98,6 +100,65 @@ def test_flags_preserved_and_new_files_default():
         tmp.cleanup()
 
 
+def test_namespace_prefixes_dest():
+    tmp = make_tree({
+        "templates/SKILL.md": "hi",
+        "config.yaml": (
+            "feature_name: firestartr_operation\n"
+            "args: {}\n"
+            "files:\n"
+            "\n"
+            "patches: {}\n"
+        ),
+    })
+    try:
+        cfg = os.path.join(tmp.name, "config.yaml")
+        assert regen.main([
+            "--templates", os.path.join(tmp.name, "templates"),
+            "--config", cfg,
+            "--namespace", "{{| installationPath |}}/firestartr-operation",
+        ]) == 0
+        text = open(cfg).read()
+        assert (
+            "  - src: SKILL.md\n"
+            '    dest: "{{| installationPath |}}/firestartr-operation/SKILL.md"\n'
+            "    user_managed: true\n" in text
+        )
+    finally:
+        tmp.cleanup()
+
+
+def test_matches_existing_by_src_when_dest_is_already_namespaced():
+    # Simulates config.yaml after a prior namespaced run: dest carries the
+    # Mustache prefix, so a dest-keyed lookup (the old behavior) would never
+    # match this src again, and would wrongly reset user_managed to true.
+    tmp = make_tree({
+        "templates/SKILL.md": "hi",
+        "config.yaml": (
+            "feature_name: firestartr_operation\n"
+            "args: {}\n"
+            "files:\n"
+            "  - src: SKILL.md\n"
+            '    dest: "{{| installationPath |}}/firestartr-operation/SKILL.md"\n'
+            "    user_managed: false\n"
+            "\n"
+            "patches: {}\n"
+        ),
+    })
+    try:
+        cfg = os.path.join(tmp.name, "config.yaml")
+        assert regen.main([
+            "--templates", os.path.join(tmp.name, "templates"),
+            "--config", cfg,
+            "--namespace", "{{| installationPath |}}/firestartr-operation",
+        ]) == 0
+        text = open(cfg).read()
+        assert "user_managed: false" in text
+        assert "user_managed: true" not in text
+    finally:
+        tmp.cleanup()
+
+
 def test_missing_files_key_fails():
     tmp = make_tree({
         "templates/a.md": "hi",
@@ -113,5 +174,7 @@ def test_missing_files_key_fails():
 if __name__ == "__main__":
     test_regenerate_matches_tree()
     test_flags_preserved_and_new_files_default()
+    test_namespace_prefixes_dest()
+    test_matches_existing_by_src_when_dest_is_already_namespaced()
     test_missing_files_key_fails()
     print("ok")

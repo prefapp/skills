@@ -3,14 +3,19 @@
 
 The Promote run replaces the package's templates/ directory with a fresh
 mirror of the skill; this keeps config.yaml's `files:` list a mechanical
-image of that tree: one `{src, dest, user_managed}` entry per file, dest ==
-src, sorted by path. An entry whose dest already exists keeps its existing
-per-file keys (e.g. `user_managed`); new files default to `user_managed:
-true`. The rest of config.yaml is untouched. Fails if the config has no
-top-level `files:` key.
+image of that tree: one `{src, dest, user_managed}` entry per file, sorted by
+`src`. `dest` is `src` prefixed with `--namespace` (joined with `/`) when
+given, else equal to `src`. Matching an existing entry against the tree is
+done by `src` — the on-disk relative path — never `dest`, since `dest` may
+carry a Mustache tag (e.g. the `installationPath` arg) once namespaced and
+would then never match a plain path lookup again. An entry whose src
+already exists keeps its existing per-file keys (e.g. `user_managed`); new
+files default to `user_managed: true`. The rest of config.yaml is
+untouched. Fails if the config has no top-level `files:` key.
 
 Usage:
-    python3 regen_files_list.py --templates DIR --config config.yaml
+    python3 regen_files_list.py --templates DIR --config config.yaml \
+        [--namespace 'PREFIX']
 """
 import argparse
 import os
@@ -55,28 +60,42 @@ def split_block(lines):
     return i, entries, j
 
 
+def _yaml_scalar(value):
+    """Render `value` as a plain YAML scalar, double-quoting it if required.
+
+    A plain YAML scalar can't start with a flow/indicator character — a
+    namespaced `dest` starts with the literal `{` of a Mustache tag
+    (`{{| installationPath |}}/...`). Every value handled here is a simple
+    path/prefix with nothing that needs escaping inside double quotes.
+    """
+    if value == "" or value[0] in "{}[]&*!|>'\"%@`,#?:-" or ": " in value:
+        return f'"{value}"'
+    return value
+
+
 def render_block(entries):
     lines = ["files:"]
     for e in entries:
-        lines.append(f"  - src: {e['src']}")
-        lines.append(f"    dest: {e['dest']}")
+        lines.append(f"  - src: {_yaml_scalar(e['src'])}")
+        lines.append(f"    dest: {_yaml_scalar(e['dest'])}")
         for key, value in e.items():
             if key not in ("src", "dest"):
                 lines.append(f"    {key}: {value}")
     return lines
 
 
-def rebuild(templates_dir, config_path):
+def rebuild(templates_dir, config_path, namespace=None):
     with open(config_path) as f:
         lines = f.read().splitlines()
     start, entries, end = split_block(lines)
-    by_dest = {e.get("dest"): e for e in entries}
+    by_src = {e.get("src"): e for e in entries}
     new_entries = []
     for rel in tree_files(templates_dir):
-        old = by_dest.get(rel)
+        old = by_src.get(rel)
         extras = {k: v for k, v in (old or {}).items()
                   if k not in ("src", "dest")} if old else {"user_managed": "true"}
-        new_entries.append({"src": rel, "dest": rel, **extras})
+        dest = f"{namespace}/{rel}" if namespace else rel
+        new_entries.append({"src": rel, "dest": dest, **extras})
     return "\n".join(lines[:start] + render_block(new_entries) + lines[end:]) + "\n"
 
 
@@ -84,9 +103,12 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--templates", required=True)
     ap.add_argument("--config", required=True)
+    ap.add_argument("--namespace", default=None,
+                     help="Prefix joined with '/' onto every dest (e.g. a "
+                          "'{{| installationPath |}}/...' Mustache tag).")
     args = ap.parse_args(argv)
     try:
-        new_text = rebuild(args.templates, args.config)
+        new_text = rebuild(args.templates, args.config, args.namespace)
     except ValueError as e:
         print(f"{args.config}: {e}", file=sys.stderr)
         return 1
