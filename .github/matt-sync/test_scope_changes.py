@@ -99,8 +99,46 @@ def test_git_fixture_diff_and_empty_range():
         assert r["suggest_imports"] == ["misc/setup-pre-commit"]
 
 
+def test_our_skill_names_and_classifier_against_workflow_dir():
+    # Mirror this repo's layout: skills/workflow/ holds our skill set, and a
+    # nested cat (firestartr) lives elsewhere under skills/.
+    with tempfile.TemporaryDirectory() as fixture:
+        workflow = os.path.join(fixture, "skills/workflow")
+        for name in ["tdd", "review", "setup-workflow", "implement", "grilling"]:
+            os.makedirs(os.path.join(workflow, name))
+            open(os.path.join(workflow, name, "SKILL.md"), "w").write("x")
+        os.makedirs(os.path.join(fixture, "skills/firestartr/firestartr-operation"))
+        open(os.path.join(
+            fixture, "skills/firestartr/firestartr-operation/SKILL.md"), "w").write("x")
+
+        # (a) --ours skills/workflow picks up exactly the workflow names,
+        # not the firestartr category.
+        names = sc.our_skill_names(os.path.join(workflow))
+        assert names == {"tdd", "review", "setup-workflow", "implement", "grilling"}
+
+        # (b) the classifier still maps upstream paths onto those names.
+        assert sc.classify("skills/engineering/tdd/SKILL.md", names) == (
+            "edit-candidate", ("engineering/tdd", "tdd"))
+
+        # (c) build_report works over a small path list with the workflow set.
+        paths = [
+            "skills/engineering/tdd/SKILL.md",
+            "skills/engineering/code-review/SKILL.md",
+            "skills/misc/setup-pre-commit/SKILL.md",
+            "skills/in-progress/wizard/SKILL.md",
+        ]
+        r = sc.build_report(paths, names)
+        assert r["edit_candidates"] == {
+            "engineering/tdd": "tdd",
+            "engineering/code-review": "review",
+        }
+        assert r["suggest_imports"] == ["misc/setup-pre-commit"]
+        assert r["ignored_count"] == 1
+
+
 if __name__ == "__main__":
     test_classify()
     test_build_report()
     test_git_fixture_diff_and_empty_range()
+    test_our_skill_names_and_classifier_against_workflow_dir()
     print("ok")
