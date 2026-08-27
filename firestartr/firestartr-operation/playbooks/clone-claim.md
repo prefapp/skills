@@ -47,8 +47,24 @@ npx @firestartr/fs-forge-cli@{version} clone <Kind> --org={org} \
 
 `TFWorkspaceClaim`/`SecretsClaim` also need
 `--path claims/{...}/{new-name}.yaml` (the deterministic-path rule from
-`create-claim.md` applies here too). Fix any validation errors, then show
-the printed Claim diff to the client and get approval
+`create-claim.md` applies here too). Fix any validation errors, then check
+the printed Claim diff yourself before showing it to the client — fix
+both before moving on:
+- **No source leakage.** `name` (claim + any provider `name`, e.g.
+  `providers.github.name`) reflects `--name`, not `--from` — a source
+  name leaking through anywhere is a defect, re-run with the missing
+  override flag.
+- **No leftover shape.** `--show-defaults` widens the diff with both
+  platform defaults and fields inherited from `--from` — only the latter
+  need checking here. Every carried-over field the client didn't ask to
+  change (`vars`, `secrets`, `sync`, provider settings, …) belongs on the
+  new claim; strip the rest with `--unset <dotted.path>` or an override,
+  re-running until the diff only has fields the new claim needs. Don't
+  unset a platform default just because it's an unrequested `+` line — the
+  client didn't ask for it either, but it's not a leftover from the
+  source.
+
+Only once both are clean, show the diff to the client and get approval
 (`../reference/fs-forge-edit-clone.md` has the diff/defaults format).
 
 > **Check this first:** a rejected `--commit` (uniqueness, schema, stale
