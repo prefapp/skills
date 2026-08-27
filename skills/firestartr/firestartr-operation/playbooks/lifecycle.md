@@ -15,40 +15,49 @@ For `create-claim`, the client's own choice of ending decides the path: landing
 immediately routes here to fs-forge-managed; an offline artifact routes to
 manual.
 
-## Governance — read once, applies everywhere
+## Governance
 
-- **PR-only. Never commit to `main`.** Every change is a branch → PR → merge.
-- Show the client the proposed change and get approval **before** opening a
-  PR or running `--commit`.
-- Tool preference: try `fs-forge-cli` first; the raw `gh` idioms in the
-  cookbook (and host composite tools like `create_claim_pr`,
-  `github_create_pr_with_changes`, `github_propose_changes_dry_run`, when
-  present) are the fallback for what it doesn't cover.
+SKILL.md's Common rules (show-plan-before, step commitment, etc.) apply
+here too. This playbook adds: **PR-only, never commit to `main`** — every
+change is a branch → PR → merge, and the host composite tools
+(`create_claim_pr`, `github_create_pr_with_changes`,
+`github_propose_changes_dry_run`, when present) are fallbacks for what
+`fs-forge-cli`/the `gh` cookbook idioms don't cover.
 
 ## fs-forge-managed flow (`create`/`edit`/`clone --commit`)
 
-1. **Capture the goal as an issue** — same as the manual flow's step 0 below,
-   for the audit trail.
-2. **Dry-run** the `edit`/`clone` command with `--diff` (no `--commit`); fix
-   any validation errors; show the Claim diff to the client (a unified YAML
-   diff, not a relation tree — `../reference/fs-forge-edit-clone.md`) and get
-   approval.
-3. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
-   `--commit` warning. For CLI `>= {tbd}`, always add `--wait-for-checks` — it
-   overrides the CLI's own `false` default so the claims-repo PR also waits for
-   its checks before merging (the state-repo PR always waits regardless).
-4. **Report the outcome.** Don't poll, hydrate, or merge the wet PR yourself
-   — `--commit` already did it. Status check: the dispatched
-   `provision-claim.yaml` run. Manual hydrate only if the client explicitly
-   asks (manual flow step 5).
+### Step 1 — Capture the goal as an issue
 
-   > **Check this first:** if the dispatched run failed, the symptom lookup
-   > at `troubleshooting.md#symptom-lookup--start-here` routes to the right
-   > surface (PR-verify, hydrate, plan, state-PR merge, or apply).
-5. **Close the audit-trail issue**, linking the merged claim PR in the closing
-   comment. `--commit`'s auto-generated PR has no `Closes #N` footer (there's
-   no flag for it), so the issue is only linked back to the change if you do
-   it here.
+Same as the manual flow's Step 0 below, for the audit trail.
+
+### Step 2 — Dry-run
+
+The `edit`/`clone` command with `--diff` (no `--commit`); fix any validation
+errors; show the Claim diff to the client (a unified YAML diff, not a
+relation tree — `../reference/fs-forge-edit-clone.md`) and get approval.
+
+### Step 3 — Re-run with `--commit`
+
+See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. For CLI
+`>= {tbd}`, always add `--wait-for-checks` — it overrides the CLI's own
+`false` default so the claims-repo PR also waits for its checks before
+merging (the state-repo PR always waits regardless).
+
+### Step 4 — Report the outcome
+
+Don't poll, hydrate, or merge the wet PR yourself — `--commit` already did
+it. Status check: the dispatched `provision-claim.yaml` run. Manual hydrate
+only if the client explicitly asks (manual flow Step 5).
+
+> **Check this first:** if the dispatched run failed, the symptom lookup
+> at `troubleshooting.md#symptom-lookup--start-here` routes to the right
+> surface (PR-verify, hydrate, plan, state-PR merge, or apply).
+
+### Step 5 — Close the audit-trail issue
+
+Link the merged claim PR in the closing comment. `--commit`'s
+auto-generated PR has no `Closes #N` footer (there's no flag for it), so
+the issue is only linked back to the change if you do it here.
 
 A `--commit` that fails (invalid claim, an already-existing target claim for
 `create`/`clone`, existing `fs-forge/{kind}-{name}` branch, etc.) surfaces as
@@ -61,41 +70,55 @@ re-run.
 
 ## Manual flow (`create` without `--commit`, or a `gh`-based edit/clone fallback)
 
-0. **Capture the goal as an issue** before touching branches. Fill in the issue
-   template at `../templates/claim-issue.md` (client's terms, not "claim") and open
-   it in the claims repo. Keep the issue number — reference it in the PR
-   (`Closes #N`).
-   ```bash
-   gh issue create --repo {claims_repo} --title "{goal}" --body "{what the client asked for}"
-   ```
+### Step 0 — Capture the goal as an issue
 
-1. **Validate the generated or updated file before opening the PR:**
-   - Schema — run `npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}` (see `../reference/fs-forge-cookbook.md`).
-   - References — every `user:` / `group:` / `system:` / `domain:` /
-     `ref:secretsclaim:` points at an existing claim.
-   - Naming — matches `^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$`, ≤63 chars (see `../reference/reference.md`).
-   - Uniqueness — for a create, no claim of that kind/name already exists. If one
-     does, stop and tell the client it would duplicate an existing entity.
-2. **Branch** from main.
-3. **Write** the full file on the branch (create or update).
-4. **Open the PR**, show it to the client, **merge** it (squash).
-5. **Hydrate** with the workflow for the claim's family (see the hydrate table in
-   `../reference/gh-cookbook.md`) — GitHub claims take `kind`+`name`;
-   Secrets/TFWorkspace take `name` only. Wait for `conclusion: success`.
-   - When a create adds a new user *and* references it elsewhere (e.g. adds them to
-     a team), hydrate the `UserClaim` **first**, then the dependent claim.
+Before touching branches. Fill in the issue template at
+`../templates/claim-issue.md` (client's terms, not "claim") and open it in
+the claims repo. Keep the issue number — reference it in the PR
+(`Closes #N`).
 
-   > **Check this first:** a failed or timed-out run — see
-   > `troubleshooting.md#hydrate-workflow-dispatchexecution` if it doesn't
-   > explain the failure.
-6. **Merge the state PR** that hydration opened — on `state-github` (GitHub claims,
-   usually auto-merged) or `state-infra` (Secrets/TFWorkspace, merge it yourself).
+```bash
+gh issue create --repo {claims_repo} --title "{goal}" --body "{what the client asked for}"
+```
 
-   > **Check this first:** a PR that won't merge — see
-   > `troubleshooting.md#state-pr-merge` if it doesn't explain the failure.
-7. Report the landed change to the client in plain terms.
+### Step 1 — Validate the generated or updated file before opening the PR
 
-A change that stops after step 4 is only half-applied — the platform won't
+- Schema — run `npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}` (see `../reference/fs-forge-cookbook.md`).
+- References — every `user:` / `group:` / `system:` / `domain:` /
+  `ref:secretsclaim:` points at an existing claim.
+- Naming — matches `^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$`, ≤63 chars (see `../reference/reference.md`).
+- Uniqueness — for a create, no claim of that kind/name already exists. If one
+  does, stop and tell the client it would duplicate an existing entity.
+
+### Step 2 — Branch from main
+
+### Step 3 — Write the full file on the branch (create or update)
+
+### Step 4 — Open the PR, show it to the client, merge it (squash)
+
+### Step 5 — Hydrate
+
+With the workflow for the claim's family (see the hydrate table in
+`../reference/gh-cookbook.md`) — GitHub claims take `kind`+`name`;
+Secrets/TFWorkspace take `name` only. Wait for `conclusion: success`.
+- When a create adds a new user *and* references it elsewhere (e.g. adds them to
+  a team), hydrate the `UserClaim` **first**, then the dependent claim.
+
+> **Check this first:** a failed or timed-out run — see
+> `troubleshooting.md#hydrate-workflow-dispatchexecution` if it doesn't
+> explain the failure.
+
+### Step 6 — Merge the state PR
+
+That hydration opened — on `state-github` (GitHub claims, usually
+auto-merged) or `state-infra` (Secrets/TFWorkspace, merge it yourself).
+
+> **Check this first:** a PR that won't merge — see
+> `troubleshooting.md#state-pr-merge` if it doesn't explain the failure.
+
+### Step 7 — Report the landed change to the client in plain terms
+
+A change that stops after Step 4 is only half-applied — the platform won't
 reconcile until hydration runs and its state PR merges. Do not stop early.
 
 ## Delete flow
@@ -111,46 +134,62 @@ support differs from every other operation, so check it before planning:
 
 ### Primary path — `fs-forge-cli delete` (current CLI version)
 
-1. **Capture the goal as an issue** — same as the fs-forge-managed flow's
-   step 1 above, for the audit trail.
-2. **Decide flags before dry-running,** so the dry-run previews the exact
-   command you'll later add `--commit` to:
-   - Always include `--wait-for-checks` — it overrides the CLI's own
-     `false` default so the claims-repo PR also waits for its checks before
-     merging (the state-repo PR always waits regardless).
-   - For TFWorkspaceClaim, ask the client whether to keep variant CRs and
-     pass `--include-variants`/`--no-include-variants` accordingly; every
-     other kind has no variants, so leave this flag off.
-   - Optional fast check first, for ComponentClaim/GroupClaim/UserClaim/
-     TFWorkspaceClaim: `preflight --deletion`
-     (`../reference/fs-forge-preflight.md`) confirms the claim exists in one
-     sub-second call — step 3's dry-run confirms it either way, so this is a
-     scriptable shortcut, not a replacement.
-3. **Dry-run** (no `--commit`) with those flags, to confirm the claim
-   exists and preview the dispatch:
-   ```bash
-   npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
-     --wait-for-checks [--include-variants|--no-include-variants]
-   ```
-   Show the client the printed plan — kind, name, `includeVariants`,
-   `waitForClaimChecks` — it should match the flags chosen in step 2.
-4. **Get approval**, then re-run the identical command with `--commit`
-   added:
-   ```bash
-   npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
-     --wait-for-checks [--include-variants|--no-include-variants] --commit
-   ```
-   `--commit` dispatches `unprovision-claim.yaml`, which fully self-services
-   — it merges both the state-repo PR and the claims-repo PR itself. Don't
-   poll or merge anything yourself; report the dispatched run.
-5. **Check run placement.** Destroy check runs and commit statuses land on the wet-PR
-   referenced by the deleted CR's `firestartr.dev/last-state-pr` annotation — not the deletion wet-PR.
-   The deletion wet-PR is merged once its CI passes; destroy feedback lives on the `last-state-pr` PR.
-   Fallback: if `last-state-pr` is missing, check runs go to the deletion wet-PR. Inspect destroy status with:
-   `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current`
-6. **Close the audit-trail issue**, linking the merged claim PR in the
-   closing comment (`--commit` has no `Closes #N` footer to do this
-   automatically).
+#### Step 1 — Capture the goal as an issue
+
+Same as the fs-forge-managed flow's Step 1 above, for the audit trail.
+
+#### Step 2 — Decide flags before dry-running
+
+So the dry-run previews the exact command you'll later add `--commit` to:
+- Always include `--wait-for-checks` — it overrides the CLI's own
+  `false` default so the claims-repo PR also waits for its checks before
+  merging (the state-repo PR always waits regardless).
+- For TFWorkspaceClaim, ask the client whether to keep variant CRs and
+  pass `--include-variants`/`--no-include-variants` accordingly; every
+  other kind has no variants, so leave this flag off.
+- Optional fast check first, for ComponentClaim/GroupClaim/UserClaim/
+  TFWorkspaceClaim: `preflight --deletion`
+  (`../reference/fs-forge-preflight.md`) confirms the claim exists in one
+  sub-second call — Step 3's dry-run confirms it either way, so this is a
+  scriptable shortcut, not a replacement.
+
+#### Step 3 — Dry-run
+
+No `--commit`, to confirm the claim exists and preview the dispatch:
+
+```bash
+npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
+  --wait-for-checks [--include-variants|--no-include-variants]
+```
+
+Show the client the printed plan — kind, name, `includeVariants`,
+`waitForClaimChecks` — it should match the flags chosen in Step 2.
+
+#### Step 4 — Get approval, then re-run with `--commit`
+
+```bash
+npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
+  --wait-for-checks [--include-variants|--no-include-variants] --commit
+```
+
+`--commit` dispatches `unprovision-claim.yaml`, which fully self-services
+— it merges both the state-repo PR and the claims-repo PR itself. Don't
+poll or merge anything yourself; report the dispatched run.
+
+#### Step 5 — Check run placement
+
+Destroy check runs and commit statuses land on the wet-PR referenced by
+the deleted CR's `firestartr.dev/last-state-pr` annotation — not the
+deletion wet-PR. The deletion wet-PR is merged once its CI passes; destroy
+feedback lives on the `last-state-pr` PR. Fallback: if `last-state-pr` is
+missing, check runs go to the deletion wet-PR. Inspect destroy status
+with:
+`npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current`
+
+#### Step 6 — Close the audit-trail issue
+
+Link the merged claim PR in the closing comment (`--commit` has no
+`Closes #N` footer to do this automatically).
 
 ### Manual fallback (older CLI, supported kind)
 

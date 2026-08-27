@@ -31,8 +31,6 @@ ComponentClaim, `Group` ← GroupClaim, `User` ← UserClaim, `Resource` ← inf
 For a flat "what claims exist" listing (not entity ownership/topology), or when
 the catalog is stale, `fs-forge discovery org-elements` reads the claims-map
 directly — faster and always current. See `../reference/fs-forge-discovery.md`.
-Use the catalog entities above whenever the question involves relations
-`discovery map` doesn't cover, such as hydrated infra `Resource`s.
 
 ## Freshness
 

@@ -7,8 +7,9 @@ disable-model-invocation: true
 # Firestartr Operation
 
 Turn a client's plain-language platform request into the right change, executed
-safely. The client never hears "claim" or sees platform internals. Run these
-steps in order.
+safely. Translate platform internals (claim kinds, YAML paths, reconciliation
+states) into the client's own terms — repos, teams, users, secrets, systems,
+domains — and never say "claim" to them. Run Steps 1-3 in order.
 
 **Asking the client:** use `grilling` if available — one question at a time,
 each with a recommended answer. Prefer exploring the repos over asking.
@@ -17,6 +18,41 @@ each with a recommended answer. Prefer exploring the repos over asking.
 claims-map, and lands changes itself via `create`/`edit`/`clone --commit`. Read
 a command's own output fully before reaching for another tool. Fall back to raw
 `gh` (`reference/gh-cookbook.md`) only for what the CLI can't do.
+
+## Common rules
+
+Apply to every invocation, on top of whatever the matched playbook adds:
+
+- **Step commitment.** Once Step 2 classifies the intent and the client
+  approves the resulting plan, only the matched playbook's own numbered
+  steps execute. A need discovered mid-flow is a new request: re-classify
+  and get fresh approval, never expand silently.
+- **Every mutation goes through `lifecycle`.** No shortcutting it for any
+  create, edit, clone, or delete.
+- **Read current state before editing.** Fetch the live claim before
+  proposing changes — array fields replace entirely, so you need the full
+  current value.
+- **Pre-check before planning.** For a repo, team, user, or TF workspace use
+  `preflight` (`reference/fs-forge-preflight.md`); every other kind uses
+  `reference/fs-forge-discovery.md`. Target already exists → tell the
+  client and suggest the right action instead (e.g. edit, not create).
+- **Show plan before, show result after.** Preview with `fs-forge-cli`'s
+  dry-run/print output, get explicit client approval, execute, then show
+  the applied state the same way. No mutation without approval, ever.
+- **Confirm destructive operations explicitly.** Deletes need the
+  client's explicit go-ahead before execution.
+- **One logical operation per confirmation cycle.** A coherent unit of
+  work (e.g. "create three repos, a group, and a system") gets one
+  plan → confirm → execute → result cycle; unrelated requests get separate
+  cycles.
+- **Stop on first failure.** Report what succeeded and what failed, then
+  wait for the client's instructions — don't push through a multi-step
+  operation after one step fails.
+- **Flag plan-vs-result discrepancies.** If the applied state differs from
+  what was planned (silent defaults, missing propagation, unexpected
+  values), call it out and ask whether to investigate or roll back.
+- **Dual-layer errors.** Lead with a client-friendly explanation, then the
+  technical detail (claim kind, YAML path, CLI error) below it.
 
 ## CLI contract
 
@@ -134,71 +170,15 @@ clarifying question if the intent is ambiguous.
 
 **Completion:** you know which playbook(s) this request needs.
 
-## Step 3 — Load and execute
+## Step 3 — Commit to steps, then execute
 
-Read the chosen playbook file(s) from `playbooks/` and follow them end to
-end. Reference material in `reference/` — `reference.md`, `fs-forge-cookbook.md`
-and its topic-specific siblings, `gh-cookbook.md` — is pulled in on demand
-when a playbook points at it. Report back to the client in their own terms —
-repos, teams, users, PRs — never the word "claim."
+Read the chosen playbook file(s) from `playbooks/`. If the harness exposes a
+todo-list tool, copy the playbook's numbered steps into it before executing
+any of them — this is step commitment made visible, not a separate format.
+Then follow the steps end to end. Reference material in `reference/` is
+pulled in on demand when a playbook points at it. Report back to the client
+in their own terms — never the word "claim."
 
 **Completion:** the change is landed — fs-forge-managed (`--commit`
 dispatched and reported) or manual (PR merged, hydrated, state PR merged) —
 or the question is answered, and the client has a plain-language summary.
-
-## Rules
-
-These rules govern agent behavior during every invocation of this skill.
-
-1. **Client terminology only.** Never say "claim" to the user. Translate to
-   repos, teams, users, secrets, systems, domains, etc. Internal vocabulary
-   (claim kinds, YAML paths, reconciliation states) stays internal.
-
-2. **fs-forge-cli first.** Fall back to raw `gh` only when the CLI cannot
-   express the operation.
-
-3. **Every mutation goes through lifecycle.** No shortcutting the lifecycle
-   playbook for any create, edit, clone, or delete.
-
-4. **Read current state before editing.** Always fetch the live claim before
-   proposing changes — especially for array fields that replace entirely.
-
-5. **Clone is the default path for new repos.** Use `clone-claim`, not
-   `create-claim`, for ComponentClaims unless clone cannot express the need.
-
-6. **Always confirm destructive operations.** Deletes require explicit user
-   approval before execution.
-
-7. **Show plan before, show result after.** For every mutation:
-   - Use `fs-forge-cli` print/dry-run capabilities to preview the planned change.
-   - Present the plan to the user and **wait for explicit approval**. No
-     exceptions — never execute a mutation without confirmation.
-   - After execution, show the applied state using the same print capabilities.
-
-8. **One logical operation per confirmation cycle.** A coherent unit of work
-   (e.g., "create three repos, a group, and a system") gets one
-   plan → confirm → execute → result cycle. Unrelated requests in the same
-   message get separate cycles.
-
-9. **Stop on first failure.** If a step in a multi-step operation fails, stop
-   immediately. Report what succeeded, what failed, and wait for the user's
-   instructions before proceeding.
-
-10. **Flag plan-vs-result discrepancies.** Diff the planned state against the
-    applied state. If anything differs (silently defaulted fields, missing
-    propagation, unexpected values), call it out explicitly and ask the user
-    whether to investigate or roll back.
-
-11. **Dual-layer error messages.** When something fails or hits an unexpected
-    state, lead with a client-friendly explanation ("The repository couldn't be
-    created because the name is already taken"), then show technical details
-    below (claim kind, YAML path, CLI error output) so the user can debug or
-    report the issue.
-
-12. **Pre-check before planning.** Before building a plan, check for existing
-    state — duplicates, missing prerequisites, already-deleted resources. For a
-    repo, team, user, or TF workspace, use `preflight`
-    (`reference/fs-forge-preflight.md`); every other kind uses the
-    discovery-based check (`reference/fs-forge-discovery.md`). If the
-    target already exists, tell the user and suggest the right action (e.g.,
-    "That repo already exists — did you mean to edit it?").

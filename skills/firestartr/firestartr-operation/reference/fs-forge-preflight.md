@@ -26,10 +26,9 @@ npx @firestartr/fs-forge-cli@{version} preflight --org={org} \
   [--scope claims|provider|all] [--json]
 ```
 
-One of `--create`/`--edition`/`--deletion` is required, mutually exclusive.
 `--edition` checks the *old* name's claim exists, then — unless `--scope
 claims`, or `--name` equals `--old-name` (no identity change) — the *new*
-name's provider availability. `--scope` defaults to `all`.
+name's provider availability.
 
 `repo`/`team` check resource existence; `user` checks **org membership**, not
 whether the GitHub login exists.

@@ -6,42 +6,74 @@ see `../reference/fs-forge-edit-clone.md` for the invocation idiom.
 
 ## Flow
 
-1. **Identify the source and the new name.** Source is `<Kind>-<source-name>`
-   (an existing claim); `--from` below takes only the `<source-name>` part,
-   since `<Kind>` is already a separate argument (short ID like `component`
-   or the full `ComponentClaim` — both work here). Confirm what should differ
-   in the new one (the client rarely wants an exact duplicate — at minimum
-   the name changes, usually also owner/visibility/members/etc.).
-2. **Pre-check the new name.** For ComponentClaim/GroupClaim/UserClaim/
-   TFWorkspaceClaim, run `preflight --create` on the new name
-   (`../reference/fs-forge-preflight.md`) before building a plan — it covers
-   both a claims-map conflict and a same-named resource already at the
-   provider. Every other kind: confirm `<Kind>-<new-name>` doesn't already
-   exist via `../reference/fs-forge-discovery.md`'s discovery commands
-   instead (same pre-check `create-claim.md` runs for its unsupported kinds).
-3. **Read the source** (optional but recommended when you don't already know
-   its fields): `edit <Kind>-<source-name> --org={org}` with no mutating flags.
-4. **Discover flags** for the kind via `create <Kind> --help --json` (same
-   discovery step as `create`/`edit` — never `clone --help --json`, which
-   mixes every kind's flags together).
-5. **Dry-run:**
-   ```bash
-   npx @firestartr/fs-forge-cli@{version} clone <Kind> --org={org} \
-     --from <source-name> --name <new-name> \
-     --<flag>=<value> ... \
-     --diff --show-defaults
-   ```
-   `TFWorkspaceClaim`/`SecretsClaim` also need
-   `--path claims/{...}/{new-name}.yaml` (the deterministic-path rule from
-   `create-claim.md` applies here too). Fix any validation errors, then show
-   the printed Claim diff to the client and get approval
-   (`../reference/fs-forge-edit-clone.md` has the diff/defaults format).
+### Step 1 — Identify the source and the new name
 
-   > **Check this first:** a rejected `--commit` (uniqueness, schema, stale
-   > branch) — see `troubleshooting.md#fs-forge-cli-command-failures`.
-6. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
-   `--commit` warning (it also covers the uniqueness check `clone --commit`
-   runs on its own).
+Source is `<Kind>-<source-name>` (an existing claim); `--from` below takes
+only the `<source-name>` part, since `<Kind>` is already a separate argument
+(short ID like `component` or the full `ComponentClaim` — both work here).
+Confirm what should differ in the new one (the client rarely wants an exact
+duplicate — at minimum the name changes, usually also
+owner/visibility/members/etc.).
+
+### Step 2 — Pre-check the new name
+
+For ComponentClaim/GroupClaim/UserClaim/TFWorkspaceClaim, run
+`preflight --create` on the new name (`../reference/fs-forge-preflight.md`)
+before building a plan — it covers both a claims-map conflict and a
+same-named resource already at the provider. Every other kind: confirm
+`<Kind>-<new-name>` doesn't already exist via `../reference/fs-forge-discovery.md`'s
+discovery commands instead (same pre-check `create-claim.md` runs for its
+unsupported kinds).
+
+### Step 3 — Read the source
+
+Optional but recommended when you don't already know its fields: `edit
+<Kind>-<source-name> --org={org}` with no mutating flags.
+
+### Step 4 — Discover flags
+
+For the kind via `create <Kind> --help --json` (same discovery step as
+`create`/`edit` — never `clone --help --json`, which mixes every kind's
+flags together).
+
+### Step 5 — Dry-run
+
+```bash
+npx @firestartr/fs-forge-cli@{version} clone <Kind> --org={org} \
+  --from <source-name> --name <new-name> \
+  --<flag>=<value> ... \
+  --diff --show-defaults
+```
+
+`TFWorkspaceClaim`/`SecretsClaim` also need
+`--path claims/{...}/{new-name}.yaml` (the deterministic-path rule from
+`create-claim.md` applies here too). Fix any validation errors, then check
+the printed Claim diff yourself before showing it to the client — fix
+both before moving on:
+- **No source leakage.** `name` (claim + any provider `name`, e.g.
+  `providers.github.name`) reflects `--name`, not `--from` — a source
+  name leaking through anywhere is a defect, re-run with the missing
+  override flag.
+- **No leftover shape.** `--show-defaults` widens the diff with both
+  platform defaults and fields inherited from `--from` — only the latter
+  need checking here. Every carried-over field the client didn't ask to
+  change (`vars`, `secrets`, `sync`, provider settings, …) belongs on the
+  new claim; strip the rest with `--unset <dotted.path>` or an override,
+  re-running until the diff only has fields the new claim needs. Don't
+  unset a platform default just because it's an unrequested `+` line — the
+  client didn't ask for it either, but it's not a leftover from the
+  source.
+
+Only once both are clean, show the diff to the client and get approval
+(`../reference/fs-forge-edit-clone.md` has the diff/defaults format).
+
+> **Check this first:** a rejected `--commit` (uniqueness, schema, stale
+> branch) — see `troubleshooting.md#fs-forge-cli-command-failures`.
+
+### Step 6 — Re-run with `--commit`
+
+See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning (it
+also covers the uniqueness check `clone --commit` runs on its own).
 
 Array fields (e.g. `members`, `additionalRules`) come across **as-is** from the
 source unless you override them; overriding replaces the whole array (see
