@@ -75,5 +75,5 @@ client.
 ## Freshness
 
 Catalog and state hydrate on a schedule (catalog every 6h). If the latest claim
-commit is newer than the latest state/catalog commit, note the lag and offer to
-trigger hydration rather than reporting stale data as drift.
+commit is newer, note the lag and offer to trigger hydration rather than
+reporting stale data as drift.

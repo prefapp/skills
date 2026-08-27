@@ -27,6 +27,15 @@ A disclosed `.md` file loaded on demand by the single entry skill
 description, no auto-fire — so the operational group costs one description of
 context load.
 
+**Step commitment**:
+`firestartr-operation`'s rule that once a playbook is matched and its plan
+approved, only that playbook's own numbered steps get executed for the
+operation cycle. A new need discovered mid-flow requires re-classification
+and fresh client approval — never silent expansion. Mirrored into the
+harness's todo tool when one is available, so the commitment is visible, not
+just stated.
+_Avoid_: scope lock, todo gating (same concept, pick one term).
+
 **Claim**:
 Firestartr's declarative desired-state unit (ComponentClaim = repo, GroupClaim =
 team, UserClaim = user, …). Internal vocabulary — the client never hears it; the

@@ -15,15 +15,14 @@ For `create-claim`, the client's own choice of ending decides the path: landing
 immediately routes here to fs-forge-managed; an offline artifact routes to
 manual.
 
-## Governance — read once, applies everywhere
+## Governance
 
-- **PR-only. Never commit to `main`.** Every change is a branch → PR → merge.
-- Show the client the proposed change and get approval **before** opening a
-  PR or running `--commit`.
-- Tool preference: try `fs-forge-cli` first; the raw `gh` idioms in the
-  cookbook (and host composite tools like `create_claim_pr`,
-  `github_create_pr_with_changes`, `github_propose_changes_dry_run`, when
-  present) are the fallback for what it doesn't cover.
+SKILL.md's Common rules (show-plan-before, step commitment, etc.) apply
+here too. This playbook adds: **PR-only, never commit to `main`** — every
+change is a branch → PR → merge, and the host composite tools
+(`create_claim_pr`, `github_create_pr_with_changes`,
+`github_propose_changes_dry_run`, when present) are fallbacks for what
+`fs-forge-cli`/the `gh` cookbook idioms don't cover.
 
 ## fs-forge-managed flow (`create`/`edit`/`clone --commit`)
 

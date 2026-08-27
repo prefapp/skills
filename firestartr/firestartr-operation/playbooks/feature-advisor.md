@@ -41,8 +41,8 @@ without requiring them to know features exist or what they're called.
 6. **Configure args** (if accepted): ask for values the schema doesn't
    default well for the user's context, one at a time with a recommended
    default. `features add --name <feature> --help --json` gives full
-   `args.*` FlagSpecs under `.flags[]`. Then follow the Rules in `SKILL.md`
-   (show-plan → approve → execute → show-result).
+   `args.*` FlagSpecs under `.flags[]`. Then follow Common rules in
+   `SKILL.md`.
 
 ## Multiple features
 
@@ -53,4 +53,3 @@ Suggest one at a time, most relevant first — each its own accept/decline.
 - At most 3 suggestions per create/clone flow.
 - Only suggest a feature whose README clearly matches the stated intent —
   never speculatively.
-- Never add a feature without explicit approval.

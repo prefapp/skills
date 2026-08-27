@@ -23,16 +23,11 @@ arg/flag constraints — e.g. `features add`'s "a component name or `--file`,
 never both" is `{"type": "exactlyOne", "args": ["component"], "flags":
 ["file"]}` — read this instead of inferring the rule from prose.
 
-Read the flags themselves from **`.flags[]`**: `path` (dotted claim-field
-path, e.g. `providers.github.org` — also the flag's literal name; pass a
-value as `--<path>=<value>`), `type`, `required`, `conditionalRequired`
-(required only once its parent object/union branch is actually supplied),
-`options` (allowed values, when constrained), `default`, `multiple` (passing
-it several times **replaces** the whole array, it never appends — read the
-current value first, compute the full desired list, then pass it whole; a
-repeatable flag's own `description` states this rule itself), and
-`description` (when the CLI provides one — check it before asking the
-client).
+Read the flags themselves from **`.flags[]`**. Notably: `path` is also the
+flag's literal name (pass a value as `--<path>=<value>`); `multiple` means
+passing it several times **replaces** the whole array, it never appends —
+read the current value first, compute the full desired list, then pass it
+whole.
 
 **Never hardcode a CLI flag name for a schema field.** Derive schema-field flag
 paths from the FlagSpec entries in `--help --json`'s `.flags[]`. Every other
