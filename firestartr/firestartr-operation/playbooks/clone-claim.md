@@ -54,11 +54,15 @@ both before moving on:
   `providers.github.name`) reflects `--name`, not `--from` — a source
   name leaking through anywhere is a defect, re-run with the missing
   override flag.
-- **No leftover shape.** Every carried-over field the client didn't ask
-  to change (`vars`, `secrets`, `sync`, provider settings, …) belongs on
-  the new claim — strip the rest with `--unset <dotted.path>` or an
-  override, re-running until the diff only has fields the new claim
-  needs.
+- **No leftover shape.** `--show-defaults` widens the diff with both
+  platform defaults and fields inherited from `--from` — only the latter
+  need checking here. Every carried-over field the client didn't ask to
+  change (`vars`, `secrets`, `sync`, provider settings, …) belongs on the
+  new claim; strip the rest with `--unset <dotted.path>` or an override,
+  re-running until the diff only has fields the new claim needs. Don't
+  unset a platform default just because it's an unrequested `+` line — the
+  client didn't ask for it either, but it's not a leftover from the
+  source.
 
 Only once both are clean, show the diff to the client and get approval
 (`../reference/fs-forge-edit-clone.md` has the diff/defaults format).
