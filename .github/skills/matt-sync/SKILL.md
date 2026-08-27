@@ -19,7 +19,7 @@ workflow. You edit *existing* skills only.
    `git clone https://github.com/mattpocock/skills.git` into a temp dir. Read
    only — never edit it.
 2. **Target skill set.** Which skills am I updating? Default: this repo's
-   `skills/`. Accept any other fork's skills directory.
+   `skills/workflow/`. Accept any other fork's skills directory.
 
 ## Step 2 — Get the worklist
 

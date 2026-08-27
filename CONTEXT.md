@@ -17,9 +17,11 @@ development workflow (plan → spec → implement → review).
 _Avoid_: skill bundle, skill pack.
 
 **Operational skill set**:
-The opt-in Firestartr skills under `firestartr/` (namespace `prefapp-firestartr`)
-that drive a Prefapp-managed platform. Separate audience (client developers) and
-charter from the workflow set. Installed with `install.sh --fs` or `--all`.
+The opt-in Firestartr skills under `skills/firestartr/` (namespace
+`prefapp-firestartr`) that drive a Prefapp-managed platform. Separate audience
+(client developers) and charter from the workflow set. Installed with
+`install.sh --fs` or `--all`, which shells out to
+`npx skills add prefapp/skills --skill firestartr-operation`.
 
 **Playbook**:
 A disclosed `.md` file loaded on demand by the single entry skill
@@ -40,6 +42,17 @@ _Avoid_: scope lock, todo gating (same concept, pick one term).
 Firestartr's declarative desired-state unit (ComponentClaim = repo, GroupClaim =
 team, UserClaim = user, …). Internal vocabulary — the client never hears it; the
 entry skill translates intent to the right claim kind.
+
+**Feature**:
+A named, versioned capability from the prefapp Features catalog (e.g.
+`release_please`, `catalog_repo`, `build_and_dispatch_docker_images`) attached
+to a ComponentClaim's `providers.github.features[]`. Each Feature owns a set of
+files it provisions into the target repo — some reconciled on every apply,
+others seeded once and left to the user thereafter. Distinct from a generic
+"feature" (a product capability) — always resolve this term to the catalog
+entry.
+_Avoid_: capability, plugin (both suggest something more generic than this
+catalog-bound unit).
 
 **Validation sweep**:
 A whole-repo dispatch of `validate-claims.yaml` that renders every claim to
@@ -182,15 +195,31 @@ issues/PRs through a triage state machine, use `triage`.
 ## Install
 
 Skills are **symlinked** (not copied) so `git pull` updates everyone instantly.
-`install.sh` links each skill flat, one symlink per skill, directly into every
-harness's skills location — no namespace-dir wrapper:
+`install.sh` links each workflow skill flat, one symlink per skill, directly into
+every harness's skills location — no namespace-dir wrapper:
 
-- pi, OpenCode, VS Code Copilot: `~/.agents/skills/<skill> → <repo>/skills/<skill>`
+- pi, OpenCode, VS Code Copilot: `~/.agents/skills/<skill> → <repo>/skills/workflow/<skill>`
 - Claude Code: same flat layout under `~/.claude/skills/`
 
-The **operational skill set** is opt-in: `./install.sh --fs` links each
-Firestartr skill the same way, from `<repo>/firestartr`. Use
-`--workflow` for the workflow set or `--all` for both; no arguments shows help.
+The **operational skill set** is opt-in: `./install.sh --fs` installs
+`firestartr-operation` via `npx skills add prefapp/skills --skill
+firestartr-operation`, which always tracks `main` HEAD (versioned release
+tags exist but aren't reachable through that command; see ADR-0006). The npx
+install is not a symlink to a local clone — updates require re-running `--fs`
+(tracks `main`) or `npx skills update` (re-fetches whatever was last
+installed). To pin instead of tracking `main`, point the install at a tag's
+tree: the full semver tag pins exactly; a rolling `firestartr-operation-vN`
+major tag is also available from the `release_please` Feature (once enabled
+on the `prefapp/skills` claim) and tracks new releases within that major
+without tracking `main`:
+
+```sh
+npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-v1/skills/firestartr/firestartr-operation
+npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-vX.Y.Z/skills/firestartr/firestartr-operation
+```
+
+Use `--workflow` for the workflow set or `--all` for both; no arguments shows
+help.
 
 ## Decisions
 

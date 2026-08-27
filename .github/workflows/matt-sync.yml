@@ -38,7 +38,7 @@ jobs:
           actionable=0
           if [ "$count" -gt 0 ]; then
             actionable="$(python3 .github/matt-sync/scope_changes.py \
-              --upstream /tmp/upstream --since "$last_sha" --ours skills \
+              --upstream /tmp/upstream --since "$last_sha" --ours skills/workflow \
               --out /tmp/report.md)"
           fi
           echo "last_sha=$last_sha"     >> "$GITHUB_OUTPUT"

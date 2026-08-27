@@ -54,6 +54,17 @@ Apply to every invocation, on top of whatever the matched playbook adds:
 - **Dual-layer errors.** Lead with a client-friendly explanation, then the
   technical detail (claim kind, YAML path, CLI error) below it.
 
+## CLI contract
+
+The fs-forge-cli commands and flags documented in this skill and its
+`reference/` files must always match fs-forge-cli's actual current contract —
+this skill is a living mirror, not a frozen snapshot; when the CLI changes,
+update the docs, don't let them drift. The specific fs-forge-cli version a
+given release's instructions were validated against is recorded only in that
+release's release-please-generated CHANGELOG entry (this skill is versioned by
+release-please in monorepo mode; tag `firestartr-operation-vX.Y.Z`) — there is
+no duplicate, manually-maintained version note elsewhere.
+
 ## Step 1 — Resolve the target platform
 
 Read `firestartr-config.yaml` from this skill's directory — schema:
