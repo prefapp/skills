@@ -7,36 +7,44 @@ isn't reachable through `edit`'s flags.
 
 ## Primary flow — `fs-forge edit`
 
-1. **Read the current claim:** `edit <Kind>-<name> --org={org}` with no
-   mutating flags prints the full current YAML.
-2. **Discover flags** for the target kind via
-   `create <Kind> --help --json` (never `edit --help --json` — see the
-   cookbook's mutation-shared reference).
-3. **Dry-run** the change: same command with the relevant `--<flag>=<value>`
-   / `--unset <path>`, `--diff`, and `--show-defaults` (unconditionally). Fix
-   any validation errors, then show the printed Claim diff to the client and
-   get approval (`../reference/fs-forge-edit-clone.md` has the diff/defaults
-   format).
+### Step 1 — Read the current claim
 
-   > **Check this first:** an unexpected diff, or a rejected `--commit` —
-   > see `troubleshooting.md#fs-forge-cli-command-failures`.
-4. **Re-run with `--commit`** — see `../reference/fs-forge-mutation-shared.md`'s
-   `--commit` warning.
+`edit <Kind>-<name> --org={org}` with no mutating flags prints the full
+current YAML.
+
+### Step 2 — Discover flags
+
+`create <Kind> --help --json` for the target kind (never `edit --help
+--json` — see the cookbook's mutation-shared reference).
+
+### Step 3 — Dry-run the change
+
+Same command with the relevant `--<flag>=<value>` / `--unset <path>`,
+`--diff`, and `--show-defaults` (unconditionally). Fix any validation
+errors, then show the printed Claim diff to the client and get approval
+(`../reference/fs-forge-edit-clone.md` has the diff/defaults format).
+
+> **Check this first:** an unexpected diff, or a rejected `--commit` —
+> see `troubleshooting.md#fs-forge-cli-command-failures`.
+
+### Step 4 — Re-run with `--commit`
+
+See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning.
 
 Array fields (e.g. `members`) are **replaced**, not appended to — always
-compute the full desired array from what step 1 read before passing it.
+compute the full desired array from what Step 1 read before passing it.
 
 ## Team membership (GroupClaim)
 
 `members` is a **root-level** array of `user:{username}` references — never under
 `providers.github`, never under `spec`.
 
-- **Add**: read the current `members` (step 1), append `user:{name}`, pass the
+- **Add**: read the current `members` (Step 1), append `user:{name}`, pass the
   **whole** array back. Each user must already have a UserClaim; if not, create
   it first and hydrate it before editing the group.
 - **Remove**: read the current `members`, drop the entries, pass the whole
   remaining array. If it becomes empty, use `--unset members` instead.
-- **List / check**: step 1's read is the answer — no PR needed for a read-only ask.
+- **List / check**: Step 1's read is the answer — no PR needed for a read-only ask.
 
 Adding the same users to several teams → one `edit` per `GroupClaim`, each
 producing its own dry-run/approval/commit cycle (they're separate commits and
@@ -88,7 +96,7 @@ providers:
 
 ## Any other field
 
-Same procedure for any existing claim of any kind: read (step 1), dry-run the
+Same procedure for any existing claim of any kind: read (Step 1), dry-run the
 flag change, get approval, commit. Consult `../reference/reference.md` for the
 field's kind, level, and format.
 

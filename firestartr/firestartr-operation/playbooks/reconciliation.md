@@ -25,13 +25,22 @@ state repo (`state-github` or `state-infra`, per the claim→state map). Each st
 file carries `metadata.annotations.firestartr.dev/claim-ref` back to its claim.
 
 For a named entity:
-1. Find the state resource whose `claim-ref` (or `external-name`) matches.
-2. Read the source claim.
-3. Compare the fields that matter for its kind:
-   - repo: visibility, description, branch strategy, features, permissions
-   - team: members, privacy
-   - membership: role
-4. Report each field as aligned or drifted (claim value vs state value).
+
+### Step 1 — Find the state resource
+
+Whose `claim-ref` (or `external-name`) matches.
+
+### Step 2 — Read the source claim
+
+### Step 3 — Compare the fields that matter for its kind
+
+- repo: visibility, description, branch strategy, features, permissions
+- team: members, privacy
+- membership: role
+
+### Step 4 — Report each field as aligned or drifted
+
+Claim value vs state value.
 
 ## The un-hydrated trap — check this first
 
@@ -75,5 +84,5 @@ client.
 ## Freshness
 
 Catalog and state hydrate on a schedule (catalog every 6h). If the latest claim
-commit is newer than the latest state/catalog commit, note the lag and offer to
-trigger hydration rather than reporting stale data as drift.
+commit is newer, note the lag and offer to trigger hydration rather than
+reporting stale data as drift.
