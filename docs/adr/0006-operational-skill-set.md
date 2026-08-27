@@ -35,7 +35,14 @@ group stays isolated from the other.
 - **Opt-in install.** `install.sh --fs` (or `--all`) shells out to
   `npx skills add prefapp/skills --skill firestartr-operation`; the default
   install is unchanged (workflow set only). Versioned independently via
-  release-please (`firestartr-operation-vX.Y.Z` tags).
+  release-please (`firestartr-operation-vX.Y.Z` tags). `--skill` always
+  installs `main` HEAD — to pin a release, install from that tag's tree
+  directly (`.../tree/firestartr-operation-vX.Y.Z/...`) instead. The
+  `release_please` Feature (attached via the `prefapp/claims` ComponentClaim,
+  prefapp/claims#72) also supports a rolling `firestartr-operation-vN` major
+  tag via its `release_please_generate_rolling_tag`/
+  `release_please_rolling_tag_name_pattern` args — needs enabling on that
+  claim to be usable as a pin target.
 - **Operator/platform kit deferred.** Operator upgrades, image provenance,
   snapshot builds, CLI pinning, and OPA policy authoring target Prefapp
   *operators*, not clients. They stay out of the client entry and are ported on

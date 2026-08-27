@@ -91,6 +91,21 @@ This installs `firestartr-operation` via the `skills` npm CLI (vercel-labs):
 skill asks for your organization and writes a git-ignored
 `firestartr-config.yaml`; nothing client-specific is ever committed.
 
+That command always installs from `main` HEAD — the `--skill` flag has no
+version pin. To pin to a release, point at its tag instead: the exact
+release tag pins exactly; a rolling `firestartr-operation-vN` major tag is
+also available from the `release_please` Feature (once enabled on the
+`prefapp/skills` claim) and tracks new `vN.*.*` releases without tracking
+`main`:
+
+```sh
+npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-v1/skills/firestartr/firestartr-operation
+npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-vX.Y.Z/skills/firestartr/firestartr-operation
+```
+
+To update either install, re-run the same command (or `npx skills update`,
+which re-fetches whatever was last installed).
+
 ## Per-harness discovery details
 
 ### `~/.agents/skills` (canonical — always linked, covers pi + OpenCode + VS Code Copilot)

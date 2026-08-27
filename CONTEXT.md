@@ -194,10 +194,23 @@ every harness's skills location — no namespace-dir wrapper:
 
 The **operational skill set** is opt-in: `./install.sh --fs` installs
 `firestartr-operation` via `npx skills add prefapp/skills --skill
-firestartr-operation` (versioned release tags; see ADR-0006). The npx install
-is not a symlink to a local clone — updates require re-running `--fs` (or a
-pinned `--skill firestartr-operation` install). Use `--workflow`
-for the workflow set or `--all` for both; no arguments shows help.
+firestartr-operation`, which always tracks `main` HEAD (versioned release
+tags exist but aren't reachable through that command; see ADR-0006). The npx
+install is not a symlink to a local clone — updates require re-running `--fs`
+(tracks `main`) or `npx skills update` (re-fetches whatever was last
+installed). To pin instead of tracking `main`, point the install at a tag's
+tree: the full semver tag pins exactly; a rolling `firestartr-operation-vN`
+major tag is also available from the `release_please` Feature (once enabled
+on the `prefapp/skills` claim) and tracks new releases within that major
+without tracking `main`:
+
+```sh
+npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-v1/skills/firestartr/firestartr-operation
+npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-vX.Y.Z/skills/firestartr/firestartr-operation
+```
+
+Use `--workflow` for the workflow set or `--all` for both; no arguments shows
+help.
 
 ## Decisions
 
