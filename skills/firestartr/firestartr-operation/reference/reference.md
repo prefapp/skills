@@ -21,7 +21,7 @@ The client never names a kind — you pick it from the intent.
 | a business domain | DomainClaim | `claims/domains/{name}.yaml` |
 | secrets | SecretsClaim | `claims/secrets/{name}.yaml` |
 | an org webhook | OrgWebhookClaim | `claims/orgwebhooks/{name}.yaml` |
-| a terraform workspace | TFWorkspaceClaim | `claims/tfworkspaces/{name}.yaml` |
+| a TF workspace | TFWorkspaceClaim | `claims/tfworkspaces/{name}.yaml` |
 
 `../playbooks/lifecycle.md`'s "Kind → hydration name" table has the hydration
 name per kind.
