@@ -52,7 +52,7 @@ skill_frontmatter_name() {
 # names, so a namespace-dir symlink hides every skill inside it. Link each
 # skill individually into $dest instead.
 link_flat() {
-  local src="$1" ns="$2" dest="$3" label="$4" skill name existing_name
+  local src="$1" ns="$2" dest="$3" label="$4" skill name legacy_skill existing_name
   mkdir -p "$dest"
 
   # Drop the namespace dir left by older versions of this script.
@@ -72,6 +72,7 @@ link_flat() {
   for skill in "$src"/*/; do
     skill="${skill%/}"
     name="$(basename "$skill")"
+    legacy_skill="${src%/*}/$name"
     [ -f "$skill/SKILL.md" ] || continue
     # Never clobber a real directory or a link owned by something else —
     # unless it's a real dir whose own SKILL.md unambiguously declares itself
@@ -79,6 +80,9 @@ link_flat() {
     if [ -e "$dest/$name" ] || [ -L "$dest/$name" ]; then
       if [ -L "$dest/$name" ] && [ "$(readlink "$dest/$name")" = "$skill" ]; then
         : # already correctly linked
+      elif [ -L "$dest/$name" ] && [ "$(readlink "$dest/$name")" = "$legacy_skill" ]; then
+        rm -f "$dest/$name"
+        echo "  $label: updated stale link $dest/$name"
       elif [ -d "$dest/$name" ] && ! [ -L "$dest/$name" ] && [ -f "$dest/$name/SKILL.md" ] \
         && existing_name="$(skill_frontmatter_name "$dest/$name/SKILL.md")" \
         && [ "$existing_name" = "$name" ]; then

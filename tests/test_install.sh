@@ -51,6 +51,18 @@ run --workflow >/dev/null
 assert_flat_links "$REPO_DIR/skills/workflow" "$AGENTS" "agents"
 [ ! -e "$AGENTS/firestartr-operation" ] || { echo "FAIL: --workflow installed Firestartr"; exit 1; }
 
+# Links created before the workflow set moved under skills/workflow are updated
+# in place on the next install, for both harness locations.
+reset
+mkdir -p "$AGENTS" "$CLAUDE"
+ln -sfn "$REPO_DIR/skills/tdd" "$AGENTS/tdd"
+ln -sfn "$REPO_DIR/skills/tdd" "$CLAUDE/tdd"
+run --workflow >/dev/null
+[ "$(readlink "$AGENTS/tdd")" = "$REPO_DIR/skills/workflow/tdd" ] \
+  || { echo "FAIL: stale agents link was not updated"; exit 1; }
+[ "$(readlink "$CLAUDE/tdd")" = "$REPO_DIR/skills/workflow/tdd" ] \
+  || { echo "FAIL: stale claude link was not updated"; exit 1; }
+
 # Firestartr-only install: shells out to `npx skills add`, never symlinks locally.
 reset
 HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs >/dev/null
