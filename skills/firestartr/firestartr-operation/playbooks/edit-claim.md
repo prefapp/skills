@@ -94,6 +94,23 @@ providers:
         - collaborator:external-dev
 ```
 
+## TFWorkspaceClaim
+
+`--commit` is mandatory for values, module, and policy (no offline path)
+and requires `--path claims/tfworkspaces/{name}.yaml`
+(`../reference/fs-forge-mutation-shared.md`'s `--commit` warning — it
+hydrates; no manual hydrate after). Create vocabulary:
+`create-claim.md`'s TF workspace section.
+
+- **values:** Step 1 is the current object. Rebuild it from the module's
+  `variables.tf` plus the client's changes; pass through the discovered
+  `.json` hatch.
+- **module:** in-place. Discover the new module
+  (`../reference/gh-cookbook.md` → "Discover Terraform modules"), rebuild
+  values from the new `variables.tf`, extra confirmation because inputs
+  change. `inline`: `../reference/reference.md` → "Terraform modules".
+- **policy:** flag change. Hierarchy in `../reference/reference.md`.
+
 ## Any other field
 
 Same procedure for any existing claim of any kind: read (Step 1), dry-run the

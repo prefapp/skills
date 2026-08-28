@@ -134,9 +134,28 @@ Non-slug name (uppercase, spaces, non-ASCII): naming normalization rules in
 
 Default flag values: `../reference/reference.md`.
 
+## TF workspace → TFWorkspaceClaim  →  `claims/tfworkspaces/{name}.yaml`
+
+**Ask for:** name. Workspace name at the provider defaults to the same
+string — only ask if they want it different. Module, values (from the
+module's `variables.tf`), policy (default `apply`).
+
+Remote module discovery is the default path (`../reference/gh-cookbook.md`
+→ "Discover Terraform modules"). `inline` is equally valid —
+`../reference/reference.md` → "Terraform modules".
+
+Pass values through the FlagSpec `.json` hatch for the terraform values
+field (Step 1).
+
+`--commit` is mandatory (no offline artifact path) and requires
+`--path claims/tfworkspaces/{name}.yaml`. See
+`../reference/fs-forge-mutation-shared.md`'s `--commit` warning — it
+hydrates; no manual hydrate after.
+
+Default flag values: `../reference/reference.md`.
+
 ## Other kinds
 
 Same flow — discover flags, fill from client answers + policy defaults,
-`create`, `validate -f`. Paths, default flag values, and TFWorkspaceClaim's
-remote-module discovery are all in `../reference/reference.md`. DomainClaim
-has no special defaults.
+`create`, `validate -f`. Paths and default flag values are in
+`../reference/reference.md`. DomainClaim has no special defaults.
