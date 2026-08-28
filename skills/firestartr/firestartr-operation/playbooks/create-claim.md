@@ -136,9 +136,9 @@ Default flag values: `../reference/reference.md`.
 
 ## TF workspace → TFWorkspaceClaim  →  `claims/tfworkspaces/{name}.yaml`
 
-**Ask for:** name. Workspace name at the provider defaults to the same
-string — only ask if they want it different. Module, values (from the
-module's `variables.tf`), policy (default `apply`).
+**Ask for:** name; workspace name (`providers.terraform.name` — can
+differ from the claim name; propose the claim name as default). Module,
+values (from the module's `variables.tf`), policy (default `apply`).
 
 Remote module discovery is the default path (`../reference/gh-cookbook.md`
 → "Discover Terraform modules"). `inline` is equally valid —
