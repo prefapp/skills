@@ -125,7 +125,7 @@ value.
 Emit one line confirming the resolved context, e.g.:
 > `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 0.1.0`
 
-**Skill-target CLI version: `0.8.0`**.
+**Skill-target CLI version: `0.10.0`**.
 Compare `{version}` against it with a plain semver check (no `--help`
 call needed):
 

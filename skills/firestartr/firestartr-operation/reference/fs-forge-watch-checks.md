@@ -3,9 +3,10 @@
 Monitor check runs on state-repo PRs produced by `create`/`edit`/`clone`/`delete --commit`. Sibling of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
 `firestartr-config.yaml`. Flags, exit codes, and output shapes: `watch-checks --help --json`.
 
-**Version guard:** requires `fs-forge-cli >= {tbd}`. Errors as an unrecognized
-command on older versions — confirm availability with
-`npx @firestartr/fs-forge-cli@{version} watch-checks --help` before use.
+**Version guard:** requires `fs-forge-cli >= 0.10.0`. On older versions it
+errors as an unrecognized command — fall back to `gh`: find the state-repo PR
+(`gh pr list --repo {org}/state-github --search <name> --state all`) and read
+its checks (`gh pr checks`).
 
 ## Modes
 

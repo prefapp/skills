@@ -3,6 +3,11 @@
 Cross-cutting rules `create`, `edit`, and `clone` all lean on. Sibling of
 `fs-forge-cookbook.md`; `{org}`/`{version}` come from `firestartr-config.yaml`.
 
+**Addressing differs by command.** `edit` takes an existing claim as ONE
+argument, `<Kind>-<name>` (e.g. `ComponentClaim-my-repo`) — never
+`edit <Kind> <name>`. `delete` is the opposite: kind and name as TWO
+arguments (`delete <Kind> <name>`).
+
 ## Discover a kind's flags at runtime
 
 ```bash

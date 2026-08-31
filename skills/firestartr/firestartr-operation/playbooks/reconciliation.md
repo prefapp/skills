@@ -5,7 +5,7 @@ Answer "is my repo/team in sync?" and related drift/alignment questions. This is
 `create-claim`/`edit-claim` + `lifecycle`. Bash idioms are in
 `../reference/gh-cookbook.md`; the claim→state map is in `../reference/reference.md`.
 
-## Opening move — watch-checks --current (CLI >= {tbd})
+## Opening move — watch-checks --current (CLI >= 0.10.0)
 
 Before a manual field diff, get a point-in-time check-status snapshot:
 

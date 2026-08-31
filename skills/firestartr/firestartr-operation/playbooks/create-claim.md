@@ -154,6 +154,18 @@ hydrates; no manual hydrate after.
 
 Default flag values: `../reference/reference.md`.
 
+## Terraform workspace → TFWorkspaceClaim  →  `claims/tfworkspaces/{name}.yaml`
+
+**Ask for:** name, owner, module source (`remote` default, `inline` for
+bespoke HCL), and the module's input values.
+
+Required beyond the shared flow: terraform `name`, `source`, `values.json`
+(`{}` when the module takes no inputs), and `context.providers.json` (`[]`
+when no provider context is needed).
+
+Modules, policies, the all-or-nothing `sync` block, and default flag values:
+`../reference/reference.md`.
+
 ## Other kinds
 
 Same flow — discover flags, fill from client answers + policy defaults,
