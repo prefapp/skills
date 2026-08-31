@@ -40,8 +40,20 @@ _Avoid_: scope lock, todo gating (same concept, pick one term).
 
 **Claim**:
 Firestartr's declarative desired-state unit (ComponentClaim = repo, GroupClaim =
-team, UserClaim = user, …). Internal vocabulary — the client never hears it; the
-entry skill translates intent to the right claim kind.
+team, UserClaim = user, TFWorkspaceClaim = TF workspace, …). Internal
+vocabulary — the client never hears it; the entry skill translates intent to
+the right claim kind.
+
+**TF workspace**:
+A Terraform workspace the client wants created, edited, or deleted. Same intent
+as tfwp, tfworkspace, or terraform workspace. Internal kind TFWorkspaceClaim —
+never say that name to the client.
+_Avoid_: tfwp, tfworkspace, terraform workspace
+
+**values**:
+The input variables of a TF workspace's module, taken from that module's
+`variables.tf` and the client's answers.
+_Avoid_: values.json
 
 **Feature**:
 A named, versioned capability from the prefapp Features catalog (e.g.
