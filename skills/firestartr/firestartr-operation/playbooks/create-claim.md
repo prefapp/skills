@@ -140,6 +140,10 @@ Default flag values: `../reference/reference.md`.
 differ from the claim name; propose the claim name as default). Module,
 values (from the module's `variables.tf`), policy (default `apply`).
 
+Required beyond the shared flow: terraform `name`, `source`, `values.json`
+(`{}` when the module takes no inputs), and `context.providers.json` (`[]`
+when no provider context is needed).
+
 Remote module discovery is the default path (`../reference/gh-cookbook.md`
 → "Discover Terraform modules"). `inline` is equally valid —
 `../reference/reference.md` → "Terraform modules".
@@ -153,18 +157,6 @@ field (Step 1).
 hydrates; no manual hydrate after.
 
 Default flag values: `../reference/reference.md`.
-
-## Terraform workspace → TFWorkspaceClaim  →  `claims/tfworkspaces/{name}.yaml`
-
-**Ask for:** name, owner, module source (`remote` default, `inline` for
-bespoke HCL), and the module's input values.
-
-Required beyond the shared flow: terraform `name`, `source`, `values.json`
-(`{}` when the module takes no inputs), and `context.providers.json` (`[]`
-when no provider context is needed).
-
-Modules, policies, the all-or-nothing `sync` block, and default flag values:
-`../reference/reference.md`.
 
 ## Other kinds
 

@@ -6,7 +6,7 @@ Monitor check runs on state-repo PRs produced by `create`/`edit`/`clone`/`delete
 **Version guard:** requires `fs-forge-cli >= 0.10.0`. On older versions it
 errors as an unrecognized command — fall back to `gh`: find the state-repo PR
 (`gh pr list --repo {org}/state-github --search <name> --state all`) and read
-its checks (`gh pr checks`).
+its checks (`gh pr checks <pr> --repo {org}/state-github`).
 
 ## Modes
 
