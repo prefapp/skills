@@ -13,7 +13,7 @@ conditional/looped.
 
 ## How `files:` / `filesTemplates` are actually processed
 
-Source: `~/work/prefapp/gitops-k8s/packages/features_renderer/src/render.ts`
+Source: `packages/features_renderer/src/render.ts` in `prefapp/gitops-k8s`
 
 - `render()` (`render.ts:20-125`) validates `config.yaml`, builds the mustache
   context, and — only if the resolved config has a `filesTemplates` key —
@@ -42,7 +42,7 @@ Source: `~/work/prefapp/gitops-k8s/packages/features_renderer/src/render.ts`
 
 ## Schema: no maxItems on `files` or `filesTemplates`
 
-Source: `~/work/prefapp/gitops-k8s/packages/features_renderer/src/schema.ts`
+Source: `packages/features_renderer/src/schema.ts` in `prefapp/gitops-k8s`
 
 - `files` (`schema.ts:14-19`) is `{ type: "array", items: {$ref: "#/definitions/File"} }`
   — no `minItems`/`maxItems`.
@@ -59,7 +59,8 @@ Source: `~/work/prefapp/gitops-k8s/packages/features_renderer/src/schema.ts`
 ## Tests: what's actually exercised
 
 Source:
-`~/work/prefapp/gitops-k8s/packages/features_renderer/__tests__/renderer_files_templates.test.ts`
+`packages/features_renderer/__tests__/renderer_files_templates.test.ts` in
+`prefapp/gitops-k8s`
 and its fixtures under `.../fixtures/features/feature_files_templates/`.
 
 - The fixture feature (`config.yaml`) has one static file (`a.txt`) plus two
@@ -90,7 +91,7 @@ and its fixtures under `.../fixtures/features/feature_files_templates/`.
 
 ## Precedent: `claims_repo` already renders more files, deeper, with binaries
 
-Source: `~/work/prefapp/features/packages/claims_repo/config.yaml` and its
+Source: `packages/claims_repo/config.yaml` in `prefapp/features` and its
 `templates/` tree.
 
 - `claims_repo/templates/` has **62 files**, 3 directories deep in places
@@ -113,13 +114,13 @@ Source: `~/work/prefapp/features/packages/claims_repo/config.yaml` and its
   independent check if it's ever verified those images render byte-identical
   in a real repo, but it does **not** affect this ticket since
   `firestartr-operation`'s 24 files are all confirmed plain UTF-8/ASCII text
-  (`file` on every path in `~/work/prefapp/skills/firestartr/firestartr-operation`
+  (`file` on every path in this repo's `firestartr/firestartr-operation/`
   returns "Unicode text, UTF-8 text" or "ASCII text", checked directly).
 
 ## Other packages, for scale context
 
-`find <pkg>/templates -type f | wc -l` per package under
-`~/work/prefapp/features/packages/`:
+`find <pkg>/templates -type f | wc -l` per package under `packages/` in
+`prefapp/features`:
 
 | package | file count |
 |---|---|

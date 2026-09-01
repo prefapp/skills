@@ -5,9 +5,9 @@ Research for [prefapp/skills#81](https://github.com/prefapp/skills/issues/81), p
 
 ## Gist
 
-No repo in `~/work/prefapp/` already does *this exact direction*
-(`prefapp/skills` → `prefapp/features`), but two structurally close precedents
-exist and can be adapted:
+None of the 18 Prefapp org repos surveyed locally already does *this exact
+direction* (`prefapp/skills` → `prefapp/features`), but two structurally
+close precedents exist and can be adapted:
 
 1. **"Promote to docs" push pattern** (`features`, `tfm`, `tfm-org-settings`,
    `tfm-specs-to-context`, `gitops-k8s` all have `promote-docs.yaml` /
@@ -25,11 +25,11 @@ exist and can be adapted:
    changes in), and is reusable as a generic "detect drift, ask a human/agent
    to reconcile" primitive regardless of direction.
 3. **Generic GitHub Actions primitives** not yet used for this purpose
-   anywhere in the org: `repository_dispatch` (searched, zero hits across all
-   `~/work/prefapp/*/.github/workflows`), and `gh workflow run` (used, but for
+   anywhere in the org: `repository_dispatch` (searched, zero hits across the
+   surveyed repos' `.github/workflows/`), and `gh workflow run` (used, but for
    triggering *deployment* dispatches, not content sync — see below).
 4. **Git submodule/subtree**: no `.gitmodules` file and no `git subtree` usage
-   found anywhere under `~/work/prefapp/`. Not a precedent at Prefapp.
+   found in any surveyed org repo. Not a precedent at Prefapp.
 
 No decision is made here — this is fact-finding only, per the ticket scope.
 
@@ -135,8 +135,8 @@ package layout rather than upstream-skills → fork-skills.
 ## 3. Generic GitHub Actions primitives (available, unused for this purpose)
 
 - **`repository_dispatch` / `workflow_dispatch` cross-repo trigger.** Searched
-  every `.github/workflows/*.yaml` under `~/work/prefapp/*` for
-  `repository_dispatch`: zero matches anywhere in the org. Not a precedent,
+  every `.github/workflows/*.yaml` across the surveyed org repos for
+  `repository_dispatch`: zero matches anywhere. Not a precedent,
   but a standard GitHub Actions primitive (a source repo fires an event/token
   call that triggers a workflow in the target repo) that nothing here already
   wires up for content sync.
@@ -157,7 +157,7 @@ package layout rather than upstream-skills → fork-skills.
 
 ## 4. Git submodule / subtree
 
-Checked every repo under `~/work/prefapp/` for `.gitmodules` (none exist) and
+Checked every surveyed org repo for `.gitmodules` (none exist) and
 grepped `.github` and `scripts` directories for `git subtree` invocations
 (none found). Git submodules/subtree are not used anywhere in the org today
 for repo-to-repo content sharing — this would be a net-new mechanism with no
@@ -167,23 +167,23 @@ internal precedent to draw on, unlike patterns 1 and 2.
 
 ## Sources consulted
 
-- `~/work/prefapp/features/.github/workflows/promote-docs.yaml`,
+- `prefapp/features`: `.github/workflows/promote-docs.yaml`,
   `promote-schemas.yaml`
-- `~/work/prefapp/tfm/.github/workflows/promote-docs.yaml` (diffed against
+- `prefapp/tfm`: `.github/workflows/promote-docs.yaml` (diffed against
   `features`' version)
-- `~/work/prefapp/tfm-org-settings/`, `~/work/prefapp/tfm-specs-to-context/`
+- `prefapp/tfm-org-settings`, `prefapp/tfm-specs-to-context`
   — same `promote-docs.yaml` workflow present
-- `~/work/prefapp/gitops-k8s/.github/workflows/promote_docs.yaml`,
+- `prefapp/gitops-k8s`: `.github/workflows/promote_docs.yaml`,
   `trigger_dispatch_on_releases.yaml`, `make_dispatches.yaml`
-- `~/work/prefapp/skills/.github/workflows/matt-sync.yml`,
-  `~/work/prefapp/skills/.github/matt-sync/scope_changes.py`,
-  `~/work/prefapp/skills/.github/matt-sync/README.md`,
-  `~/work/prefapp/skills/.github/skills/matt-sync/SKILL.md`,
-  `~/work/prefapp/skills/docs/adr/0008-track-upstream-matt-skills.md`
-  (same file duplicated in `~/work/prefapp/skills-troubleshoot/`)
-- Full listing of `.github/workflows/` across every repo under
-  `~/work/prefapp/*/` (18 repos checked)
+- `prefapp/skills`: `.github/workflows/matt-sync.yml`,
+  `.github/matt-sync/scope_changes.py`,
+  `.github/matt-sync/README.md`,
+  `.github/skills/matt-sync/SKILL.md`,
+  `docs/adr/0008-track-upstream-matt-skills.md`
+  (same file duplicated in `prefapp/skills-troubleshoot`)
+- Full listing of `.github/workflows/` across all surveyed Prefapp org repos
+  (18 repos checked)
 - `grep -r repository_dispatch`, `grep -r "git subtree"`, and a
-  `.gitmodules` search across all of `~/work/prefapp/*`: no matches
+  `.gitmodules` search across all surveyed org repos: no matches
 - `gh issue view 4` and `gh issue view 81` in `prefapp/skills`, for the
   originating risk framing and the exact ticket wording

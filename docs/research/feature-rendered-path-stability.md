@@ -104,7 +104,7 @@ not how Features are conventionally authored (see caveat below).
 
 ## Empirical confirmation from a real claims repo
 
-`~/work/prefapp/claims` is a real Firestartr claims repo whose own
+`prefapp/claims` is a real Firestartr claims repo whose own
 `.github/workflows/*.yaml` files are themselves rendered output of the
 `claims_repo` Feature (self-hosting: this repo's claim installs the Feature
 that manages the repo). Its git history contains three real version bumps of
@@ -131,7 +131,7 @@ Same pattern holds for `.github/workflows/update-features.yaml` and
 (checked with the same `git log --follow -p` command). No renames were
 detected by `--follow` in any of the three files across any of the bumps.
 
-(`~/work/pre-vieitesss/claims` was also checked as a second sample repo, but
+(A second claims repo from a client checkout was also checked, but
 its single tracked Feature reference — `release_please`/`features_repo` —
 has never been version-bumped in its recorded history, so it offers no
 additional bump-over-bump evidence; the `prefapp/claims` history above is the

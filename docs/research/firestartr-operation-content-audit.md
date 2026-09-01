@@ -38,8 +38,9 @@ above).
   issue #85 to act on: 6 total line hits across 2 files, listed above.
 
 - **`firestartr-config.yaml`** (repo root of the skill dir) — present on
-  disk locally with real values (`organizations[0].name: pre-vieitesss`,
-  real local filesystem paths, `cli_version: "0.7.0"`), but it is
+  disk locally with real values (a real org name in
+  `organizations[0].name`, real local filesystem paths,
+  `cli_version: "0.7.0"`), but it is
   **git-ignored** (`.gitignore:2`) and confirmed **not tracked** by git
   (`git ls-files` does not list it). It is a per-install runtime file, never
   committed, so it carries **no publish-leak risk** through normal
