@@ -140,6 +140,10 @@ Default flag values: `../reference/reference.md`.
 differ from the claim name; propose the claim name as default). Module,
 values (from the module's `variables.tf`), policy (default `apply`).
 
+Required beyond the shared flow: terraform `name`, `source`, `values.json`
+(`{}` when the module takes no inputs), and `context.providers.json` (`[]`
+when no provider context is needed).
+
 Remote module discovery is the default path (`../reference/gh-cookbook.md`
 → "Discover Terraform modules"). `inline` is equally valid —
 `../reference/reference.md` → "Terraform modules".

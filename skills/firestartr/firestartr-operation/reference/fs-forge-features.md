@@ -50,6 +50,9 @@ npx @firestartr/fs-forge-cli@{version} features add <component> --org={org} \
   you don't pass — it does not reapply schema defaults.
 - Schemas are cached by Feature name (`FS_FORGE_FEATURE_CACHE_DIR` overrides
   the location); pass `--refresh` to bypass a stale cache.
+- `--no-wait` skips waiting for the provision workflow a `--commit`
+  dispatches; `--json` outputs structured JSON. Both exist on `add`/`edit`/
+  `remove`.
 - `--args.json='{...}'` is the raw escape hatch when you'd rather pass the
   whole `args` object as JSON than discover each field flag.
 

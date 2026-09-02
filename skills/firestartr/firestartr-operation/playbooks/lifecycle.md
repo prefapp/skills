@@ -39,7 +39,7 @@ relation tree — `../reference/fs-forge-edit-clone.md`) and get approval.
 ### Step 3 — Re-run with `--commit`
 
 See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. For CLI
-`>= {tbd}`, always add `--wait-for-checks` — it overrides the CLI's own
+`>= 0.8.0`, always add `--wait-for-checks` — it overrides the CLI's own
 `false` default so the claims-repo PR also waits for its checks before
 merging (the state-repo PR always waits regardless).
 
@@ -147,6 +147,8 @@ So the dry-run previews the exact command you'll later add `--commit` to:
 - For TFWorkspaceClaim, ask the client whether to keep variant CRs and
   pass `--include-variants`/`--no-include-variants` accordingly; every
   other kind has no variants, so leave this flag off.
+- Add `--no-wait` only if the client asks not to wait for the unprovision
+  workflow to finish.
 - Optional fast check first, for ComponentClaim/GroupClaim/UserClaim/
   TFWorkspaceClaim: `preflight --deletion`
   (`../reference/fs-forge-preflight.md`) confirms the claim exists in one
