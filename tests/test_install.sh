@@ -13,6 +13,8 @@ AGENTS="$TMP/.agents/skills"
 CLAUDE="$TMP/.claude/skills"
 WORKFLOW_NS="$AGENTS/prefapp-workflow"
 NARGS="$TMP/npx-args.log"
+SKILLS_CLI_VERSION="1.5.23"
+EXPECTED_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add ./skills --skill firestartr-operation --global"
 
 # Stub npx so --all/--fs never touch the real one (no network, no node
 # dependency): it records its invocation args and exits with FAKE_NPX_EXIT.
@@ -63,10 +65,10 @@ run --workflow >/dev/null
 [ "$(readlink "$CLAUDE/tdd")" = "$REPO_DIR/skills/workflow/tdd" ] \
   || { echo "FAIL: stale claude link was not updated"; exit 1; }
 
-# Firestartr-only install: shells out to `npx skills add`, never symlinks locally.
+# Firestartr-only install: shells out to the pinned `npx skills` CLI, never symlinks locally.
 reset
 HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs >/dev/null
-[ "$(cat "$NARGS")" = "skills add prefapp/skills --skill firestartr-operation" ] \
+[ "$(cat "$NARGS")" = "$EXPECTED_NPX_ARGS" ] \
   || { echo "FAIL: --fs npx invocation: $(cat "$NARGS")"; exit 1; }
 [ ! -e "$AGENTS/firestartr-operation" ] || { echo "FAIL: --fs created a firestartr-operation symlink"; exit 1; }
 
@@ -81,7 +83,7 @@ ln -sfn "$REPO_DIR/firestartr" "$CLAUDE/prefapp-firestartr"
 OUT="$(HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs 2>&1 >/dev/null)"
 [ ! -L "$FIRESTARTR_NS" ] || { echo "FAIL: stale agents firestartr namespace link not removed"; exit 1; }
 [ ! -L "$CLAUDE/prefapp-firestartr" ] || { echo "FAIL: stale claude firestartr namespace link not removed"; exit 1; }
-[ "$(cat "$NARGS")" = "skills add prefapp/skills --skill firestartr-operation" ] \
+[ "$(cat "$NARGS")" = "$EXPECTED_NPX_ARGS" ] \
   || { echo "FAIL: --fs npx invocation with stale links: $(cat "$NARGS")"; exit 1; }
 
 # A stale per-skill firestartr-operation link from the old flat layout is also
@@ -94,7 +96,7 @@ ln -sfn "$REPO_DIR/firestartr/firestartr-operation" "$CLAUDE/firestartr-operatio
 OUT="$(HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs 2>&1 >/dev/null)"
 [ ! -L "$AGENTS/firestartr-operation" ] || { echo "FAIL: stale agents firestartr-operation link not removed"; exit 1; }
 [ ! -L "$CLAUDE/firestartr-operation" ] || { echo "FAIL: stale claude firestartr-operation link not removed"; exit 1; }
-[ "$(cat "$NARGS")" = "skills add prefapp/skills --skill firestartr-operation" ] \
+[ "$(cat "$NARGS")" = "$EXPECTED_NPX_ARGS" ] \
   || { echo "FAIL: --fs npx invocation with stale skill links: $(cat "$NARGS")"; exit 1; }
 
 # npx failure is a hard dependency: propagated as-is, no fallback, no retry.
