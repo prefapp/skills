@@ -54,8 +54,7 @@ does not update it. Either:
 
 The `--skill` flag has no version pin — it always installs from `main` HEAD.
 To pin, point the install at a tag's tree instead: the exact release tag pins
-exactly, and a rolling `firestartr-operation-vN` major tag (available from
-the `release_please` Feature once enabled on the `prefapp/skills` claim)
+exactly, and a rolling `firestartr-operation-vN` major tag (if published)
 tracks new `vN.*.*` releases without tracking `main`:
 
 ```sh
