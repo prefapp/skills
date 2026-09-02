@@ -14,7 +14,7 @@ CLAUDE="$TMP/.claude/skills"
 WORKFLOW_NS="$AGENTS/prefapp-workflow"
 NARGS="$TMP/npx-args.log"
 SKILLS_CLI_VERSION="1.5.23"
-EXPECTED_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add ./skills --skill firestartr-operation --global"
+EXPECTED_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add $REPO_DIR/skills --skill firestartr-operation --global"
 
 # Stub npx so --all/--fs never touch the real one (no network, no node
 # dependency): it records its invocation args and exits with FAKE_NPX_EXIT.
@@ -65,9 +65,9 @@ run --workflow >/dev/null
 [ "$(readlink "$CLAUDE/tdd")" = "$REPO_DIR/skills/workflow/tdd" ] \
   || { echo "FAIL: stale claude link was not updated"; exit 1; }
 
-# Firestartr-only install: shells out to the pinned `npx skills` CLI, never symlinks locally.
+# Firestartr-only install works outside the checkout and never symlinks locally.
 reset
-HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs >/dev/null
+(cd "$TMP" && HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs >/dev/null)
 [ "$(cat "$NARGS")" = "$EXPECTED_NPX_ARGS" ] \
   || { echo "FAIL: --fs npx invocation: $(cat "$NARGS")"; exit 1; }
 [ ! -e "$AGENTS/firestartr-operation" ] || { echo "FAIL: --fs created a firestartr-operation symlink"; exit 1; }

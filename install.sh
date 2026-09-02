@@ -135,7 +135,7 @@ if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
     fi
   done
   rc=0
-  npx --yes "skills@$SKILLS_CLI_VERSION" add ./skills --skill firestartr-operation --global || rc=$?
+  npx --yes "skills@$SKILLS_CLI_VERSION" add "$REPO_DIR/skills" --skill firestartr-operation --global || rc=$?
   if [ "$rc" -ne 0 ]; then
     echo "prefapp-firestartr: 'npx skills@$SKILLS_CLI_VERSION add' failed (exit $rc) — hard dependency, no fallback." >&2
     echo "Ensure npx is available (Node >= 18) and that you have network access. Do not proceed without it." >&2
