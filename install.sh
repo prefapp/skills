@@ -14,6 +14,7 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILLS_DIR="$REPO_DIR/skills/workflow"
 NAMESPACE="prefapp-workflow"
+SKILLS_CLI_VERSION="1.5.23"
 
 usage() {
   cat <<'EOF'
@@ -113,7 +114,7 @@ if [ "$INSTALL_WORKFLOW" -eq 1 ]; then
 fi
 
 if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
-  echo "prefapp-firestartr: installing via npx skills add"
+  echo "prefapp-firestartr: installing via npx skills@$SKILLS_CLI_VERSION add"
   # Drop stale links left by earlier versions of this script (pre-npx): the
   # prefapp-firestartr namespace link, and any per-skill firestartr-operation
   # link from the old flat layout. The npx install never creates them, and they
@@ -134,9 +135,9 @@ if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
     fi
   done
   rc=0
-  npx skills add prefapp/skills --skill firestartr-operation || rc=$?
+  npx --yes "skills@$SKILLS_CLI_VERSION" add "$REPO_DIR/skills" --skill firestartr-operation --global || rc=$?
   if [ "$rc" -ne 0 ]; then
-    echo "prefapp-firestartr: 'npx skills add' failed (exit $rc) — hard dependency, no fallback." >&2
+    echo "prefapp-firestartr: 'npx skills@$SKILLS_CLI_VERSION add' failed (exit $rc) — hard dependency, no fallback." >&2
     echo "Ensure npx is available (Node >= 18) and that you have network access. Do not proceed without it." >&2
     exit "$rc"
   fi
