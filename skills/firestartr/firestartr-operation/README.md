@@ -28,24 +28,46 @@ The skill runs inside an agent harness. If you don't have one yet, pick either:
   `curl -fsSL https://pi.dev/install.sh | sh`
   ([docs](https://pi.dev/docs/latest))
 
-Both discover skills from `~/.agents/skills/`, which is where the installer
-links this skill. Claude Code is also supported via `~/.claude/skills/`.
+Both discover skills from `~/.agents/skills/`, one of the locations the
+installer puts this skill. Claude Code is also supported via
+`~/.claude/skills/`.
 
 ## 📦 Install
 
-From the root of the `skills` repo:
-
 ```sh
-./install.sh --fs
+npx skills add prefapp/skills --skill firestartr-operation
 ```
 
-This symlinks the skill flat into `~/.agents/skills/firestartr-operation` —
-the location pi, OpenCode, and VS Code Copilot all read — plus
-`~/.claude/skills/firestartr-operation` if Claude Code is detected. pi and
-OpenCode discover skills recursively, but Claude Code and VS Code Copilot only
-read one level deep (`<skills-root>/<skill>/SKILL.md`), so a flat, per-skill
-symlink is what all four agree on. `git pull` keeps it up to date
-automatically.
+This installs the skill via the `skills` npm CLI (vercel-labs) — no clone of
+this repo required, and always installs `main` HEAD. If you do have the repo
+cloned, run `./install.sh --fs` from the repo root instead: it uses the same
+`skills` CLI but installs **from your local checkout**, whatever branch or
+tag you have checked out is what gets installed.
+
+### 🔄 Updating
+
+The install is **not** a symlink to a local clone, so `git pull` on a clone
+does not update it. Either:
+
+- **No clone**: re-run the install command above (always tracks `main` HEAD),
+  or run `npx skills update`, which re-fetches whatever was last installed.
+- **With a clone**: `git pull` (or check out the ref you want), then re-run
+  `./install.sh --fs` to reinstall from your local checkout.
+
+### 📌 Pinning to a release
+
+With a clone, pinning is just git: check out the release tag and re-run
+`./install.sh --fs`.
+
+Without a clone, the `--skill` flag has no version pin — it always installs
+from `main` HEAD. To pin, point the install at a tag's tree instead: the
+exact release tag pins exactly, and a rolling `firestartr-operation-vN` major
+tag (if published) tracks new `vN.*.*` releases without tracking `main`:
+
+```sh
+npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-v1/skills/firestartr/firestartr-operation
+npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-vX.Y.Z/skills/firestartr/firestartr-operation
+```
 
 ## 🚀 First run
 
