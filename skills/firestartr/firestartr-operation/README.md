@@ -39,23 +39,30 @@ npx skills add prefapp/skills --skill firestartr-operation
 ```
 
 This installs the skill via the `skills` npm CLI (vercel-labs) — no clone of
-this repo required. If you do have the repo cloned, `./install.sh --fs` from
-the repo root runs the same command.
+this repo required, and always installs `main` HEAD. If you do have the repo
+cloned, run `./install.sh --fs` from the repo root instead: it uses the same
+`skills` CLI but installs **from your local checkout**, whatever branch or
+tag you have checked out is what gets installed.
 
 ### 🔄 Updating
 
 The install is **not** a symlink to a local clone, so `git pull` on a clone
 does not update it. Either:
 
-- re-run the install command above (always tracks `main` HEAD), or
-- run `npx skills update`, which re-fetches whatever was last installed.
+- **No clone**: re-run the install command above (always tracks `main` HEAD),
+  or run `npx skills update`, which re-fetches whatever was last installed.
+- **With a clone**: `git pull` (or check out the ref you want), then re-run
+  `./install.sh --fs` to reinstall from your local checkout.
 
 ### 📌 Pinning to a release
 
-The `--skill` flag has no version pin — it always installs from `main` HEAD.
-To pin, point the install at a tag's tree instead: the exact release tag pins
-exactly, and a rolling `firestartr-operation-vN` major tag (if published)
-tracks new `vN.*.*` releases without tracking `main`:
+With a clone, pinning is just git: check out the release tag and re-run
+`./install.sh --fs`.
+
+Without a clone, the `--skill` flag has no version pin — it always installs
+from `main` HEAD. To pin, point the install at a tag's tree instead: the
+exact release tag pins exactly, and a rolling `firestartr-operation-vN` major
+tag (if published) tracks new `vN.*.*` releases without tracking `main`:
 
 ```sh
 npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-v1/skills/firestartr/firestartr-operation
