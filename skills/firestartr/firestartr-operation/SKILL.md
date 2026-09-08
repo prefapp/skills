@@ -23,10 +23,10 @@ a command's own output fully before reaching for another tool. Fall back to raw
 
 Apply to every invocation, on top of whatever the matched playbook adds:
 
-- **fs-forge auth.** Prefix every `fs-forge-cli` invocation with
-  `GITHUB_TOKEN=$(gh auth token)` so the token stays in that process's
-  environment. Never run `gh auth token` on its own, never print the
-  value, never pass it as a flag or in chat.
+- **fs-forge auth.** Prefix every invocation with the token inline:
+  `GITHUB_TOKEN="$(gh auth token)" npx @firestartr/fs-forge-cli@{version} …`
+  so it stays in that process's environment. Never run `gh auth token` on
+  its own, never print the value, never pass it as a flag or in chat.
 - **Step commitment.** Once Step 2 classifies the intent and the client
   approves the resulting plan, only the matched playbook's own numbered
   steps execute. A need discovered mid-flow is a new request: re-classify
