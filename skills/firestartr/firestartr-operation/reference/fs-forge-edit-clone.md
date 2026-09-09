@@ -5,14 +5,11 @@ commands — they read and write the claims repo directly over the GitHub API.
 Sibling of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
 `firestartr-config.yaml`.
 
-All need:
-
-- `GITHUB_TOKEN` in the environment — `fs-forge` reads this env var directly,
-  it doesn't share `gh`'s internal auth store. Populate it from `gh` once per
-  session if it isn't already set: `export GITHUB_TOKEN=$(gh auth token)`.
-- `--org={org}` on every invocation — the control-plane flag
-  (`fs-forge-mutation-shared.md`'s `{org}` passthrough); always pass it
-  explicitly rather than relying on an env var default.
+All need `--org={org}` on every invocation — the control-plane flag
+(`fs-forge-mutation-shared.md`'s `{org}` passthrough); always pass it
+explicitly rather than relying on an env var default. Auth is the
+`GITHUB_TOKEN` inline prefix from `../SKILL.md`'s Common rules — every
+command below assumes it.
 
 Claims are addressed as `<Kind>-<name>` (e.g. `ComponentClaim-my-repo`) — the
 same key the claims-map uses. Use this notation everywhere you need to name an
