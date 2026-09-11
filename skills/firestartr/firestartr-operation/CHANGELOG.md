@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/prefapp/skills/compare/firestartr-operation-v0.3.0...firestartr-operation-v0.4.0) (2026-09-11)
+
+
+### Features
+
+* **firestartr-operation:** ask to update or keep pinned CLI version ([8e5602b](https://github.com/prefapp/skills/commit/8e5602be95538bb751259de9eb05fca4022bb4df))
+
 ## [0.3.0](https://github.com/prefapp/skills/compare/firestartr-operation-v0.2.0...firestartr-operation-v0.3.0) (2026-09-03)
 
 
