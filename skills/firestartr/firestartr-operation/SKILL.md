@@ -116,18 +116,21 @@ doesn't exist on disk yet.
 Do not touch any repository until the organization resolves to a concrete
 value.
 
-**Resolve the CLI version** once the organization is known:
-1. If `cli_version` is set, use it as `{version}`.
-2. Otherwise:
-   ```bash
-   npm dist-tag ls @firestartr/fs-forge-cli | awk '$1 == "latest:" { print $2 }'
-   ```
-   Empty or `snapshot` → no stable release: list versions with
-   `npm view @firestartr/fs-forge-cli versions`, ask the client to pick one,
-   persist as `cli_version` (show-before-write).
+**Resolve the CLI version** once the organization is known. Always read
+`cli_version` and look up latest:
 
-Emit one line confirming the resolved context, e.g.:
-> `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 0.1.0`
+```bash
+npm dist-tag ls @firestartr/fs-forge-cli | awk '$1 == "latest:" { print $2 }'
+```
+
+- Lookup fails: say so. Pin set → keep-as-is vs retry. Do not invent a version.
+- Pin equals latest: use it as `{version}` (no ask).
+- Pin differs from latest (older or newer): tell both versions; ask whether to
+  update the pin to latest (show-before-write) or keep the set version. Do not
+  start until they answer — never override a pin silently.
+- Unset: use latest as `{version}`. Empty or `snapshot` → no stable release:
+  list versions with `npm view @firestartr/fs-forge-cli versions`, ask the
+  client to pick one, persist as `cli_version` (show-before-write).
 
 **Skill-target CLI version: `0.10.0`**.
 Compare `{version}` against it with a plain semver check (no `--help`
@@ -141,6 +144,9 @@ call needed):
   whatever it reports.
 - `< {target version}` and unpinned: same as the "no stable release found" flow
   above — ask the client to pick a version and pin it.
+
+Emit one line confirming the resolved context, e.g.:
+> `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 0.1.0`
 
 **Completion:** you hold a concrete `{org}`, `{claims_repo}`, `{version}`, and
 the matched path.

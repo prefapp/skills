@@ -11,7 +11,7 @@ Per-install, git-ignored. Template: `../firestartr-config.example.yaml`.
 | `organizations[].state_github_repo` | no | default `{name}/state-github` |
 | `organizations[].state_infra_repo` | no | default `{name}/state-infra` |
 | `organizations[].catalog_repo` | no | default `{name}/catalog` |
-| `cli_version` | no | single top-level key, shared across every organization (not per-org); unset resolves the latest stable `@firestartr/fs-forge-cli` |
+| `cli_version` | no | single top-level pin for `@firestartr/fs-forge-cli`, shared across every organization (not per-org). Resolution (set pin vs latest, or unset): `SKILL.md` Step 1 |
 
 The old single-`organization: { name }` shape is not supported — treat a file
 in that shape as unset (`SKILL.md` Step 1).
