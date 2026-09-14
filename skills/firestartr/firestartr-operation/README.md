@@ -98,7 +98,7 @@ repos over asking.
    current directory against each organization's registered `paths` (longest
    prefix wins), and pins down your org, claims repo, and CLI version.
 2. 🧭 **Classify** — your request is mapped to one of its playbooks (create,
-   clone, edit, delete, reconcile, browse).
+   edit, delete, reconcile, browse).
 3. 🛠️ **Execute** — changes land through `fs-forge-cli` when possible, falling
    back to raw `gh` (manual create-then-PR flows, Terraform discovery) only
    where the CLI can't express them.
@@ -110,7 +110,7 @@ repos over asking.
 | You say | What happens |
 |---|---|
 | "Create a repo called payments-api" | 🆕 new repo, landed via PR |
-| "Duplicate the web-frontend repo as web-frontend-v2" | 🐑 clone flow using the existing repo as the starting point |
+| "Duplicate the web-frontend repo as web-frontend-v2" | 🆕 new repo named web-frontend-v2; the existing repo is read for likeness, not copied |
 | "Add ana to the platform team" | 👥 team membership edit |
 | "Who owns the billing service?" | 📖 catalog lookup, read-only |
 | "Is the claims repo in sync?" | 🩺 reconciliation status (synced, drifted, orphaned, stale) |

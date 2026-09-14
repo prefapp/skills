@@ -1,15 +1,16 @@
 # Lifecycle Playbook
 
-The one flow every mutating operation follows. `create-claim`, `edit-claim`,
-and `clone-claim` produce or fetch the claim body; this playbook lands it.
+The one flow every mutating operation follows. `create-claim` and
+`edit-claim` produce or fetch the claim body; this playbook lands it.
 All bash idioms live in `../reference/gh-cookbook.md`.
 
 Two landing paths — pick by how the claim was produced:
 
-- **fs-forge-managed** — `create`/`edit`/`clone --commit`. The primary path
-  for `edit-claim`/`clone-claim`. Go to "fs-forge-managed flow" below.
-- **Manual** — `create` without `--commit`, or a `gh`-based edit/clone
-  fallback. Go to "Manual flow" below.
+- **fs-forge-managed** — `create`/`edit --commit`. The primary path for
+  `edit-claim` and for `create-claim` when landing immediately. Go to
+  "fs-forge-managed flow" below.
+- **Manual** — `create` without `--commit`, or a `gh`-based edit fallback.
+  Go to "Manual flow" below.
 
 For `create-claim`, the client's own choice of ending decides the path: landing
 immediately routes here to fs-forge-managed; an offline artifact routes to
@@ -24,7 +25,7 @@ change is a branch → PR → merge, and the host composite tools
 `github_propose_changes_dry_run`, when present) are fallbacks for what
 `fs-forge-cli`/the `gh` cookbook idioms don't cover.
 
-## fs-forge-managed flow (`create`/`edit`/`clone --commit`)
+## fs-forge-managed flow (`create`/`edit --commit`)
 
 ### Step 1 — Capture the goal as an issue
 
@@ -32,9 +33,12 @@ Same as the manual flow's Step 0 below, for the audit trail.
 
 ### Step 2 — Dry-run
 
-The `edit`/`clone` command with `--diff` (no `--commit`); fix any validation
-errors; show the Claim diff to the client (a unified YAML diff, not a
-relation tree — `../reference/fs-forge-edit-clone.md`) and get approval.
+**edit** — `edit` with `--diff` (no `--commit`); fix any validation errors;
+show the Claim diff to the client (a unified YAML diff, not a relation tree
+— `../reference/fs-forge-edit.md`) and get approval.
+
+**create** — the `create` output (no `--commit`) already shown in
+create-claim; that file is the plan. `create` has no `--diff`.
 
 ### Step 3 — Re-run with `--commit`
 
@@ -60,7 +64,7 @@ auto-generated PR has no `Closes #N` footer (there's no flag for it), so
 the issue is only linked back to the change if you do it here.
 
 A `--commit` that fails (invalid claim, an already-existing target claim for
-`create`/`clone`, existing `fs-forge/{kind}-{name}` branch, etc.) surfaces as
+`create`, existing `fs-forge/{kind}-{name}` branch, etc.) surfaces as
 a CLI error before anything is dispatched — fix the reported problem and
 re-run.
 
@@ -68,7 +72,7 @@ re-run.
 > `troubleshooting.md#fs-forge-cli-command-failures` if it doesn't explain
 > the failure.
 
-## Manual flow (`create` without `--commit`, or a `gh`-based edit/clone fallback)
+## Manual flow (`create` without `--commit`, or a `gh`-based edit fallback)
 
 ### Step 0 — Capture the goal as an issue
 

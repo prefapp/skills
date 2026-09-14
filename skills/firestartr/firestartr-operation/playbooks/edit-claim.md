@@ -1,7 +1,7 @@
 # Edit Claim Playbook
 
 Change an existing claim, then land it via `lifecycle`. Prefer `fs-forge edit`
-over hand-editing the file — see `../reference/fs-forge-edit-clone.md` for the
+over hand-editing the file — see `../reference/fs-forge-edit.md` for the
 invocation idiom. Fall back to the manual `gh`-based edit only when a field
 isn't reachable through `edit`'s flags.
 
@@ -22,7 +22,7 @@ current YAML.
 Same command with the relevant `--<flag>=<value>` / `--unset <path>`,
 `--diff`, and `--show-defaults` (unconditionally). Fix any validation
 errors, then show the printed Claim diff to the client and get approval
-(`../reference/fs-forge-edit-clone.md` has the diff/defaults format).
+(`../reference/fs-forge-edit.md` has the diff/defaults format).
 
 > **Check this first:** an unexpected diff, or a rejected `--commit` —
 > see `troubleshooting.md#fs-forge-cli-command-failures`.

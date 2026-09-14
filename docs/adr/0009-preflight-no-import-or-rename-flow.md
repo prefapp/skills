@@ -10,10 +10,10 @@ actually perform; claims have no rename operation).
 ## Decision
 
 Don't build either now. On a provider conflict, tell the client plainly and
-stop — no invented import step. A rename is only achievable today via the
-existing clone-then-delete recipe, which `preflight --edition` would gate
-well in one call, but we're not wiring that up as a first-class capability
-yet.
+stop — no invented import step. Rename is not a first-class flow. The former
+unofficial clone-then-delete recipe is withdrawn with claim cloning;
+create-then-delete is not a substitute. `preflight --edition` still surfaces
+the collision; we are not wiring a rename mutation.
 
 ## Consequences
 

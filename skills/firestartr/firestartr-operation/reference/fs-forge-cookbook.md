@@ -8,7 +8,7 @@ that matches the task instead of assuming everything lives here:
 | Need to… | Read |
 |---|---|
 | discover a kind's flags, pass `{org}`, use `--commit`, or preview claim defaults | `fs-forge-mutation-shared.md` |
-| read, edit, or clone an existing claim | `fs-forge-edit-clone.md` |
+| read or edit an existing claim | `fs-forge-edit.md` |
 | list an org's claims, render its topology, or print an arbitrary relation graph | `fs-forge-discovery.md` |
 | check whether a name is free before create/edit/delete | `fs-forge-preflight.md` |
 | watch check runs on a state-repo PR, or get point-in-time check status | `fs-forge-watch-checks.md` |
@@ -46,8 +46,8 @@ npx @firestartr/fs-forge-cli@{version} schema show MutationDiff
 output needs more certainty than this cookbook's prose gives:
 `CommandHelpJson` for `--help --json` (`fs-forge-mutation-shared.md`),
 `RelationGraph` for `discovery map --json`/`diagram print`
-(`fs-forge-discovery.md`), `MutationDiff` for `edit`/`clone --diff --json
---show-defaults` (`fs-forge-edit-clone.md`).
+(`fs-forge-discovery.md`), `MutationDiff` for `edit --diff --json
+--show-defaults` (`fs-forge-edit.md`).
 
 ## List supported claim kinds
 
@@ -70,6 +70,6 @@ cross-claim references, duplicates, or naming rules — those are the skill's
 responsibility (see the validation split in `reference.md`).
 
 Schema lookup is relative to the current working directory (`{cwd}/schemas/`).
-Run `validate`/`create`/`edit`/`clone` from a directory that has one — e.g. a
+Run `validate`/`create`/`edit` from a directory that has one — e.g. a
 clone of `{claims_repo}` (which ships it), or a `schemas/` symlink to the CLI's
 bundled copy — not an arbitrary scratch directory like `/tmp`.
