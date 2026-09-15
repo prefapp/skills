@@ -19,9 +19,12 @@ refs come from the requested name and that policy — not from another claim.
 YAML, run `fs-forge clone`, or hand-copy a claim file.
 
 The plan is the `create` output — requested fields plus required
-identifiers. Credentials, vars, Features, annotations, leftover provider
-settings (sync, org permissions, merge, technology), and `tfStateKey` stay
-off unless this request named them. Do not bake live claims-repo defaults
+identifiers and `../reference/reference.md`'s policy defaults. Never
+inherited from a source claim: credentials, vars, Features, annotations,
+provider settings (sync, org permissions, merge, technology),
+`tfStateKey` — absent unless this request named them. Documented policy
+defaults (e.g. the ComponentClaim/UserClaim `sync` block) are defaults,
+not inheritance — apply them. Do not bake live claims-repo defaults
 into the file; Step 4 previews what the renderer will add later.
 
 ## General flow (all kinds)
@@ -53,7 +56,7 @@ npx @firestartr/fs-forge-cli@{version} create <Kind> \
   > claims/{dir}/{name}.yaml
 ```
 
-`--org` is control-plane (required once Step 5 adds `--commit`);
+`--org` is control-plane (required for the `--commit` landing run);
 `--<schema-org-flag>` is the kind's schema org field if it has one — both
 in `../reference/fs-forge-mutation-shared.md` `{org}` passthrough. No
 output flag; redirect stdout to save. TFWorkspaceClaim/SecretsClaim need
@@ -88,10 +91,10 @@ distinct from the file.
 
 The plan is the Step 3 file plus any Step 4 preview.
 
-- **Landing now** — re-run Step 3's command **without the redirect** (so
-  its output — including the dispatched provisioning URL — stays visible)
-  with `--commit` (`../reference/fs-forge-mutation-shared.md` `--commit`
-  warning). Then `lifecycle`'s fs-forge-managed flow.
+- **Landing now** — hand the approved Step 3 command to `lifecycle`'s
+  fs-forge-managed flow, which owns the single `--commit` run (with
+  `--wait-for-checks`). Re-run it there **without the redirect** so its
+  output — including the dispatched provisioning URL — stays visible.
 - **Offline artifact** — hand Step 3's validated file to `lifecycle`'s
   manual flow.
 
