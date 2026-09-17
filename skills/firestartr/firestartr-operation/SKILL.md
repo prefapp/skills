@@ -15,7 +15,7 @@ domains — and never say "claim" to them. Run Steps 1-3 in order.
 each with a recommended answer. Prefer exploring the repos over asking.
 
 **Tool preference:** try `fs-forge-cli` first — it knows the schemas, the
-claims-map, and lands changes itself via `create`/`edit`/`clone --commit`. Read
+claims-map, and lands changes itself via `create`/`edit --commit`. Read
 a command's own output fully before reaching for another tool. Fall back to raw
 `gh` (`reference/gh-cookbook.md`) only for what the CLI can't do.
 
@@ -32,7 +32,7 @@ Apply to every invocation, on top of whatever the matched playbook adds:
   steps execute. A need discovered mid-flow is a new request: re-classify
   and get fresh approval, never expand silently.
 - **Every mutation goes through `lifecycle`.** No shortcutting it for any
-  create, edit, clone, or delete.
+  create, edit, or delete.
 - **Read current state before editing.** Fetch the live claim before
   proposing changes — array fields replace entirely, so you need the full
   current value.
@@ -158,9 +158,8 @@ always loads `lifecycle` in addition to its authoring playbook.
 
 | The client wants to… | Load |
 |---|---|
-| create a repo | `clone-claim` + `lifecycle` + proactive `feature-advisor` — default; see "When to clone vs. create" there for the fallback |
-| create a team, user, system, domain, secret, webhook, or TF workspace (tfwp, tfworkspace) | `create-claim` + `lifecycle` |
-| duplicate an existing repo/team/etc. as the starting point for a new one | `clone-claim` + `lifecycle` + proactive `feature-advisor` |
+| create or duplicate a repo (including another like an existing one) | `create-claim` + `lifecycle` + proactive `feature-advisor` |
+| create or duplicate a team, user, system, domain, secret, webhook, or TF workspace (tfwp, tfworkspace) — including another like an existing one | `create-claim` + `lifecycle` |
 | add or remove members of a team | `edit-claim` + `lifecycle` |
 | set a repo's owner, maintainers, platform owner, CODEOWNERS, or collaborators | `edit-claim` + `lifecycle` |
 | add, edit, remove, or list a Feature on a repo | `edit-claim` + `lifecycle` |

@@ -1,6 +1,6 @@
 # fs-forge Mutation Shared Reference
 
-Cross-cutting rules `create`, `edit`, and `clone` all lean on. Sibling of
+Cross-cutting rules `create` and `edit` both lean on. Sibling of
 `fs-forge-cookbook.md`; `{org}`/`{version}` come from `firestartr-config.yaml`.
 
 **Addressing differs by command.** `edit` takes an existing claim as ONE
@@ -38,7 +38,7 @@ whole.
 paths from the FlagSpec entries in `--help --json`'s `.flags[]`. Every other
 flag this cookbook uses is already a fixed, hardcoded name, safe to keep
 hardcoding: `org`, `commit`, and `path` on every kind; `diff` and `json` on
-`edit`/`clone` only (`create` has neither); ComponentClaim's own
+`edit` only (`create` has neither); ComponentClaim's own
 `feature`/`add-feature`/`remove-feature` (`fs-forge-features.md`'s "Feature
 CRUD"); and the two schema org-field paths documented next, identified by exact
 `path` match, never fuzzy "contains org" matching.
@@ -50,8 +50,8 @@ tell them apart by FlagSpec `path`, never by name alone:
 
 - **Control-plane `--org`** (`path: "org"`, env `FSCRT_ORG`) — which GitHub
   org's claims repo to talk to. Same name on every kind and every command
-  (`create`/`edit`/`clone`/`defaults`/`discovery`). Only enforced when a
-  network call actually happens — `--commit`, `edit`/`clone`, a `defaults`
+  (`create`/`edit`/`defaults`/`discovery`). Only enforced when a
+  network call actually happens — `--commit`, `edit`, a `defaults`
   command — a plain, uncommitted `create` needs neither it nor network access.
 - **Schema org field** — which GitHub org the claim's own resource (repo,
   team, …) belongs to. Path varies by kind, and several kinds have none at
@@ -62,8 +62,8 @@ tell them apart by FlagSpec `path`, never by name alone:
 The `{org}` value from `firestartr-config.yaml` is usually the same GitHub
 org for both, but pass it to each flag under its own discovered name — never
 assume one flag also sets the other. This distinction doesn't go away for
-`edit`/`clone` — they still need the control-plane flag on top of it for
-every network call (`fs-forge-edit-clone.md`).
+`edit` — it still needs the control-plane flag on top of it for
+every network call (`fs-forge-edit.md`).
 
 The example below uses `jq` to parse FlagSpec JSON; install `jq` or use an
 equivalent JSON parser when following it. To find the schema org field at
@@ -74,25 +74,25 @@ npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json \
   | jq -r '.flags[] | select(.path == "providers.github.org" or .path == "providers.github.orgName") | "--\(.path)=\("{org}")"'
 ```
 
-Pass the resulting `--<flag>=<value>` to `create`, `edit`, or `clone`.
+Pass the resulting `--<flag>=<value>` to `create` or `edit`.
 
 ## The `--commit` warning
 
-`--commit` does not just write the claim. Appended to `create`, `edit`, or
-`clone`, it creates the branch, commits the claim file, and dispatches
+`--commit` does not just write the claim. Appended to `create` or `edit`,
+it creates the branch, commits the claim file, and dispatches
 `provision-claim.yaml`, which opens the PR, waits for verify, merges it,
 **dispatches and waits for hydration**, and merges the resulting wet PR — all
 on its own, with no further input. One flag provisions **and hydrates** the
-claim end-to-end. Never pass it before the client has approved the diff, and
+claim end-to-end. Never pass it before the client has approved the plan, and
 never follow it with a manual hydrate step — it already happened. If the
 client asks for status, check the dispatched run; only trigger a *separate*
 manual hydrate (`gh-cookbook.md`) if they explicitly ask for one.
 
-`create --commit` and `clone --commit` additionally error up front if the
+`create --commit` additionally errors up front if the
 target `<Kind>-<name>` already exists — no separate uniqueness check needed
 from the CLI's side (the skill still pre-checks its own side —
-`reference.md`'s validation split). `create --commit`/`clone --commit` on
-TFWorkspaceClaim/SecretsClaim also require `--path claims/{...}/{name}.yaml`
+`reference.md`'s validation split). `create --commit` on
+TFWorkspaceClaim/SecretsClaim also requires `--path claims/{...}/{name}.yaml`
 (rejected outright for every other kind, which resolve their own path). A
 `--commit` that fails for any of these reasons surfaces as a CLI error before
 anything is dispatched — fix the reported problem and re-run.
@@ -102,13 +102,13 @@ anything is dispatched — fix the reported problem and re-run.
 
 ## Claim defaults (`claims_defaults.yaml` in the claims repo)
 
-`edit`/`clone` automatically fetch the org's repo-level claim defaults and
-apply them **after** the client's own requested changes, additively — a
+`edit` automatically fetches the org's repo-level claim defaults and
+applies them **after** the client's own requested changes, additively — a
 field is only filled when the claim doesn't already set it, never
 overwriting client intent. Validation runs against this final, defaulted
 document, so `--commit` always publishes a fully-defaulted, schema-valid
 claim. Reveal what got filled in a dry-run with `--show-defaults`
-(`fs-forge-edit-clone.md`).
+(`fs-forge-edit.md`).
 
 **`create` never applies them** — with or without `--commit`, its output is
 always the minimal document its flags describe. Preview what the platform
@@ -128,7 +128,7 @@ defaults; no validation, no write. `show` prints one kind's defaults on
 their own (an empty result for a kind with none defined, an error for an
 unrecognized kind id). `list` prints which kinds have any defaults defined
 for the org — table by default, `--json` for structured output. All three
-need the same `GITHUB_TOKEN`/`--org` prerequisites as `edit`/`clone`.
+need the same `GITHUB_TOKEN`/`--org` prerequisites as `edit`.
 
 Some fields default as an **all-or-nothing block** rather than field-by-field
 — currently TFWorkspaceClaim's `providers.terraform.sync` block (see
@@ -140,7 +140,7 @@ field.
 **Failure handling differs by context.** An ambiguous defaults-file location
 (more than one candidate found, none at the conventional path) hard-fails
 the three preview commands above with the candidate list, but only warns on
-stderr for `edit`/`clone`, which continue **without** applying defaults at
+stderr for `edit`, which continues **without** applying defaults at
 all — never a partial/best-guess application. A genuine network or auth
 failure fetching the file is always a hard failure, everywhere — never
 treated the same as "no defaults file" and silently skipped.

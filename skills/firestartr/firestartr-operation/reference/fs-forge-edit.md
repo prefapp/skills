@@ -1,6 +1,6 @@
-# fs-forge Edit & Clone Reference
+# fs-forge Edit Reference
 
-`edit`, `clone`, and a committing `create` are the network-bound fs-forge
+`edit` and a committing `create` are the network-bound fs-forge
 commands — they read and write the claims repo directly over the GitHub API.
 Sibling of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
 `firestartr-config.yaml`.
@@ -46,7 +46,7 @@ structured form: a flat `ClaimDiff[]` array — `{path, before, after}` per
 changed field; no separate published schema of its own.
 
 Add `--show-defaults` **unconditionally, every time** — it implies `--diff`
-and fetches the same repo-level claim defaults `edit`/`clone` already apply
+and fetches the same repo-level claim defaults `edit` already applies
 automatically (`fs-forge-mutation-shared.md`'s "Claim defaults"), widening
 the diff's "after" side to the fully-defaulted claim: defaults show up as
 ordinary `+` lines alongside the client's own field changes. Combined with
@@ -67,23 +67,3 @@ npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
 If the field you need isn't exposed by `--help --json` (e.g. editing one
 element inside an array of objects without recomputing the whole array), fall
 back to the manual `gh-cookbook.md` read → edit → write flow.
-
-## Clone an existing claim
-
-```bash
-npx @firestartr/fs-forge-cli@{version} clone <Kind> --org={org} \
-  --from <source-name> --name <new-name> \
-  --<flag>=<value> ... \
-  --diff
-```
-
-`<Kind>` here takes either the short ID (`component`) or the full name
-(`ComponentClaim`) — unlike `edit`'s `<Kind>-<name>` reference, which still
-requires the full name. `--name` must differ from `--from`.
-`TFWorkspaceClaim`/`SecretsClaim` also need
-`--path claims/{...}/{new-name}.yaml` (same rule as `create`'s deterministic
-path). Same dry-run → approve → `--commit` sequence and the same `--commit`
-warning as `edit` above (`fs-forge-mutation-shared.md`); `--diff`/`--json`/
-`--show-defaults` behave the same as `edit`'s Claim diff too (the whole new
-document renders as added lines, since there's no "before" to diff against).
-See `../playbooks/clone-claim.md` for the full flow.
