@@ -1,7 +1,7 @@
 # Prefapp Workflow Skills
 
 The end-to-end development workflow Prefapp developers (and clients'
-developers) follow on any repository, packaged as 19 harness-agnostic agent
+developers) follow on any repository, packaged as 20 harness-agnostic agent
 skills: plan → spec → implement → review. Extracted from a proven,
 repo-specific skill set and generalized to work anywhere. Runs in pi,
 OpenCode, Claude Code, and VS Code Copilot.
@@ -69,6 +69,9 @@ fire automatically when the situation matches.
 - **`review`** — Use when you want the changes since a fixed point (branch,
   tag, SHA) reviewed on two axes — Standards and Spec — via parallel
   sub-agents.
+- **`visual-pr`** *(explicit)* — Use when a PR needs describing: creates or
+  updates the PR for the current task with a concise why, special notes, and
+  a visual change outline a reviewer can scan.
 
 ### Cross-cutting — pull in anytime
 
