@@ -12,7 +12,7 @@ A self-contained capability package — a directory with a `SKILL.md` (Agent
 Skills standard) plus optional helper docs/scripts. The unit this repo ships.
 
 **Workflow set**:
-The 19 generalized skills in this repo that, together, describe the end-to-end
+The 20 generalized skills in this repo that, together, describe the end-to-end
 development workflow (plan → spec → implement → review).
 _Avoid_: skill bundle, skill pack.
 
@@ -174,6 +174,7 @@ the skill.
 | `tdd` | auto | Red-green-refactor, one test at a time. |
 | `diagnosing-bugs` | auto | Disciplined feedback-loop debugging for hard bugs / perf regressions. |
 | `review` | auto | Two-axis review (Standards + Spec) via parallel sub-agents. |
+| `visual-pr` | auto | Create or update the PR for the current task with a concise, reviewer-oriented description (why, special notes, show-me-style change outline). |
 | `improve-codebase-architecture` | explicit | Periodic deep-module rescue scan + report. |
 | `wayfinder` | explicit | Chart a too-big-for-one-session effort as a shared map of decision tickets on the tracker; resolve them one at a time. |
 | `research` | auto | Delegate reading/investigation against primary sources to a background agent; capture findings as a Markdown file. |
