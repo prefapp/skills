@@ -30,7 +30,7 @@ npx @firestartr/fs-forge-cli@{version} discovery map --org={org}
 ```
 
 Read-only but network-bound (downloads one claims-repo tarball; needs
-`GITHUB_TOKEN` like `edit`/`clone`). Recognizes only `owner`, `maintainedBy`,
+`GITHUB_TOKEN` like `edit`). Recognizes only `owner`, `maintainedBy`,
 `platformOwner`, `subComponentOf`, `system`, `domain`, `parent`, `children`,
 and `members` — API references and inline Features are never part of this
 graph. This is the tool for "show the org structure" / "what's in system Y" /
@@ -39,10 +39,10 @@ might be stale, since this reads the claims repo directly with no ~6h
 hydration lag.
 
 Options: repeatable `--kind <kind>` filters to one or more kinds (short ID
-like `component` or the full `ComponentClaim` — both spellings work here and
-for `clone`'s kind argument), `--ref <branch|tag|commit>` pins the claims repo
-revision, `--ascii` swaps emoji icons for bracket tags, `--json` returns the
-structured **`RelationGraph`** (`{"nodes": [...], "edges": [...]}` — schema:
+like `component` or the full `ComponentClaim` — both spellings work here),
+`--ref <branch|tag|commit>` pins the claims repo revision, `--ascii` swaps
+emoji icons for bracket tags, `--json` returns the structured
+**`RelationGraph`** (`{"nodes": [...], "edges": [...]}` — schema:
 `schema show RelationGraph`, `fs-forge-cookbook.md`) instead of the rendered
 tree — use `--json` when the result feeds another step rather than the
 client's eyes.

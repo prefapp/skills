@@ -50,9 +50,9 @@ GitHub-backed kinds) `providers.github.name` — GitHub teams accept Unicode.
 ## Validation split
 
 fs-forge validates syntax only (schema, types, enums) — via `npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}`.
-`edit`/`clone` run this same validation automatically before `--commit` and
-refuse to commit an invalid claim; `clone --commit`/`create --commit` also
-check name-uniqueness themselves (error if the target `<Kind>-<name>` already
+`edit` runs this same validation automatically before `--commit` and
+refuses to commit an invalid claim; `create --commit` also
+checks name-uniqueness itself (error if the target `<Kind>-<name>` already
 exists). The skill is still responsible for:
 - **References** — `user:`/`group:`/`system:`/… values point at claims that
   actually exist.
@@ -60,7 +60,7 @@ exists). The skill is still responsible for:
   lookup, so the skill must pre-check itself: `preflight`
   (`fs-forge-preflight.md`) for ComponentClaim/GroupClaim/UserClaim/
   TFWorkspaceClaim, the discovery commands (`fs-forge-discovery.md`) for
-  every other kind. The CLI's own guard on `create --commit`/`clone --commit`
+  every other kind. The CLI's own guard on `create --commit`
   (`fs-forge-mutation-shared.md`'s `--commit` warning) doesn't replace this —
   pre-checking first is a friendlier, earlier catch than waiting for that
   error.
@@ -72,7 +72,7 @@ exists). The skill is still responsible for:
 These are the skill's own portable, baked-in per-kind recommendations — a
 fallback starting point for `create`, not a live mirror of any org's actual
 configuration. For the org's real, current repo-level claim defaults
-(auto-applied by `edit`/`clone`, previewable for `create`; see
+(auto-applied by `edit`, previewable for `create`; see
 `fs-forge-mutation-shared.md`'s "Claim defaults" section), run
 `npx @firestartr/fs-forge-cli@{version} defaults show <kind> --org={org}`.
 

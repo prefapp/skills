@@ -15,7 +15,7 @@ top to bottom.
 |---|---|
 | `npx`/`fs-forge` won't run, no network, wrong Node | [Environment & tooling](#environment--tooling) |
 | No usable org/CLI-version config, no published CLI release | [Config & CLI-version resolution](#config--cli-version-resolution) |
-| A `create`/`edit`/`clone`/`defaults` command errored | [fs-forge-cli command failures](#fs-forge-cli-command-failures) |
+| A `create`/`edit`/`defaults` command errored | [fs-forge-cli command failures](#fs-forge-cli-command-failures) |
 | A claims-repo PR's checks are failing (PR Verify / render) | [PR-verify / render-pipeline denial](#pr-verify--render-pipeline-denial) |
 | A hydrate workflow run failed, or no state PR ever appeared | [Hydrate-workflow dispatch/execution](#hydrate-workflow-dispatchexecution) |
 | A state PR's `terraform_plan` check is red | [Terraform plan status check (pre-merge)](#terraform-plan-status-check-pre-merge) |
@@ -26,7 +26,7 @@ top to bottom.
 ## Diagnose, don't fix — with one exception
 
 Report what this finds and route back to the playbook that owns the fix
-(`create-claim`/`edit-claim`/`clone-claim`/`lifecycle`) — never edit a claim
+(`create-claim`/`edit-claim`/`lifecycle`) — never edit a claim
 from here. The one exception: offering to trigger a re-hydrate directly,
 already sanctioned as non-mutating by `catalog.md`'s and `reconciliation.md`'s
 Freshness sections (`../reference/gh-cookbook.md` → "Trigger hydration and

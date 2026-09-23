@@ -5,7 +5,7 @@ without requiring them to know features exist or what they're called.
 
 ## Triggers
 
-1. **Create/clone flows.** Before showing the plan for approval, check
+1. **Create flows.** Before showing the plan for approval, check
    whether the user's description implies features they haven't explicitly
    requested; suggest them first.
 2. **Standalone.** The user describes a capability (e.g. "I want Docker
@@ -47,7 +47,7 @@ the configurable args from the schema.
 
 ### Step 5 — Handle the decision
 
-**Accepted** → fold into the create/clone plan (`--feature` inline flag or
+**Accepted** → fold into the create plan (`--feature` inline flag or
 a `features add` step after landing), or hand off to `edit-claim` +
 `lifecycle` if standalone. **Declined** → move on, don't re-suggest it
 this session.
@@ -65,6 +65,6 @@ Suggest one at a time, most relevant first — each its own accept/decline.
 
 ## Boundaries
 
-- At most 3 suggestions per create/clone flow.
+- At most 3 suggestions per create flow.
 - Only suggest a feature whose README clearly matches the stated intent —
   never speculatively.

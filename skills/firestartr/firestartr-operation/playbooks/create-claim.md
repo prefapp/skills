@@ -1,42 +1,49 @@
 # Create Claim Playbook
 
-Author a new claim body via `fs-forge`, then land it — immediately via
-`--commit`, or as an offline file handed to `lifecycle`'s manual flow. Apply
-defaults from `../reference/reference.md` before calling fs-forge. File path is
-`claims/{dir}/{name}.yaml` in the claims repo (see the kind table in
-`../reference/reference.md`). Read `../reference/fs-forge-cookbook.md` before
+Author a new claim with `create`, then land it via `lifecycle` — `--commit`
+now, or an offline file to the manual flow. Policy defaults and kind paths:
+`../reference/reference.md`. Read `../reference/fs-forge-cookbook.md` before
 invoking fs-forge.
 
 Ask the client only for what you can't infer or default.
 
-If the client wants "one like an existing X but with Y different", use
-`clone-claim` instead. For a **repo** specifically, check `clone-claim.md`'s
-"When to clone vs. create" first — it's the default there, not the exception.
+## Fresh construction
+
+Construct with `create` from this request and documented policy
+(`../reference/reference.md`). Claim name, provider identity, and needed
+refs come from the requested name and that policy — not from another claim.
+
+"Like X": read X (`edit <Kind>-<name> --org={org}`, no mutating flags —
+`../reference/fs-forge-edit.md`) for kind and the likeness they asked for
+(Feature names, visibility). Fold that into this request. Do not copy X's
+YAML, run `fs-forge clone`, or hand-copy a claim file.
+
+The plan is the `create` output — requested fields plus required
+identifiers and `../reference/reference.md`'s policy defaults. Never
+inherited from a source claim: credentials, vars, Features, annotations,
+provider settings (sync, org permissions, merge, technology),
+`tfStateKey` — absent unless this request named them. Documented policy
+defaults (e.g. the ComponentClaim/UserClaim `sync` block) are defaults,
+not inheritance — apply them. Do not bake live claims-repo defaults
+into the file; Step 4 previews what the renderer will add later.
 
 ## General flow (all kinds)
 
 ### Step 1 — Discover flags
 
-```bash
-npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json
-```
-
-Map client answers + policy defaults from `../reference/reference.md` onto the
-logical claim-field paths returned in the FlagSpec. **Never hardcode a CLI flag
-name** for a schema field — derive the `path` from the FlagSpec for each value
-(`../reference/fs-forge-mutation-shared.md` lists the fixed flags that are safe to
-hardcode).
+`create <Kind> --help --json` (`../reference/fs-forge-mutation-shared.md`).
+Map client answers + policy defaults onto FlagSpec paths. Never hardcode a
+schema-field flag name; that reference lists the fixed flags safe to
+hardcode.
 
 ### Step 2 — Pre-check uniqueness
 
-For a repo, team, user, or TF workspace, run `preflight --create`
-(`../reference/fs-forge-preflight.md`) before building a plan — it covers
-both a claims-map conflict and a same-named resource already at the
-provider. Every other kind: confirm `<Kind>-<name>` doesn't already exist
-via `../reference/fs-forge-discovery.md`'s discovery commands instead. Tell
-the client and suggest `edit` on a claim conflict; on a provider conflict,
-stop and explain — there's no import path yet
-(`../reference/fs-forge-preflight.md`).
+Repo, team, user, or TF workspace: `preflight --create`
+(`../reference/fs-forge-preflight.md`) — claims-map and provider. Every
+other kind: confirm `<Kind>-<name>` does not already exist via
+`../reference/fs-forge-discovery.md`. Claim conflict → tell the client,
+suggest `edit`. Provider conflict → stop (no import; same preflight
+reference).
 
 ### Step 3 — Build the claim in one invocation
 
@@ -49,23 +56,19 @@ npx @firestartr/fs-forge-cli@{version} create <Kind> \
   > claims/{dir}/{name}.yaml
 ```
 
-`--org` is the control-plane flag (harmless here, required once Step 5 adds
-`--commit`); `--<schema-org-flag>` is the kind's own schema org field, if it
-has one — both are explained in `../reference/fs-forge-mutation-shared.md`'s
-"{org} passthrough". There's no output flag — the redirect above is the
-only way to save it; `create` prints the full new claim, so redirecting
-stdout is the whole step. TFWorkspaceClaim/SecretsClaim also need
-`--path claims/{...}/{name}.yaml` (rejected for every other kind; only
-required once `--commit` is added). For complex arrays and union values,
-write the value to a temporary JSON file and use the `path` from the
-relevant FlagSpec for its `.json` escape-hatch flag — pass that discovered
-path verbatim, never construct or hardcode it. Then validate:
+`--org` is control-plane (required for the `--commit` landing run);
+`--<schema-org-flag>` is the kind's schema org field if it has one — both
+in `../reference/fs-forge-mutation-shared.md` `{org}` passthrough. No
+output flag; redirect stdout to save. TFWorkspaceClaim/SecretsClaim need
+`--path claims/{...}/{name}.yaml` only with `--commit` (rejected for every
+other kind). Complex arrays/unions: temp JSON file + FlagSpec `.json`
+escape-hatch `path`, passed verbatim.
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} validate -f claims/{dir}/{name}.yaml
 ```
 
-Fix any errors before proceeding.
+Fix errors before proceeding.
 
 > **Check this first:** `validate -f` passing but `--commit` still
 > rejecting the claim — see
@@ -73,93 +76,81 @@ Fix any errors before proceeding.
 
 ### Step 4 — Offer to preview the org's repo-level claim defaults
 
-Needs network and `--org`, so skip it if the client wants a fully offline
+Needs network and `--org`; skip if the client wants a fully offline
 artifact and declines. `create` never applies these itself, committed or
-not:
+not (`../reference/fs-forge-mutation-shared.md` → "Claim defaults"):
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} defaults apply -f claims/{dir}/{name}.yaml --org={org}
 ```
 
-Compare its output against Step 3's file and tell the client what the
-platform will additionally fill in (`../reference/fs-forge-mutation-shared.md` →
-"Claim defaults"), distinct from the file itself.
+Compare to Step 3's file; tell the client what the platform will fill in,
+distinct from the file.
 
-### Step 5 — Show the client the file and any defaults preview, then land it
+### Step 5 — Show plan, get explicit approval, land
 
-- **Landing now** — re-run Step 3's command **without the redirect** (so
-  its output — including the dispatched provisioning URL — stays visible)
-  with `--commit` appended (see
-  `../reference/fs-forge-mutation-shared.md`'s `--commit` warning); the
-  `lifecycle` playbook's fs-forge-managed flow takes it from there.
-- **Offline artifact instead** — hand off Step 3's validated file to
-  `lifecycle`'s manual flow.
+The plan is the Step 3 file plus any Step 4 preview.
 
-## Repository → ComponentClaim  →  `claims/components/{name}.yaml`
+- **Landing now** — hand the approved Step 3 command to `lifecycle`'s
+  fs-forge-managed flow, which owns the single `--commit` run (with
+  `--wait-for-checks`). Re-run it there **without the redirect** so its
+  output — including the dispatched provisioning URL — stays visible.
+- **Offline artifact** — hand Step 3's validated file to `lifecycle`'s
+  manual flow.
+
+## Repository → ComponentClaim
 
 **Ask for:** description, owner, system (default `system:default-system`),
 visibility (default private), branch strategy (default `none`), features
 (default none).
 
 **Verify first:** `owner` and `system` exist; offer to create them if not.
-Never use `system:firestartr` unless the client names it.
+Never `system:firestartr` unless the client names it.
 
-Default flag values: `../reference/reference.md`.
+`features`: repeatable `--feature 'name@version:{...}'` or
+`--feature 'name#ref:{...}'` (`../reference/fs-forge-features.md`), not
+the `.json` hatch — one per Feature. Skips schema validation; run
+`validate --source`/`--refresh` after.
 
-`features`: use the repeatable `--feature 'name@version:{...}'` or
-`--feature 'name#ref:{...}'` inline flag (`../reference/fs-forge-features.md` →
-"Feature CRUD"), not the `.json` escape hatch — one per Feature. Skips
-schema validation; run `validate --source`/`--refresh` after.
-
-## User → UserClaim  →  `claims/users/{name}.yaml`
+## User → UserClaim
 
 **Ask for:** display name, email, role (`admin`/`member`, default `member`),
 teams to add.
 
-Teams named → add the user to each `GroupClaim`'s root-level `members` in the
-**same** PR (`edit-claim`), hydrate the user before the groups.
+Teams named → add the user to each `GroupClaim`'s root-level `members` in
+the **same** PR (`edit-claim`); hydrate the user before the groups.
 
-Default flag values: `../reference/reference.md`.
+## Team → GroupClaim
 
-## Team → GroupClaim  →  `claims/groups/{name}.yaml`
+`members` is optional — omit the flag unless the client names members.
+Set `sync` only when the client asks.
 
-`members` is optional — omit the flag for an empty team, only pass it when
-the client names members.
+Non-slug name: `../reference/reference.md` naming rules (`name` slug;
+`profile.displayName` / `providers.github.name` keep the original).
 
-Don't set `sync` unless the client asks.
+## TF workspace → TFWorkspaceClaim
 
-Non-slug name (uppercase, spaces, non-ASCII): naming normalization rules in
-`../reference/reference.md` — `name` gets the slug, `profile.displayName`/
-`providers.github.name` keep the original.
-
-Default flag values: `../reference/reference.md`.
-
-## TF workspace → TFWorkspaceClaim  →  `claims/tfworkspaces/{name}.yaml`
-
-**Ask for:** name; workspace name (`providers.terraform.name` — can
-differ from the claim name; propose the claim name as default). Module,
-values (from the module's `variables.tf`), policy (default `apply`).
+**Ask for:** name; workspace name (`providers.terraform.name` — can differ
+from the claim name; propose the claim name as default). Module, values
+(from the module's `variables.tf`), policy (default `apply`).
 
 Required beyond the shared flow: terraform `name`, `source`, `values.json`
 (`{}` when the module takes no inputs), and `context.providers.json` (`[]`
 when no provider context is needed).
 
-Remote module discovery is the default path (`../reference/gh-cookbook.md`
-→ "Discover Terraform modules"). `inline` is equally valid —
+Remote module discovery is the default (`../reference/gh-cookbook.md` →
+"Discover Terraform modules"). `inline` is equally valid —
 `../reference/reference.md` → "Terraform modules".
 
 Pass values through the FlagSpec `.json` hatch for the terraform values
 field (Step 1).
 
-`--commit` is mandatory (no offline artifact path) and requires
-`--path claims/tfworkspaces/{name}.yaml`. See
-`../reference/fs-forge-mutation-shared.md`'s `--commit` warning — it
-hydrates; no manual hydrate after.
-
-Default flag values: `../reference/reference.md`.
+`--commit` is mandatory (no offline artifact) and requires
+`--path claims/tfworkspaces/{name}.yaml`
+(`../reference/fs-forge-mutation-shared.md` `--commit` warning — it
+hydrates; no manual hydrate after).
 
 ## Other kinds
 
-Same flow — discover flags, fill from client answers + policy defaults,
-`create`, `validate -f`. Paths and default flag values are in
-`../reference/reference.md`. DomainClaim has no special defaults.
+Same flow. Paths and policy defaults: `../reference/reference.md`.
+DomainClaim has no special defaults.

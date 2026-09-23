@@ -26,7 +26,7 @@ isn't loaded by PR-verify, the sweep, or the render CLI; the only enforcement
 is a manual `docker run ... conftest ...` step the client runs by hand. A
 failed run's error text is one of the render error shapes below, or an
 unrecognized render failure — never one of `fs-forge-cli`'s own (that table
-only applies to `create`/`edit`/`clone`/`validate`/`defaults` invocations).
+only applies to `create`/`edit`/`validate`/`defaults` invocations).
 
 ## Validation sweep
 
@@ -144,17 +144,17 @@ gh search code '"{ClaimKind}/{claim-name}"' --repo {org}/{state-repo} # unknown 
 
 ## fs-forge-cli error shapes
 
-`create`/`edit`/`clone`/`validate`/`defaults` only — never a render; see
+`create`/`edit`/`validate`/`defaults` only — never a render; see
 "Render error shapes" above for PR-verify/`validate-claims.yaml`/
 `provision-claim.yaml` failures instead.
 
 | Condition | Message | Exit code | Verdict |
 |---|---|---|---|
-| Schema validation | AJV message, e.g. `must have required property 'owner'` / `/providers/github must have required property 'privacy'` | `validate -f` 1 · `create --commit` 2 · `edit`/`clone` 1 | Client-fixable — correct the field |
-| Uniqueness | `Claim already exists: <Kind>-<name>` | `create --commit` 1 · `clone --commit` 2 | Client-fixable — `edit` instead, or rename |
+| Schema validation | AJV message, e.g. `must have required property 'owner'` / `/providers/github must have required property 'privacy'` | `validate -f` 1 · `create --commit` 2 · `edit` 1 | Client-fixable — correct the field |
+| Uniqueness | `Claim already exists: <Kind>-<name>` | `create --commit` 1 | Client-fixable — `edit` instead, or pick a different name |
 | Stale branch | `Branch already exists: fs-forge/<kind>-<name>. Delete it before publishing again.` | 1 | Client-fixable — delete the branch, retry |
 | Ambiguous defaults (fatal) | `Multiple claims_defaults.yaml files found: <path1>, <path2>...` | `defaults apply/show/list` 1 | Client-fixable — consolidate to one file |
-| Ambiguous defaults (tolerant) | `Warning: Skipping defaults: Multiple claims_defaults.yaml files found: ...` (stderr) | 0 — `edit`/`clone` continue without defaults | Not a failure |
+| Ambiguous defaults (tolerant) | `Warning: Skipping defaults: Multiple claims_defaults.yaml files found: ...` (stderr) | 0 — `edit` continues without defaults | Not a failure |
 | Unknown kind | `No schema found for claim kind: <kind>` | 1 or 2 | Client-fixable if `<kind>` is a typo (`reference.md`'s kind table); escalate as a CLI bug if it's a real kind |
 | Anything else | uncaught crash / bare stack trace | — | Escalate |
 

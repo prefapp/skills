@@ -8,7 +8,7 @@ named. This reverses that policy for a bounded subset of surfaces.
 ## Decision
 
 Once `troubleshooting` names a fix, it continues straight into the playbook
-that owns it (`edit-claim`/`clone-claim`/`create-claim`) in the same turn,
+that owns it (`edit-claim`/`create-claim`) in the same turn,
 using the diagnosed field/value as the proposed change — that playbook's own
 dry-run → approve → commit flow is reused untouched, never reimplemented.
 
