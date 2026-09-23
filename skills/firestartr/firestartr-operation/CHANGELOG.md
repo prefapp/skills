@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/prefapp/skills/compare/firestartr-operation-v0.3.0...firestartr-operation-v0.4.0) (2026-09-23)
+
+
+### Features
+
+* **firestartr-operation:** ask to update or keep pinned CLI version ([8e5602b](https://github.com/prefapp/skills/commit/8e5602be95538bb751259de9eb05fca4022bb4df))
+* **firestartr-operation:** create claims fresh; remove claim cloning ([#122](https://github.com/prefapp/skills/issues/122)) ([fe16703](https://github.com/prefapp/skills/commit/fe1670390436211e005d787614a391cfe849beb7))
+
 ## [0.3.0](https://github.com/prefapp/skills/compare/firestartr-operation-v0.2.0...firestartr-operation-v0.3.0) (2026-09-03)
 
 
