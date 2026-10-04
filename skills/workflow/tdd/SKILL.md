@@ -3,7 +3,7 @@ name: tdd
 description: Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests.
 ---
 
-> **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it — repo rules override this skill.
+> **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it: repo rules override this skill.
 
 # Test-Driven Development
 
@@ -15,7 +15,7 @@ description: Test-driven development. Use when the user wants to build features 
 
 **Bad tests** are coupled to implementation. They mock internal collaborators, test private methods, or verify through external means (like querying a database directly instead of using the interface). The warning sign: your test breaks when you refactor, but behavior hasn't changed. If you rename an internal function and tests fail, those tests were testing implementation, not behavior.
 
-**Tautological tests** are the other trap: the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a hand-derived snapshot, a constant asserted equal to itself), so it passes by construction and can never disagree with the code. Expected values must come from an independent source of truth — a known-good literal, a worked example, the spec. See [tests.md](tests.md).
+**Tautological tests** are the other trap: the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a hand-derived snapshot, a constant asserted equal to itself), so it passes by construction and can never disagree with the code. Expected values must come from an independent source of truth: a known-good literal, a worked example, the spec. See [tests.md](tests.md).
 
 See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.
 
@@ -54,7 +54,7 @@ Before writing any code:
 
 - [ ] Confirm with user what interface changes are needed
 - [ ] Confirm with user which behaviors to test (prioritize)
-- [ ] Identify opportunities for deep modules (small interface, deep implementation) — run the `/codebase-design` skill for the vocabulary and the testability checks
+- [ ] Identify opportunities for deep modules (small interface, deep implementation): run the `/codebase-design` skill for the vocabulary and the testability checks
 - [ ] List the behaviors to test (not implementation steps)
 - [ ] Get user approval on the plan
 
@@ -106,7 +106,7 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 Run the project's lint and test commands scoped to what you touched. Run single test
 files frequently while iterating; run the full suite once at the end.
 
-Do not commit — commits require explicit user approval.
+Do not commit: commits require explicit user approval.
 
 ## Checklist Per Cycle
 

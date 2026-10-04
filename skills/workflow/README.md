@@ -35,7 +35,7 @@ fire automatically when the situation matches.
 
 - **`setup-workflow`** *(explicit)* — Use when you're in a fresh repo:
   detects the doc layout (single- vs multi-context), bootstraps the
-  `CONTEXT.md` + `docs/adr/` structure the other skills expect, and wires the
+  `GLOSSARY.md` + `docs/adr/` structure the other skills expect, and wires the
   routing. Run first, once per repo.
 - **`grilling`** — Use when you have a plan or idea and want it stress-tested
   before building: a relentless round-by-round interview.
@@ -114,8 +114,8 @@ setup-workflow            (once per repo)
 ## Getting the most out of these skills
 
 - **Start every new repo with `setup-workflow`** to scaffold the domain doc
-  layout the other skills expect (`CONTEXT.md` + `docs/adr/`).
-- **Let `domain-modeling` fill in `CONTEXT.md` lazily** — don't pre-populate
+  layout the other skills expect (`GLOSSARY.md` + `docs/adr/`).
+- **Let `domain-modeling` fill in `GLOSSARY.md` lazily** — don't pre-populate
   it; terms get added as they crystallize during grilling/implementation.
 - **`implement` never commits.** It stops and reports what changed. Commits
   require explicit user approval — this is by design (see `AGENTS.md` global

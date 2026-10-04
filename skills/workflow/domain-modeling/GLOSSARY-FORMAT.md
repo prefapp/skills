@@ -1,4 +1,4 @@
-# CONTEXT.md Format
+# GLOSSARY.md Format
 
 ## Structure
 
@@ -31,9 +31,9 @@ _Avoid_: Client, buyer, account
 
 ## Single vs multi-context repos
 
-**Single context (a non-monorepo repo):** One `CONTEXT.md` at the repo root.
+**Single context (a non-monorepo repo):** One `GLOSSARY.md` at the repo root.
 
-**Multiple contexts (a monorepo with per-package contexts):** A `CONTEXT-MAP.md` at the
+**Multiple contexts (a monorepo with per-package contexts):** A `GLOSSARY-MAP.md` at the
 repo root lists the contexts, where they live, and how they relate to each other:
 
 ```md
@@ -41,8 +41,8 @@ repo root lists the contexts, where they live, and how they relate to each other
 
 ## Contexts
 
-- [package-a](./packages/package-a/CONTEXT.md) — (one-line description)
-- [package-b](./packages/package-b/CONTEXT.md) — (one-line description)
+- [package-a](./packages/package-a/GLOSSARY.md): (one-line description)
+- [package-b](./packages/package-b/GLOSSARY.md): (one-line description)
 
 ## Relationships
 
@@ -51,8 +51,8 @@ repo root lists the contexts, where they live, and how they relate to each other
 
 The skill infers which structure applies:
 
-- If `CONTEXT-MAP.md` exists, read it to find contexts
-- If only a root `CONTEXT.md` exists, single context
-- If neither exists, create a root `CONTEXT.md` lazily when the first term is resolved
+- If `GLOSSARY-MAP.md` exists, read it to find contexts
+- If only a root `GLOSSARY.md` exists, single context
+- If neither exists, create a root `GLOSSARY.md` lazily when the first term is resolved
 
 When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.

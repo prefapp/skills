@@ -5,7 +5,7 @@ argument-hint: "What will the next session be used for?"
 disable-model-invocation: true
 ---
 
-> **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it — repo rules override this skill.
+> **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it: repo rules override this skill.
 
 Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS - not the current workspace.
 

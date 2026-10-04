@@ -167,9 +167,9 @@ the skill.
 
 | Skill | Invocation | What it does |
 |---|---|---|
-| `setup-workflow` | explicit | One-time repo bootstrap: detect doc layout (single vs multi-context), scaffold `CONTEXT`/`docs/adr`, wire routing. Run first on a fresh repo. |
+| `setup-workflow` | explicit | One-time repo bootstrap: detect doc layout (single vs multi-context), scaffold `GLOSSARY`/`docs/adr`, wire routing. Run first on a fresh repo. |
 | `grilling` | auto | Round-by-round interview to stress-test a plan before building. |
-| `grill-with-docs` | explicit | `grilling` that also writes CONTEXT/ADRs as it goes (runs `domain-modeling`). |
+| `grill-with-docs` | explicit | `grilling` that also writes GLOSSARY/ADRs as it goes (runs `domain-modeling`). |
 | `domain-modeling` | auto | Build/sharpen the glossary + ADRs. Single- and multi-context aware. |
 | `codebase-design` | auto | Deep-module vocabulary (module / interface / depth / seam) + testability. |
 | `to-spec` | explicit | Synthesize the conversation into a spec and publish it as a GitHub issue. |

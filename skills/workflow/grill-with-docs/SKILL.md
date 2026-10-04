@@ -4,6 +4,6 @@ description: A relentless interview to sharpen a plan or design, which also crea
 disable-model-invocation: true
 ---
 
-> **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it — repo rules override this skill.
+> **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it: repo rules override this skill.
 
 Run a `/grilling` session, using the `/domain-modeling` skill.

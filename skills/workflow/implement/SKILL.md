@@ -4,7 +4,7 @@ description: "Implement a piece of work based on a spec or set of tickets."
 disable-model-invocation: true
 ---
 
-> **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it — repo rules override this skill.
+> **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it: repo rules override this skill.
 
 Implement the work described by the user in the spec or tickets.
 

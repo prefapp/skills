@@ -7,5 +7,5 @@ needs to understand the concepts and carry out the tasks — no more. See
 (no-ops, sediment, single source of truth).
 
 This does not apply to files written for a human reader — `README.md` (root
-or nested), `CONTEXT.md`, `docs/adr/*`, `THIRD_PARTY_NOTICES.md` — which
+or nested), `GLOSSARY.md`, `docs/adr/*`, `THIRD_PARTY_NOTICES.md` — which
 should stay as clear and welcoming as they need to be.

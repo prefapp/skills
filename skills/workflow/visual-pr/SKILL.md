@@ -1,9 +1,9 @@
 ---
 name: visual-pr
-description: Create or update the pull request for the current task with a concise, reviewer-oriented description — a one-sentence why, special notes, and a show-me-style structural change outline.
+description: "Create or update the pull request for the current task with a concise, reviewer-oriented description: a one-sentence why, special notes, and a show-me-style structural change outline."
 ---
 
-> **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it — repo rules override this skill.
+> **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it: repo rules override this skill.
 
 # Describe a Pull Request
 
