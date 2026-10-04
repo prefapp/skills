@@ -12,7 +12,7 @@ A self-contained capability package — a directory with a `SKILL.md` (Agent
 Skills standard) plus optional helper docs/scripts. The unit this repo ships.
 
 **Workflow set**:
-The 20 generalized skills in this repo that, together, describe the end-to-end
+The 22 generalized skills in this repo that, together, describe the end-to-end
 development workflow (plan → spec → implement → review).
 _Avoid_: skill bundle, skill pack.
 
@@ -177,8 +177,10 @@ the skill.
 | `triage` | explicit | Move issues through a state machine of triage roles; optionally include external PRs when the repo config enables PRs as a triage surface — categorise, verify, grill if needed, write agent-ready briefs, and record rejections in `.out-of-scope/`. |
 | `implement` | explicit | Implement from spec/tickets at agreed seams. **Never commits.** |
 | `tdd` | auto | Red-green-refactor, one test at a time. |
+| `coding` | auto | Behaviour guide while writing code: surface assumptions, keep it simple, make surgical changes, verify against success criteria. |
+| `zero-tech-debt` | auto | Rebuild a feature toward its intended shape, removing compatibility cruft and dead abstractions. Not for hotfixes. |
 | `diagnosing-bugs` | auto | Disciplined feedback-loop debugging for hard bugs / perf regressions. |
-| `review` | auto | Two-axis review (Standards + Spec) via parallel sub-agents. |
+| `review` | auto | Three-axis review (Standards + Spec + Debt) via parallel sub-agents. |
 | `visual-pr` | auto | Create or update the PR for the current task with a concise, reviewer-oriented description (why, special notes, show-me-style change outline). |
 | `improve-codebase-architecture` | explicit | Periodic deep-module rescue scan + report. |
 | `wayfinder` | explicit | Chart a too-big-for-one-session effort as a shared map of decision tickets on the tracker; resolve them one at a time. |
@@ -199,14 +201,14 @@ setup-workflow            (once per repo)
         │
     to-tickets                      ← spec split into tracer-bullet tickets
         │
-    implement                        ← uses tdd + codebase-design at seams
+    implement                        ← uses tdd + coding + codebase-design at seams
         │
-     review                          ← Standards + Spec
+     review                          ← Standards + Spec + Debt
 ```
 
 Cross-cutting, pull in anytime: `domain-modeling`, `diagnosing-bugs`,
-`improve-codebase-architecture`, `handoff`, `research`, `prototype`, `wizard`,
-`writing-for-agents`. For an
+`improve-codebase-architecture`, `zero-tech-debt`, `handoff`, `research`,
+`prototype`, `wizard`, `writing-for-agents`. For an
 effort too big to hold in one session, start with `wayfinder`. To move incoming
 issues/PRs through a triage state machine, use `triage`.
 

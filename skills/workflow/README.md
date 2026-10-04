@@ -1,7 +1,7 @@
 # Prefapp Workflow Skills
 
 The end-to-end development workflow Prefapp developers (and clients'
-developers) follow on any repository, packaged as 20 harness-agnostic agent
+developers) follow on any repository, packaged as 22 harness-agnostic agent
 skills: plan → spec → implement → review. Extracted from a proven,
 repo-specific skill set and generalized to work anywhere. Runs in pi,
 OpenCode, Claude Code, and VS Code Copilot.
@@ -63,12 +63,21 @@ fire automatically when the situation matches.
   at the agreed seams. **Never commits** — it stops and reports what changed.
 - **`tdd`** — Use when building test-first: red-green-refactor, one test at a
   time.
+- **`coding`** — Use when writing or changing code: think before coding,
+  keep it simple, change only what the task needs, and define how you will
+  verify it.
+
+### Refine
+
+- **`zero-tech-debt`** — Use when code should be rebuilt toward its intended
+  shape: remove compatibility cruft, dead abstractions, and historical
+  workarounds. Not for hotfixes or security backports.
 
 ### Review
 
 - **`review`** — Use when you want the changes since a fixed point (branch,
-  tag, SHA) reviewed on two axes — Standards and Spec — via parallel
-  sub-agents.
+  tag, SHA) reviewed on three axes — Standards, Spec, and Debt — via
+  parallel sub-agents.
 - **`visual-pr`** *(explicit)* — Use when a PR needs describing: creates or
   updates the PR for the current task with a concise why, special notes, and
   a visual change outline a reviewer can scan.
@@ -106,9 +115,9 @@ setup-workflow            (once per repo)
         │
     to-tickets                      ← spec split into tracer-bullet tickets
         │
-    implement                        ← uses tdd + codebase-design at seams
+    implement                        ← uses tdd + coding + codebase-design at seams
         │
-     review                          ← Standards + Spec
+     review                          ← Standards + Spec + Debt
 ```
 
 ## Getting the most out of these skills

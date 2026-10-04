@@ -10,7 +10,7 @@ Implement the work described by the user in the spec or tickets.
 
 Before exploring, follow the context-doc rules in [domain-modeling/domain.md](../domain-modeling/domain.md).
 
-Use /tdd where possible, at pre-agreed seams.
+Use /tdd where possible, at pre-agreed seams. Follow /coding as you write.
 
 Run the project's lint and test commands scoped to what you touched. Run single test
 files frequently while iterating; run the full suite once at the end.

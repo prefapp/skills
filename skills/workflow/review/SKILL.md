@@ -1,16 +1,17 @@
 ---
 name: review
-description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating ticket/spec asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
+description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along three axes: Standards (does the code follow this repo's documented coding standards?), Spec (does the code match what the originating ticket/spec asked for?), and Debt (does the change leave cruft behind?). Runs the three reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
 ---
 
 > **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it: repo rules override this skill.
 
-Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
+Three-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
 - **Standards**: does the code conform to this repo's documented coding standards?
 - **Spec**: does the code faithfully implement the originating ticket / spec?
+- **Debt**: does the change leave the code carrying more history than its intended shape needs?
 
-Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
+The axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
 
 The issue tracker is GitHub (`gh` CLI). For conventions, see [setup-workflow/issue-tracker-github.md](../setup-workflow/issue-tracker-github.md).
 
@@ -22,7 +23,7 @@ Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main
 
 Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
 
-Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside two parallel sub-agents.
+Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside three parallel sub-agents.
 
 ### 2. Identify the spec source
 
@@ -57,9 +58,9 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 - **Middle Man**: a class or function that mostly just delegates onward. → cut it, call the real target direct.
 - **Refused Bequest**: a subclass or implementer that ignores or overrides most of what it inherits. → drop the inheritance, use composition.
 
-### 4. Spawn both sub-agents in parallel
+### 4. Spawn the sub-agents in parallel
 
-Send a single message with two `Agent` tool calls. Use the `general-purpose` subagent for both.
+Send a single message with one `Agent` tool call per axis. Use the `general-purpose` subagent for each.
 
 **Standards sub-agent prompt**: include:
 
@@ -73,19 +74,26 @@ Send a single message with two `Agent` tool calls. Use the `general-purpose` sub
 - The path or fetched contents of the spec.
 - The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Under 400 words."
 
+**Debt sub-agent prompt**: include:
+
+- The diff command and commit list.
+- The absolute paths of [zero-tech-debt/references/04-audit-patterns.md](../zero-tech-debt/references/04-audit-patterns.md) and [05-decision-filters.md](../zero-tech-debt/references/05-decision-filters.md).
+- The brief: "Hunt cruft (compatibility paths, versioned twins, stale flags, pass-through layers, abstractions with one caller) in what the diff adds and in the functions and modules it edits. Walk every pattern in 04-audit-patterns.md over those files, and judge each candidate against 05-decision-filters.md. Find a candidate's callers before calling it dead; keep anything a repo rule, a live caller, or an in-flight migration still needs; skip what tooling enforces. Fowler smells belong to the Standards axis. Report (a) each finding: pattern, `file:line`, quoted hunk, and the fix (delete, inline, rename, or merge) in one sentence; (b) cruft outside that scope as follow-ups, one line each; (c) the patterns that found nothing. Under 400 words."
+
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
 
 ### 5. Aggregate
 
-Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings: the two axes are deliberately separate (see _Why two axes_).
+Present the reports under `## Standards`, `## Spec`, and `## Debt` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings: the axes are deliberately separate (see _Why separate axes_).
 
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
 
-## Why two axes
+## Why separate axes
 
-A change can pass one axis and fail the other:
+A change can pass one axis and fail another:
 
 - Code that follows every standard but implements the wrong thing → **Standards pass, Spec fail.**
 - Code that does exactly what the ticket asked but breaks the project's conventions → **Spec pass, Standards fail.**
+- Clean, correct code that keeps a legacy path alive beside the new one → **Standards and Spec pass, Debt fail.**
 
-Reporting them separately stops one axis from masking the other.
+Reporting them separately stops one axis from masking another.

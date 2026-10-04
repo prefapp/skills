@@ -33,5 +33,6 @@ per-harness layout, updating, and version pinning: see each set's README.
 ## Attribution
 
 Parts of the workflow skill set are adapted from
-[`mattpocock/skills`](https://github.com/mattpocock/skills). See
-[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for its MIT license notice.
+[`mattpocock/skills`](https://github.com/mattpocock/skills) and other
+MIT-licensed skill sets. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)
+for each source and its license notice.
