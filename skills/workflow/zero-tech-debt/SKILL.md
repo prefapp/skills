@@ -1,14 +1,7 @@
 ---
 name: zero-tech-debt
-description: |
-  Rebuild a feature as if the correct product architecture existed from day one — remove compatibility cruft, dead abstractions, and historical compromises instead of preserving them. Use when the operator says "refactor properly," "clean up," "rewrite," "modernize," "remove legacy," "simplify," "rethink," "pay down tech debt," or signals frustration with accumulated complexity. Do NOT use for hotfixes, bug repros, surgical patches, or security backports — blast-radius minimization wins there. Trigger with "/zero-tech-debt", "do it right this time", "the way it should have been built", "refactor toward intent".
-allowed-tools: Read, Edit, Glob, Grep, Bash(git:*), Bash(rg:*), Bash(fd:*)
-version: 1.1.0
-author: Jeremy Longshore <jeremy@intentsolutions.io>
+description: Refactor code toward its intended shape, deleting compatibility cruft, dead abstractions, and legacy paths instead of preserving them. Use when the user asks to refactor properly, clean up, simplify, remove legacy, or pay down tech debt.
 license: MIT
-compatibility: Designed for Claude Code
-tags: [refactoring, tech-debt, architecture, cleanup, modernization, code-quality]
-user-invocable: true
 ---
 
 > **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it: repo rules override this skill.
@@ -28,12 +21,12 @@ Preserve only the parts that still serve the intended architecture, UX, reliabil
 
 ## Operating Mode (read this section every invocation)
 
-1. **Confirm scope** — `Read` [`references/01-when-to-use.md`](references/01-when-to-use.md). If the request smells like a hotfix, security backport, or time-boxed patch, stop and recommend a targeted change instead.
-2. **Pre-flight** — walk [`references/02-preflight-checklist.md`](references/02-preflight-checklist.md). Every box must be checked before touching code. Tests, callers, rollback path, single-paragraph end-state description, no in-flight migration, telemetry accounted for. Use `Glob` to locate test files and `Grep` / `Bash(rg:*)` to enumerate external callers of the surface being changed.
+1. **Confirm scope** — read [`references/01-when-to-use.md`](references/01-when-to-use.md). If the request smells like a hotfix, security backport, or time-boxed patch, stop and recommend a targeted change instead.
+2. **Pre-flight** — walk [`references/02-preflight-checklist.md`](references/02-preflight-checklist.md). Every box must be checked before touching code. Tests, callers, rollback path, single-paragraph end-state description, no in-flight migration, telemetry accounted for. Locate the test files and search for every external caller of the surface being changed.
 3. **Run the 7-step workflow** — [`references/03-workflow.md`](references/03-workflow.md). Define end state → audit reality → delete before adding → optimize around final shape → collapse duplicate decision logic → remove historical leakage → validate.
-4. **Use the audit patterns** — [`references/04-audit-patterns.md`](references/04-audit-patterns.md) lists the concrete `Grep` / `Bash(rg:*)` / `Bash(fd:*)` targets (TODO/DEPRECATED markers, `_v2`/`_old` suffixes, stale feature flags, dual-mode forks, etc.). Each match is a *candidate*, not an automatic deletion.
+4. **Use the audit patterns** — [`references/04-audit-patterns.md`](references/04-audit-patterns.md) lists the concrete search targets (TODO/DEPRECATED markers, `_v2`/`_old` suffixes, stale feature flags, dual-mode forks, etc.). Each match is a *candidate*, not an automatic deletion.
 5. **Apply decision filters when choices tie** — [`references/05-decision-filters.md`](references/05-decision-filters.md) covers tiebreakers and named anti-patterns to avoid.
-6. **Apply edits with `Edit`** — once a deletion / rename / consolidation is approved, use `Edit` to apply the change atomically. Stage with `Bash(git:*)` so the operator can review per commit before push.
+6. **Apply edits** — once a deletion / rename / consolidation is approved, apply it as one coherent edit. Leave the changes in the working tree for the user to review; commit only when asked.
 7. **Report back in shape-change terms** — [`references/06-outcomes-and-reporting.md`](references/06-outcomes-and-reporting.md). The diff lists every line; the summary makes the architectural delta legible.
 
 ## Scope Discipline (this is the most common failure mode)

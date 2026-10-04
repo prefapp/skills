@@ -1,6 +1,6 @@
 ---
 name: review
-description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along three axes: Standards (does the code follow this repo's documented coding standards?), Spec (does the code match what the originating ticket/spec asked for?), and Debt (does the change leave cruft behind?). Runs the three reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
+description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along three axes: Standards (does the code follow this repo's documented coding standards?), Spec (does the code match what the originating ticket/spec asked for?), and Debt (does the change leave cruft behind?). Runs the axes in parallel sub-agents, Debt only when the change adds behaviour or reshapes a module, and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
 ---
 
 > **Before acting:** read any root `AGENTS.md` / `CLAUDE.md` and obey it: repo rules override this skill.
@@ -23,7 +23,7 @@ Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main
 
 Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
 
-Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside three parallel sub-agents.
+Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside the sub-agents.
 
 ### 2. Identify the spec source
 
@@ -60,7 +60,7 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 ### 4. Spawn the sub-agents in parallel
 
-Send a single message with one `Agent` tool call per axis. Use the `general-purpose` subagent for each.
+Launch one sub-agent per axis in parallel with your harness's sub-agent tool (Claude Code: one message with one `Agent` call per axis, `general-purpose` subagent). If your harness has none, run each axis yourself from its prompt below, finishing one report before starting the next.
 
 **Standards sub-agent prompt**: include:
 
@@ -80,7 +80,7 @@ Send a single message with one `Agent` tool call per axis. Use the `general-purp
 - The absolute paths of [zero-tech-debt/references/04-audit-patterns.md](../zero-tech-debt/references/04-audit-patterns.md) and [05-decision-filters.md](../zero-tech-debt/references/05-decision-filters.md).
 - The brief: "Hunt cruft (compatibility paths, versioned twins, stale flags, pass-through layers, abstractions with one caller) in what the diff adds and in the functions and modules it edits. Walk every pattern in 04-audit-patterns.md over those files, and judge each candidate against 05-decision-filters.md. Find a candidate's callers before calling it dead; keep anything a repo rule, a live caller, or an in-flight migration still needs; skip what tooling enforces. Fowler smells belong to the Standards axis. Report (a) each finding: pattern, `file:line`, quoted hunk, and the fix (delete, inline, rename, or merge) in one sentence; (b) cruft outside that scope as follow-ups, one line each; (c) the patterns that found nothing. Under 400 words."
 
-If the spec is missing, skip the Spec sub-agent and note this in the final report.
+If the spec is missing, skip the Spec sub-agent and note this in the final report. Run the Debt sub-agent only when the diff adds behaviour or reshapes a module; for fixes, renames, docs, and config, skip it and note this in the final report.
 
 ### 5. Aggregate
 

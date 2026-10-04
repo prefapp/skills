@@ -180,7 +180,7 @@ the skill.
 | `coding` | auto | Behaviour guide while writing code: surface assumptions, keep it simple, make surgical changes, verify against success criteria. |
 | `zero-tech-debt` | auto | Rebuild a feature toward its intended shape, removing compatibility cruft and dead abstractions. Not for hotfixes. |
 | `diagnosing-bugs` | auto | Disciplined feedback-loop debugging for hard bugs / perf regressions. |
-| `review` | auto | Three-axis review (Standards + Spec + Debt) via parallel sub-agents. |
+| `review` | auto | Standards + Spec review, plus Debt when the change adds behaviour or reshapes a module, via parallel sub-agents. |
 | `visual-pr` | auto | Create or update the PR for the current task with a concise, reviewer-oriented description (why, special notes, show-me-style change outline). |
 | `improve-codebase-architecture` | explicit | Periodic deep-module rescue scan + report. |
 | `wayfinder` | explicit | Chart a too-big-for-one-session effort as a shared map of decision tickets on the tracker; resolve them one at a time. |

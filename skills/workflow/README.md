@@ -76,8 +76,8 @@ fire automatically when the situation matches.
 ### Review
 
 - **`review`** — Use when you want the changes since a fixed point (branch,
-  tag, SHA) reviewed on three axes — Standards, Spec, and Debt — via
-  parallel sub-agents.
+  tag, SHA) reviewed on Standards and Spec, plus Debt when the change adds
+  behaviour or reshapes a module, via parallel sub-agents.
 - **`visual-pr`** *(explicit)* — Use when a PR needs describing: creates or
   updates the PR for the current task with a concise why, special notes, and
   a visual change outline a reviewer can scan.
