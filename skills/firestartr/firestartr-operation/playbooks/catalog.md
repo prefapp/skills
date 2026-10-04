@@ -1,6 +1,6 @@
 # Catalog Playbook
 
-Answer ownership, topology, and discovery questions — "who owns service X", "what's
+Answer ownership, topology, and discovery questions: "who owns service X", "what's
 in system Y", "what services do we have". **Read-only.** The catalog
 (`{org}/catalog`) is a Backstage-style view hydrated from claims; never edit it, and
 if the client wants a change, route to `edit-claim`/`create-claim` + `lifecycle`
@@ -17,7 +17,7 @@ ComponentClaim, `Group` ← GroupClaim, `User` ← UserClaim, `Resource` ← inf
   owner, system as a table.
 - **Who owns service X? What's in system Y? Show the org structure.** Prefer
   `fs-forge discovery map` (`../reference/fs-forge-discovery.md`) over walking
-  catalog entities by hand — it renders the ownership/grouping tree
+  catalog entities by hand: it renders the ownership/grouping tree
   (`owner`, `maintainedBy`, `platformOwner`, `system`, `domain`, `members`, …)
   straight from the claims repo in one call, always current. Filter with
   `--kind` (e.g. `--kind system --kind component`) to scope to one
@@ -30,10 +30,10 @@ ComponentClaim, `Group` ← GroupClaim, `User` ← UserClaim, `Resource` ← inf
 
 For a flat "what claims exist" listing (not entity ownership/topology), or when
 the catalog is stale, `fs-forge discovery org-elements` reads the claims-map
-directly — faster and always current. See `../reference/fs-forge-discovery.md`.
+directly: faster and always current. See `../reference/fs-forge-discovery.md`.
 
 ## Freshness
 
 The catalog hydrates every ~6h, so it can lag recent claim changes. When the latest
-claim commit is newer than the catalog's, say so and offer to trigger hydration —
+claim commit is newer than the catalog's, say so and offer to trigger hydration:
 don't present stale data as authoritative. (Details: `reconciliation` playbook.)

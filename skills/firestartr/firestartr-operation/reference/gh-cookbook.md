@@ -40,7 +40,7 @@ gh api repos/{claims_repo}/contents/{path} -X PUT \
   -f sha="$FILE_SHA"     # updates only
 ```
 
-Always write the **complete** file — a PUT replaces it wholesale. Preserve every
+Always write the **complete** file: a PUT replaces it wholesale. Preserve every
 existing field when editing.
 
 ## Open and merge the PR
@@ -55,7 +55,7 @@ If merge fails with "Base branch was modified", wait 3–5s and retry.
 
 ## Trigger hydration and wait
 
-Each claim family has its **own** hydrate workflow — not interchangeable, and they
+Each claim family has its **own** hydrate workflow, not interchangeable, and they
 take different inputs. Pick by the claim you landed:
 
 | Claim family | Workflow (💧 name) | Inputs | State repo |
@@ -64,7 +64,7 @@ take different inputs. Pick by the claim you landed:
 | Secrets | `Secrets claim: hydrate` | `name` | state-infra |
 | TFWorkspace | `TFWorkspace claim: hydrate` | `name` **only** (no `kind`) | state-infra |
 
-Workflow **IDs are per-deployment** — never hardcode them; display names carry
+Workflow **IDs are per-deployment**, never hardcode them; display names carry
 emoji prefixes so bare-name matching fails. List, then trigger by ID:
 
 ```bash
@@ -79,13 +79,13 @@ gh run list --repo {claims_repo} --workflow {workflow-id} --limit 1 \
 Passing an input the workflow doesn't declare (e.g. `kind` to TFWorkspace hydrate)
 fails HTTP 422. Proceed only when `conclusion` is `success`.
 
-> **Check this first:** a run that didn't reach `success` — see
+> **Check this first:** a run that didn't reach `success`; see
 > `../playbooks/troubleshooting.md#hydrate-workflow-dispatchexecution`.
 
 ## Discover Terraform modules (TFWorkspaceClaim)
 
 Commands for `reference.md`'s Terraform modules section, if sourcing
-`remote` from Prefapp's own `prefapp/tfm` (public; discover, don't guess —
+`remote` from Prefapp's own `prefapp/tfm` (public; discover, don't guess:
 `inline` needs none of this):
 
 ```bash
@@ -104,7 +104,7 @@ Build the `module` field as:
 
 ## Merge the resulting state PR
 
-Hydration opens a PR on the target **state repo** — `state-github` for GitHub
+Hydration opens a PR on the target **state repo**: `state-github` for GitHub
 claims, `state-infra` for Secrets/TFWorkspace. GitHub-claim hydrate auto-merges it;
 Secrets/TFWorkspace hydrate default `automerge: false`, so you **must** merge it.
 

@@ -10,7 +10,7 @@ this file). Read it before calling fs-forge or writing any claim.
 
 ## Kind ↔ intent ↔ path
 
-The client never names a kind — you pick it from the intent.
+The client never names a kind: you pick it from the intent.
 
 | Intent | Kind | Path |
 |---|---|---|
@@ -33,7 +33,7 @@ name per kind.
 
 **Normalizing a non-compliant name** (uppercase, spaces, non-ASCII): put a
 transliterated slug in `name`, keep the original in `profile.displayName` and (for
-GitHub-backed kinds) `providers.github.name` — GitHub teams accept Unicode.
+GitHub-backed kinds) `providers.github.name`: GitHub teams accept Unicode.
 
 | Desired | `name` (slug) | `displayName` / `github.name` |
 |---|---|---|
@@ -49,27 +49,27 @@ GitHub-backed kinds) `providers.github.name` — GitHub teams accept Unicode.
 
 ## Validation split
 
-fs-forge validates syntax only (schema, types, enums) — via `npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}`.
+fs-forge validates syntax only (schema, types, enums): via `npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}`.
 `edit` runs this same validation automatically before `--commit` and
 refuses to commit an invalid claim; `create --commit` also
 checks name-uniqueness itself (error if the target `<Kind>-<name>` already
 exists). The skill is still responsible for:
-- **References** — `user:`/`group:`/`system:`/… values point at claims that
+- **References**: `user:`/`group:`/`system:`/… values point at claims that
   actually exist.
-- **Uniqueness** — `create` without `--commit` is file-based, no claims-map
+- **Uniqueness**: `create` without `--commit` is file-based, no claims-map
   lookup, so the skill must pre-check itself: `preflight`
   (`fs-forge-preflight.md`) for ComponentClaim/GroupClaim/UserClaim/
   TFWorkspaceClaim, the discovery commands (`fs-forge-discovery.md`) for
   every other kind. The CLI's own guard on `create --commit`
-  (`fs-forge-mutation-shared.md`'s `--commit` warning) doesn't replace this —
+  (`fs-forge-mutation-shared.md`'s `--commit` warning) doesn't replace this:
   pre-checking first is a friendlier, earlier catch than waiting for that
   error.
-- **Naming normalization** — the slug, displayName, and github.name rules
+- **Naming normalization**: the slug, displayName, and github.name rules
   described above.
 
 ## Default flag values for new claims
 
-These are the skill's own portable, baked-in per-kind recommendations — a
+These are the skill's own portable, baked-in per-kind recommendations: a
 fallback starting point for `create`, not a live mirror of any org's actual
 configuration. For the org's real, current repo-level claim defaults
 (auto-applied by `edit`, previewable for `create`; see
@@ -97,7 +97,7 @@ passed to the kind's org field flag.
 - **SecretsClaim**: `lifecycle: production`, external-secrets provider:
   `refreshInterval: 24h`.
 - **TFWorkspaceClaim**: Terraform provider: `source: remote` (`inline` also
-  valid — see "Terraform modules" below), `policy: apply`,
+  valid; see "Terraform modules" below), `policy: apply`,
   `sync: {policy: observe, period: 24h, enabled: true}`,
   `backend: firestartr-terraform-state`.
 - **OrgWebhookClaim**: GitHub provider:
@@ -105,18 +105,18 @@ passed to the kind's org field flag.
 
 ## Terraform modules (TFWorkspaceClaim)
 
-`providers.terraform.source` is `remote` or `inline` — both equally valid;
+`providers.terraform.source` is `remote` or `inline`: both equally valid;
 pick per claim.
 
-- **`remote`** — pull a module from git. `prefapp/tfm` is Prefapp's own
-  module repo: public (Apache-2.0), actively maintained, usable by anyone —
+- **`remote`**: pull a module from git. `prefapp/tfm` is Prefapp's own
+  module repo: public (Apache-2.0), actively maintained, usable by anyone,
   not a mandatory dependency. Discover, never guess (commands in
   `gh-cookbook.md`): list `modules/`, read the module's `variables.tf` for
   inputs, pin the latest per-module release tag (`{module}-vX.Y.Z`).
 
   `module: git::https://github.com/prefapp/tfm.git//modules/{module}?ref={module}-vX.Y.Z`
 
-- **`inline`** — raw Terraform HCL directly in `module`; no external repo,
+- **`inline`**: raw Terraform HCL directly in `module`; no external repo,
   no discovery step.
 
 Common intent → module / `resourceType`: S3 bucket → `aws-s3` / `aws-s3`,
@@ -159,7 +159,7 @@ create-update-only) → `create-only` (create+sync) → `observe` (sync/plan onl
 The sync policy may never exceed the general policy.
 
 Repo-level claim defaults fill TFWorkspaceClaim's `sync` block
-all-or-nothing, not field-by-field — `fs-forge-mutation-shared.md`'s "Claim
+all-or-nothing, not field-by-field: `fs-forge-mutation-shared.md`'s "Claim
 defaults" section has the rule.
 
 ## Claim → state mapping

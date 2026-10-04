@@ -7,23 +7,23 @@ references. Sibling of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
 ## Discovering the feature catalog
 
 Browsing what's available (names, READMEs, schemas, versions, changelogs) is
-part of the feature-matching flow, not a CRUD operation — see
+part of the feature-matching flow, not a CRUD operation: see
 `../playbooks/feature-advisor.md` for the commands and the full flow.
 
 ## Feature CRUD (ComponentClaim only)
 
-Dedicated subcommands mutate one `features[]` entry at a time — no more
+Dedicated subcommands mutate one `features[]` entry at a time: no more
 read-whole-array-and-recompute for this one field. Target either form (the
 positional `<component>` is the **bare** component name, not
 `ComponentClaim-<name>`):
 
-- `<component> --org={org}` — resolved through the claims-map as
+- `<component> --org={org}`: resolved through the claims-map as
   `ComponentClaim-<component>`.
-- `-f {claim-file}` — a local ComponentClaim YAML file; skips the claims-map.
+- `-f {claim-file}`: a local ComponentClaim YAML file; skips the claims-map.
 
 All four subcommands error if the claim isn't a ComponentClaim.
 
-### Add / edit — schema-derived `args.*` flags
+### Add / edit: schema-derived `args.*` flags
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} features add --name <feature> --help --json
@@ -32,7 +32,7 @@ npx @firestartr/fs-forge-cli@{version} features add --name <feature> --help --js
 Resolves the Feature's **latest published schema** from the Feature source
 (`--source`, defaults to `firestartr-pro/docs`) and returns a `CommandHelpJson`
 object whose `.flags[]` includes `args.<field>` entries alongside the fixed
-`name`/`version`/`ref`/`repo` flags — same discovery idiom as `create <Kind>
+`name`/`version`/`ref`/`repo` flags: same discovery idiom as `create <Kind>
 --help --json` (`fs-forge-mutation-shared.md`). The reference's own
 `version`/`ref` only pins what the claim stores; it never selects which
 schema validates `args`.
@@ -47,7 +47,7 @@ npx @firestartr/fs-forge-cli@{version} features add <component> --org={org} \
 - Exactly one of `--version` / `--ref` is required.
 - `features add` errors if the name already exists; `features edit` errors if
   it doesn't. `features edit` carries forward the existing `args` for fields
-  you don't pass — it does not reapply schema defaults.
+  you don't pass: it does not reapply schema defaults.
 - Schemas are cached by Feature name (`FS_FORGE_FEATURE_CACHE_DIR` overrides
   the location); pass `--refresh` to bypass a stale cache.
 - `--no-wait` skips waiting for the provision workflow a `--commit`
@@ -56,7 +56,7 @@ npx @firestartr/fs-forge-cli@{version} features add <component> --org={org} \
 - `--args.json='{...}'` is the raw escape hatch when you'd rather pass the
   whole `args` object as JSON than discover each field flag.
 
-### Remove / list — no schema resolution
+### Remove / list: no schema resolution
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} features remove <component> --org={org} --name <feature> --commit
@@ -65,7 +65,7 @@ npx @firestartr/fs-forge-cli@{version} features list <component> --org={org} --j
 
 `remove` needs no `--source`/schema fetch.
 
-## Inline, unvalidated alternative — `create`/`edit`
+## Inline, unvalidated alternative: `create`/`edit`
 
 For attaching a Feature at creation time, or adding/removing one without a
 schema round-trip, use the repeatable inline flag instead of the Feature
@@ -79,7 +79,7 @@ npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
 
 Form is `name@version:{...}` or `name#ref:{...}`; `{...}` is a raw JSON object
 and may be omitted for no args. These do **not** fetch or validate against the
-Feature's schema — run `validate` afterward (deep mode, below) to check `args`
+Feature's schema: run `validate` afterward (deep mode, below) to check `args`
 against the latest schema before landing the change.
 
 ## Deep validation

@@ -1,14 +1,14 @@
 # Troubleshooting Playbook
 
-Diagnose why a platform request failed or is behaving unexpectedly —
-anywhere from local tooling to Terraform apply — using only what's visible
+Diagnose why a platform request failed or is behaving unexpectedly
+(anywhere from local tooling to Terraform apply) using only what's visible
 via GitHub (Actions runs, PR comments, check runs, issues) and
 `fs-forge-cli`/`gh`. Never assumes cluster/`kubectl` access to the operator.
 Raw commands and full lookup tables: `../reference/diagnostics.md`.
 
-## Symptom lookup — start here
+## Symptom lookup: start here
 
-Each row jumps straight to one failure surface — read that section only, not
+Each row jumps straight to one failure surface: read that section only, not
 top to bottom.
 
 | Symptom | Failure surface |
@@ -23,10 +23,10 @@ top to bottom.
 | A repo/team/webhook/TF resource wasn't created, or drift has no obvious cause | [Terraform apply / operator reconciliation (post-merge)](#terraform-apply--operator-reconciliation-post-merge) |
 | The catalog looks stale, or reconciliation drift might be a false positive | [Read-only playbooks' own failure modes](#read-only-playbooks-own-failure-modes) |
 
-## Diagnose, don't fix — with one exception
+## Diagnose, don't fix: with one exception
 
 Report what this finds and route back to the playbook that owns the fix
-(`create-claim`/`edit-claim`/`lifecycle`) — never edit a claim
+(`create-claim`/`edit-claim`/`lifecycle`), never edit a claim
 from here. The one exception: offering to trigger a re-hydrate directly,
 already sanctioned as non-mutating by `catalog.md`'s and `reconciliation.md`'s
 Freshness sections (`../reference/gh-cookbook.md` → "Trigger hydration and
@@ -36,20 +36,20 @@ wait").
 
 Two axes decide "keep digging" versus "tell the client this needs Prefapp":
 
-1. **Signal legibility** — does the GitHub-visible signal name a cause? Each
+1. **Signal legibility**: does the GitHub-visible signal name a cause? Each
    surface below has a finite check; exhausting it *is* "stop digging."
-2. **Ownership of the fix** — once named, can the client act on it
+2. **Ownership of the fix**: once named, can the client act on it
    themselves (edit a claim field, approve a PR, fix local env), or is it
    Prefapp-owned (credentials, quota, platform bug, state corruption, repo
    administration)?
 
-Two exits only: **client-fixable** (name the specific fix) or **escalate —
+Two exits only: **client-fixable** (name the specific fix) or **escalate:
 needs Prefapp** (name why). Full per-surface table: `../reference/diagnostics.md`.
 
 ## Validation sweep
 
-A whole-repo `validate-claims.yaml` dispatch — distinct from a single PR's
-own PR-verify render — confirms every claim still renders, catching a
+A whole-repo `validate-claims.yaml` dispatch: distinct from a single PR's
+own PR-verify render: confirms every claim still renders, catching a
 broken reference PR-verify wouldn't (PR-verify only renders the claims one
 PR touches, except on a delete). It's a last resort before escalating, never
 the first move: reach for it only once the failing surface's own check
@@ -59,13 +59,13 @@ hydrate dispatch/execution, Terraform apply/operator reconciliation
 failure's uniqueness/stale-branch shapes.
 
 Read the latest run first; reuse it if newer than the claims repo's latest
-commit, dispatch fresh otherwise. Verifying a fix always dispatches fresh —
+commit, dispatch fresh otherwise. Verifying a fix always dispatches fresh:
 a prior run can't reflect a fix that didn't exist yet. No client approval
 needed (read-only, same tier as the re-hydrate offer above), but say it's
 running: it's a multi-repo-checkout, multi-minute job.
 
 A green run confirms the whole repo. A red one only guarantees the first
-broken claim found (rendering halts there) — fix the named claim,
+broken claim found (rendering halts there): fix the named claim,
 re-dispatch, and report each round; never treat one pass as exhaustive.
 
 Dispatch/wait/read commands and the render error-shape table:
@@ -74,15 +74,15 @@ Dispatch/wait/read commands and the render error-shape table:
 ## Environment & tooling
 
 Never escalate. Node/network/`npx` problems are
-`../reference/fs-forge-cookbook.md`'s hard-dependency check — fix and retry,
+`../reference/fs-forge-cookbook.md`'s hard-dependency check: fix and retry,
 or tell the client and stop.
 
 ## Config & CLI-version resolution
 
-Never escalate — both are self-service via `SKILL.md` Step 1 (missing/invalid
+Never escalate: both are self-service via `SKILL.md` Step 1 (missing/invalid
 `firestartr-config.yaml`, unpinned/stale `cli_version`). One exception:
 `npm dist-tag ls`/`npm view @firestartr/fs-forge-cli versions` showing **zero
-published versions at all** — that's a Prefapp-owned publishing failure,
+published versions at all**: that's a Prefapp-owned publishing failure,
 escalate.
 
 ## fs-forge-cli command failures
@@ -91,17 +91,17 @@ Four known conditions, all client-fixable except an uncaught crash. Exact
 messages, exit codes, and the verdict table: `../reference/diagnostics.md`.
 
 > **Check this first:** the uniqueness/stale-branch shapes are about the
-> shared repo's actual state — if this happened via `--commit`, a
+> shared repo's actual state: if this happened via `--commit`, a
 > [validation sweep](#validation-sweep) is worth a confirmatory dispatch.
 
 ## PR-verify / render-pipeline denial
 
-PR-verify is a plain Actions run — no dedicated check-run/PR-comment step;
+PR-verify is a plain Actions run: no dedicated check-run/PR-comment step;
 read its log (`../reference/diagnostics.md`). There is **no automated
 Rego-policy evaluation** today, so there's no separate "policy denial" mode:
-a failed render has its own error shapes — a broken reference or a naming
+a failed render has its own error shapes: a broken reference or a naming
 collision, never fs-forge-cli's own (`validate` is schema-only and never
-runs during a render) — client-fixable if it matches one of those, escalate
+runs during a render): client-fixable if it matches one of those, escalate
 otherwise.
 
 > **Check this first:** still unclear? A [validation sweep](#validation-sweep)
@@ -112,8 +112,8 @@ otherwise.
 
 `::error::No CR files found for claim '<name>' (<kind>). The claim may not
 exist.` → client-fixable: check name/kind spelling and that the defining PR
-merged. A GroupClaim referencing an un-hydrated UserClaim fails the same way
-— hydrate the user first, then retry. Any other failed step: read it once
+merged. A GroupClaim referencing an un-hydrated UserClaim fails the same way:
+hydrate the user first, then retry. Any other failed step: read it once
 (`../reference/diagnostics.md`); a recognized fs-forge/render shape is
 client-fixable, anything else escalates.
 
@@ -122,23 +122,23 @@ client-fixable, anything else escalates.
 
 ## Terraform plan status check (pre-merge)
 
-Read the `terraform_plan` check run's `output.summary` — the plan or error
+Read the `terraform_plan` check run's `output.summary`: the plan or error
 text verbatim, for Terraform-claim and GitHub-claim state PRs alike
 (`../reference/diagnostics.md`). Same client-fixable/escalate call as
 Terraform apply / operator reconciliation below.
 
 > **`watch-checks` exit code 1** (`../reference/fs-forge-watch-checks.md`)
-> means at least one check on a state-repo PR has failed — start here.
+> means at least one check on a state-repo PR has failed: start here.
 
 ## State-PR merge
 
 `terraform_plan` green and required checks passing but the PR still won't
 merge → escalate (branch-protection/repo-administration, Prefapp-owned).
-Unmerged only for lack of human review isn't a failure — get it reviewed.
+Unmerged only for lack of human review isn't a failure: get it reviewed.
 
 ## Terraform apply / operator reconciliation (post-merge)
 
-No enumerated table — errors are unbounded, so use this heuristic:
+No enumerated table: errors are unbounded, so use this heuristic:
 
 - Names a value **traceable to the claim's own fields** (invalid enum, name
   collision, a quota tied to a requested size, a resource the claim itself
@@ -148,7 +148,7 @@ No enumerated table — errors are unbounded, so use this heuristic:
   escalate.
 
 Read the sticky PR comment / check-run `output.summary` first
-(`../reference/diagnostics.md`) — the CR's `.status.conditions` is a generic
+(`../reference/diagnostics.md`): the CR's `.status.conditions` is a generic
 templated message, good only to confirm *that* it failed, never *why*. This
 covers GitHub-claim kinds too: they surface through the identical check-run
 pair plus sticky PR comment, not a cluster-only failure class.
@@ -165,14 +165,14 @@ pair plus sticky PR comment, not a cluster-only failure class.
 
 Rule these out before treating either as a real failure:
 
-- **Catalog looks wrong or stale** — `catalog.md`'s Freshness section: it
+- **Catalog looks wrong or stale**: `catalog.md`'s Freshness section: it
   hydrates every ~6h.
-- **Reconciliation reports drift** — `reconciliation.md`'s un-hydrated trap:
+- **Reconciliation reports drift**: `reconciliation.md`'s un-hydrated trap:
   an open state-repo PR, or a claim newer than its state resource, isn't
   drift yet.
 
-Only a mismatch that survives hydration and state-PR merge is genuine drift
-— then it's this playbook's Terraform apply / operator reconciliation
+Only a mismatch that survives hydration and state-PR merge is genuine drift;
+then it's this playbook's Terraform apply / operator reconciliation
 surface above.
 
 ## Reference

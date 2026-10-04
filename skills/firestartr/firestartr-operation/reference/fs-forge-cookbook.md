@@ -2,7 +2,7 @@
 
 The repeated `fs-forge` idioms every mutating playbook builds on. `{org}` and
 `{version}` are resolved from `firestartr-config.yaml` before any of these run.
-Beyond invocation and validation, idioms are split by topic — read the sibling
+Beyond invocation and validation, idioms are split by topic: read the sibling
 that matches the task instead of assuming everything lives here:
 
 | Need to… | Read |
@@ -13,7 +13,7 @@ that matches the task instead of assuming everything lives here:
 | check whether a name is free before create/edit/delete | `fs-forge-preflight.md` |
 | watch check runs on a state-repo PR, or get point-in-time check status | `fs-forge-watch-checks.md` |
 | discover, attach, edit, or remove a Feature on a ComponentClaim | `fs-forge-features.md` |
-| author a brand-new claim with `create` | `../playbooks/create-claim.md` — the invocation lives there, not here |
+| author a brand-new claim with `create` | `../playbooks/create-claim.md`; the invocation lives there, not here |
 
 ## Invocation
 
@@ -21,7 +21,7 @@ that matches the task instead of assuming everything lives here:
 npx @firestartr/fs-forge-cli@{version} <args>
 ```
 
-**Hard dependency — no fallback.** If the invocation fails, stop immediately
+**Hard dependency: no fallback.** If the invocation fails, stop immediately
 and tell the user:
 
 > `fs-forge` could not be run via `npx`.
@@ -32,7 +32,7 @@ Never hand-author a claim body when fs-forge is unavailable.
 
 ## Discover the CLI's own machine-readable contracts
 
-Local and offline — no `--org`, no network, no claims-repo checkout:
+Local and offline: no `--org`, no network, no claims-repo checkout:
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} schema list --json
@@ -56,7 +56,7 @@ npx @firestartr/fs-forge-cli@{version} kinds --json
 ```
 
 Local and offline. Each entry's `description` is the schema's own one-line
-summary — prefer it, translated to client terms (never "claim" — Rule 1,
+summary: prefer it, translated to client terms (never "claim"; Rule 1,
 `../SKILL.md`), over composing your own when explaining what's available.
 
 ## Validate a claim file (syntactic only)
@@ -66,10 +66,10 @@ npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}
 ```
 
 fs-forge validates schema, types, and enum constraints. It does **not** check
-cross-claim references, duplicates, or naming rules — those are the skill's
+cross-claim references, duplicates, or naming rules: those are the skill's
 responsibility (see the validation split in `reference.md`).
 
 Schema lookup is relative to the current working directory (`{cwd}/schemas/`).
-Run `validate`/`create`/`edit` from a directory that has one — e.g. a
+Run `validate`/`create`/`edit` from a directory that has one, e.g. a
 clone of `{claims_repo}` (which ships it), or a `schemas/` symlink to the CLI's
-bundled copy — not an arbitrary scratch directory like `/tmp`.
+bundled copy, not an arbitrary scratch directory like `/tmp`.

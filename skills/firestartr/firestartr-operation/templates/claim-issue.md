@@ -1,8 +1,8 @@
 # Claim issue template
 
 Fill this in and open it as the tracking issue in `{claims_repo}` before any
-branch/PR (lifecycle step 0). Write it in the **client's** terms — repos, teams,
-users, buckets — never the word "claim". Drop rows that don't apply.
+branch/PR (lifecycle step 0). Write it in the **client's** terms (repos, teams,
+users, buckets), never the word "claim". Drop rows that don't apply.
 
 ```markdown
 ## Goal
@@ -15,7 +15,7 @@ users, buckets — never the word "claim". Drop rows that don't apply.
 - **Where:** <system / project / AWS account, if relevant>
 
 ## Settings
-<the decisions that matter — visibility, region, versioning, policy, members, …>
+<the decisions that matter: visibility, region, versioning, policy, members, …>
 
 ## Notes
 <anything the operator should know: related entities, follow-ups>

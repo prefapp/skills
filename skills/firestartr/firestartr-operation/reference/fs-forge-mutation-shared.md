@@ -4,7 +4,7 @@ Cross-cutting rules `create` and `edit` both lean on. Sibling of
 `fs-forge-cookbook.md`; `{org}`/`{version}` come from `firestartr-config.yaml`.
 
 **Addressing differs by command.** `edit` takes an existing claim as ONE
-argument, `<Kind>-<name>` (e.g. `ComponentClaim-my-repo`) — never
+argument, `<Kind>-<name>` (e.g. `ComponentClaim-my-repo`): never
 `edit <Kind> <name>`. `delete` is the opposite: kind and name as TWO
 arguments (`delete <Kind> <name>`).
 
@@ -15,22 +15,22 @@ npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json
 ```
 
 This (and dynamic Feature help, `fs-forge-features.md`) returns a
-**`CommandHelpJson`** object, never a root-level array — full contract:
+**`CommandHelpJson`** object, never a root-level array: full contract:
 `npx @firestartr/fs-forge-cli@{version} schema show CommandHelpJson`
 (`fs-forge-cookbook.md`'s contract-discovery commands). Besides `flags`
 (below), read: `id`/`aliases` to confirm which command actually matched;
-`description`/`summary` — the command's own explanation; prefer these,
+`description`/`summary`: the command's own explanation; prefer these,
 translated to client terms (Rule 1, `../SKILL.md`), over composing your own
 when telling the client what an operation does; `usage`/`examples` for the
 canonical invocation; `args` for positional-argument specs (same
 `required`/`multiple` idea as flags); and `relationships` for declarative
-arg/flag constraints — e.g. `features add`'s "a component name or `--file`,
+arg/flag constraints, e.g. `features add`'s "a component name or `--file`,
 never both" is `{"type": "exactlyOne", "args": ["component"], "flags":
-["file"]}` — read this instead of inferring the rule from prose.
+["file"]}`: read this instead of inferring the rule from prose.
 
 Read the flags themselves from **`.flags[]`**. Notably: `path` is also the
 flag's literal name (pass a value as `--<path>=<value>`); `multiple` means
-passing it several times **replaces** the whole array, it never appends —
+passing it several times **replaces** the whole array, it never appends:
 read the current value first, compute the full desired list, then pass it
 whole.
 
@@ -43,26 +43,26 @@ hardcoding: `org`, `commit`, and `path` on every kind; `diff` and `json` on
 CRUD"); and the two schema org-field paths documented next, identified by exact
 `path` match, never fuzzy "contains org" matching.
 
-## `{org}` passthrough — two distinct flags
+## `{org}` passthrough: two distinct flags
 
-A kind's discovered flags can include **two** org-shaped entries at once —
+A kind's discovered flags can include **two** org-shaped entries at once:
 tell them apart by FlagSpec `path`, never by name alone:
 
-- **Control-plane `--org`** (`path: "org"`, env `FSCRT_ORG`) — which GitHub
+- **Control-plane `--org`** (`path: "org"`, env `FSCRT_ORG`): which GitHub
   org's claims repo to talk to. Same name on every kind and every command
   (`create`/`edit`/`defaults`/`discovery`). Only enforced when a
-  network call actually happens — `--commit`, `edit`, a `defaults`
-  command — a plain, uncommitted `create` needs neither it nor network access.
-- **Schema org field** — which GitHub org the claim's own resource (repo,
+  network call actually happens: `--commit`, `edit`, a `defaults`
+  command: a plain, uncommitted `create` needs neither it nor network access.
+- **Schema org field**: which GitHub org the claim's own resource (repo,
   team, …) belongs to. Path varies by kind, and several kinds have none at
   all:
   - Most kinds: `providers.github.org`
   - OrgWebhookClaim: `providers.github.orgName`
 
 The `{org}` value from `firestartr-config.yaml` is usually the same GitHub
-org for both, but pass it to each flag under its own discovered name — never
+org for both, but pass it to each flag under its own discovered name: never
 assume one flag also sets the other. This distinction doesn't go away for
-`edit` — it still needs the control-plane flag on top of it for
+`edit`: it still needs the control-plane flag on top of it for
 every network call (`fs-forge-edit.md`).
 
 The example below uses `jq` to parse FlagSpec JSON; install `jq` or use an
@@ -81,36 +81,36 @@ Pass the resulting `--<flag>=<value>` to `create` or `edit`.
 `--commit` does not just write the claim. Appended to `create` or `edit`,
 it creates the branch, commits the claim file, and dispatches
 `provision-claim.yaml`, which opens the PR, waits for verify, merges it,
-**dispatches and waits for hydration**, and merges the resulting wet PR — all
+**dispatches and waits for hydration**, and merges the resulting wet PR: all
 on its own, with no further input. One flag provisions **and hydrates** the
 claim end-to-end. Never pass it before the client has approved the plan, and
-never follow it with a manual hydrate step — it already happened. If the
+never follow it with a manual hydrate step: it already happened. If the
 client asks for status, check the dispatched run; only trigger a *separate*
 manual hydrate (`gh-cookbook.md`) if they explicitly ask for one.
 
 `create --commit` additionally errors up front if the
-target `<Kind>-<name>` already exists — no separate uniqueness check needed
-from the CLI's side (the skill still pre-checks its own side —
-`reference.md`'s validation split). `create --commit` on
+target `<Kind>-<name>` already exists: no separate uniqueness check needed
+from the CLI's side (the skill still pre-checks its own side;
+see `reference.md`'s validation split). `create --commit` on
 TFWorkspaceClaim/SecretsClaim also requires `--path claims/{...}/{name}.yaml`
 (rejected outright for every other kind, which resolve their own path). A
 `--commit` that fails for any of these reasons surfaces as a CLI error before
-anything is dispatched — fix the reported problem and re-run.
+anything is dispatched: fix the reported problem and re-run.
 
-> **Check this first:** the exact error text and exit code — see
+> **Check this first:** the exact error text and exit code; see
 > `diagnostics.md#fs-forge-cli-error-shapes`.
 
 ## Claim defaults (`claims_defaults.yaml` in the claims repo)
 
 `edit` automatically fetches the org's repo-level claim defaults and
-applies them **after** the client's own requested changes, additively — a
+applies them **after** the client's own requested changes, additively: a
 field is only filled when the claim doesn't already set it, never
 overwriting client intent. Validation runs against this final, defaulted
 document, so `--commit` always publishes a fully-defaulted, schema-valid
 claim. Reveal what got filled in a dry-run with `--show-defaults`
 (`fs-forge-edit.md`).
 
-**`create` never applies them** — with or without `--commit`, its output is
+**`create` never applies them**: with or without `--commit`, its output is
 always the minimal document its flags describe. Preview what the platform
 would add with the read-only commands below and surface it to the client as
 "the platform will also apply: …", distinct from the file itself.
@@ -122,16 +122,16 @@ npx @firestartr/fs-forge-cli@{version} defaults show <kind> --org={org}
 npx @firestartr/fs-forge-cli@{version} defaults list --org={org} [--json]
 ```
 
-`apply` prints a claim (by `<Kind>-<name>` reference, or a local `-f` file —
+`apply` prints a claim (by `<Kind>-<name>` reference, or a local `-f` file,
 which must have a `kind` field, or it errors) filled with its kind's
 defaults; no validation, no write. `show` prints one kind's defaults on
 their own (an empty result for a kind with none defined, an error for an
 unrecognized kind id). `list` prints which kinds have any defaults defined
-for the org — table by default, `--json` for structured output. All three
+for the org: table by default, `--json` for structured output. All three
 need the same `GITHUB_TOKEN`/`--org` prerequisites as `edit`.
 
-Some fields default as an **all-or-nothing block** rather than field-by-field
-— currently TFWorkspaceClaim's `providers.terraform.sync` block (see
+Some fields default as an **all-or-nothing block** rather than field-by-field:
+currently TFWorkspaceClaim's `providers.terraform.sync` block (see
 `reference.md`'s Terraform policy section): set any one `sync.*` field
 yourself and the whole block stays exactly as set; set none and the whole
 default block applies. A partially-set block is never "topped up" field by
@@ -141,6 +141,6 @@ field.
 (more than one candidate found, none at the conventional path) hard-fails
 the three preview commands above with the candidate list, but only warns on
 stderr for `edit`, which continues **without** applying defaults at
-all — never a partial/best-guess application. A genuine network or auth
-failure fetching the file is always a hard failure, everywhere — never
+all, never a partial/best-guess application. A genuine network or auth
+failure fetching the file is always a hard failure, everywhere: never
 treated the same as "no defaults file" and silently skipped.
