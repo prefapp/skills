@@ -21,13 +21,13 @@ Preserve only the parts that still serve the intended architecture, UX, reliabil
 
 ## Operating Mode (read this section every invocation)
 
-1. **Confirm scope** — read [`references/01-when-to-use.md`](references/01-when-to-use.md). If the request smells like a hotfix, security backport, or time-boxed patch, stop and recommend a targeted change instead.
-2. **Pre-flight** — walk [`references/02-preflight-checklist.md`](references/02-preflight-checklist.md). Every box must be checked before touching code. Tests, callers, rollback path, single-paragraph end-state description, no in-flight migration, telemetry accounted for. Locate the test files and search for every external caller of the surface being changed.
-3. **Run the 7-step workflow** — [`references/03-workflow.md`](references/03-workflow.md). Define end state → audit reality → delete before adding → optimize around final shape → collapse duplicate decision logic → remove historical leakage → validate.
-4. **Use the audit patterns** — [`references/04-audit-patterns.md`](references/04-audit-patterns.md) lists the concrete search targets (TODO/DEPRECATED markers, `_v2`/`_old` suffixes, stale feature flags, dual-mode forks, etc.). Each match is a *candidate*, not an automatic deletion.
-5. **Apply decision filters when choices tie** — [`references/05-decision-filters.md`](references/05-decision-filters.md) covers tiebreakers and named anti-patterns to avoid.
+1. **Confirm scope** — read first [`references/01-when-to-use.md`](references/01-when-to-use.md). If the request smells like a hotfix, security backport, or time-boxed patch, stop and recommend a targeted change instead.
+2. **Pre-flight** — read first and walk [`references/02-preflight-checklist.md`](references/02-preflight-checklist.md). Every box must be checked before touching code. Tests, callers, rollback path, single-paragraph end-state description, no in-flight migration, telemetry accounted for. Locate the test files and search for every external caller of the surface being changed.
+3. **Run the 7-step workflow** — read first [`references/03-workflow.md`](references/03-workflow.md). Define end state → audit reality → delete before adding → optimize around final shape → collapse duplicate decision logic → remove historical leakage → validate.
+4. **Use the audit patterns** — read [`references/04-audit-patterns.md`](references/04-audit-patterns.md) when auditing (workflow step 2); it lists the concrete search targets (TODO/DEPRECATED markers, `_v2`/`_old` suffixes, stale feature flags, dual-mode forks, etc.). Each match is a *candidate*, not an automatic deletion.
+5. **Apply decision filters when choices tie** — read [`references/05-decision-filters.md`](references/05-decision-filters.md) only when two options tie; it covers tiebreakers and named anti-patterns to avoid.
 6. **Apply edits** — once a deletion / rename / consolidation is approved, apply it as one coherent edit. Leave the changes in the working tree for the user to review; commit only when asked.
-7. **Report back in shape-change terms** — [`references/06-outcomes-and-reporting.md`](references/06-outcomes-and-reporting.md). The diff lists every line; the summary makes the architectural delta legible.
+7. **Report back in shape-change terms** — read [`references/06-outcomes-and-reporting.md`](references/06-outcomes-and-reporting.md) when the edits are done. The diff lists every line; the summary makes the architectural delta legible.
 
 ## Scope Discipline (this is the most common failure mode)
 
@@ -44,7 +44,3 @@ A zero-tech-debt refactor will tempt unbounded scope. Hold the line:
 Do not optimize for preserving the past.
 
 Optimize for making the next 2 years of development simpler.
-
----
-
-See [`references/`](references/) for the full methodology — each file is a single concern, loadable on demand.
