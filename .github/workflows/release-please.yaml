@@ -1,7 +1,9 @@
 ---
 # FEATURE_NAME: release_please
-# FEATURE_VERSION: release_please-v1
-# FEATURE_URL: https://github.com/prefapp/features/tree/release_please-v1/packages/release_please
+# FEATURE_VERSION: release_please-v2
+# FEATURE_URL: https://github.com/prefapp/features/tree/release_please-v2/packages/release_please
+# FEATURE_GIT_SHA: "74a34b61de0625058600a2cc8cbd78765d983124"
+# FEATURE_GIT_TAGS: ["release_please-v2.0.0","release_please-v2"]
 
 name: Run Release Please
 
@@ -28,7 +30,7 @@ jobs:
           owner: ${{ github.repository_owner }}
 
       - name: Release Please
-        uses: googleapis/release-please-action@v5
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         id: release
         with:
           token: ${{ steps.generate-token.outputs.token }}
