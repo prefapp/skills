@@ -1,7 +1,7 @@
 # Prefapp Workflow Skills
 
 The end-to-end development workflow Prefapp developers (and clients'
-developers) follow on any repository, packaged as 22 harness-agnostic agent
+developers) follow on any repository, packaged as 23 harness-agnostic agent
 skills: plan → spec → implement → review. Extracted from a proven,
 repo-specific skill set and generalized to work anywhere. Runs in pi,
 OpenCode, Claude Code, and VS Code Copilot.
@@ -72,6 +72,10 @@ fire automatically when the situation matches.
 - **`zero-tech-debt`** — Use when code should be rebuilt toward its intended
   shape: remove compatibility cruft, dead abstractions, and historical
   workarounds. Not for hotfixes or security backports.
+- **`prune-comments`** *(explicit)* — Use when comments have piled up:
+  deletes every comment that isn't a license header, external constraint,
+  public API contract, or justified suppression, then reshapes the code the
+  deleted comments were excusing.
 
 ### Review
 
