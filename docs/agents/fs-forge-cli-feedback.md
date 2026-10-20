@@ -64,6 +64,8 @@ per-command output shapes the same way input flags are documented.
 
 ## `features add` ignores `--version` and breaks when the index outruns the schemas
 
+Filed as firestartr-pro/firestartr#115.
+
 Found 2026-10-20 (prefapp/skills#13). The `firestartr-pro/docs` index lists
 `release_please` 2.0.0, but `--versions` only publishes 1.8.1/1.8.0/1.7.0.
 `features add` always resolves the index's *latest* schema
@@ -73,6 +75,8 @@ a clean cache it fails with `Unknown version for feature release_please:
 schema.
 
 ## Feature schema cache never expires
+
+Filed as firestartr-pro/firestartr#116.
 
 Schemas cached in `~/.cache/fs-forge/features` have no TTL; without
 `--refresh`, `--help --json` returned args from stale versions
