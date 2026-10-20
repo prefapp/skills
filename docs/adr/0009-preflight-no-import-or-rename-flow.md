@@ -1,6 +1,6 @@
 # Preflight: no import or rename flow yet
 
-`fs-forge-cli`'s `preflight` command (gitops-k8s #2546) surfaces two
+`fs-forge-cli`'s `preflight` command ([firestartr-pro/firestartr ADR 0008](https://github.com/firestartr-pro/firestartr/blob/main/packages/fs-forge-cli/docs/adr/0008-preflight-top-level-command.md)) surfaces two
 collisions this skill has no automated response to yet: a **provider
 conflict** (the resource already exists at GitHub with no matching claim —
 the CLI's own error even says "use import process") and a **rename**
