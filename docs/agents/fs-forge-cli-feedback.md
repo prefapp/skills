@@ -61,3 +61,20 @@ duplicate source of truth over time.
 changes it to `{"changes"/"defaults"}`). None of this is in `--help`; it can
 only be learned by reading source or by trial and error. Worth documenting
 per-command output shapes the same way input flags are documented.
+
+## `features add` ignores `--version` and breaks when the index outruns the schemas
+
+Found 2026-10-20 (prefapp/skills#13). The `firestartr-pro/docs` index lists
+`release_please` 2.0.0, but `--versions` only publishes 1.8.1/1.8.0/1.7.0.
+`features add` always resolves the index's *latest* schema
+(`resolveLatestFeatureSchema`), even when `--version` pins an older one, so on
+a clean cache it fails with `Unknown version for feature release_please:
+2.0.0`. Validate against the pinned version's schema, and publish the 2.0.0
+schema.
+
+## Feature schema cache never expires
+
+Schemas cached in `~/.cache/fs-forge/features` have no TTL; without
+`--refresh`, `--help --json` returned args from stale versions
+(`build_and_dispatch_docker_images` 5.6.1, `release_please` 1.8.0). Consider a
+TTL, or re-checking the index version on each run.
