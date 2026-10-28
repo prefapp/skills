@@ -43,9 +43,9 @@ create-claim; that file is the plan. `create` has no `--diff`.
 ### Step 3: Re-run with `--commit`
 
 See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. Always
-add `--wait-for-checks`: it overrides the CLI's own `false` default so the
-claims-repo PR also waits for its checks before merging (the state-repo PR
-always waits regardless).
+add `--wait-for-checks`: it overrides the CLI's own `false` default, so the
+CLI also watches the wet (state-repo) PR's check runs after provisioning
+until they finish.
 
 ### Step 4: Report the outcome
 
@@ -144,9 +144,8 @@ Same as the fs-forge-managed flow's Step 1 above, for the audit trail.
 #### Step 2: Decide flags before dry-running
 
 So the dry-run previews the exact command you'll later add `--commit` to:
-- Always include `--wait-for-checks`: it overrides the CLI's own
-  `false` default so the claims-repo PR also waits for its checks before
-  merging (the state-repo PR always waits regardless).
+- Always include `--wait-for-checks`: the unprovision workflow waits for PR
+  Verify on the claims PR before merging it.
 - For TFWorkspaceClaim, ask the client whether to keep variant CRs and
   pass `--include-variants`/`--no-include-variants` accordingly; every
   other kind has no variants, so leave this flag off.
