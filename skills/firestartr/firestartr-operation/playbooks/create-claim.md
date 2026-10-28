@@ -110,7 +110,7 @@ Never `system:firestartr` unless the client names it.
 `features`: repeatable `--feature 'name@version:{...}'` or
 `--feature 'name#ref:{...}'` (`../reference/fs-forge-features.md`), not
 the `.json` hatch: one per Feature. Skips schema validation; run
-`validate --source`/`--refresh` after.
+`validate` after.
 
 ## User → UserClaim
 

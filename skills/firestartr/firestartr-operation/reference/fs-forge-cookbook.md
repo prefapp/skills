@@ -59,12 +59,13 @@ Local and offline. Each entry's `description` is the schema's own one-line
 summary: prefer it, translated to client terms (never "claim"; Rule 1,
 `../SKILL.md`), over composing your own when explaining what's available.
 
-## Validate a claim file (syntactic only)
+## Validate a claim file
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}
 ```
 
-fs-forge validates schema, types, and enum constraints. It does **not** check
+fs-forge validates schema, types, enum constraints, and attached Feature
+`args` (`fs-forge-features.md`). It does **not** check
 cross-claim references, duplicates, or naming rules: those are the skill's
 responsibility (see the validation split in `reference.md`).
