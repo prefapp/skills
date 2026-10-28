@@ -99,8 +99,8 @@ TFWorkspaceClaim/SecretsClaim also requires `--path claims/{...}/{name}.yaml`
 error: fix the reported problem and re-run. On `Branch already exists`, an
 earlier attempt left `fs-forge/{kind}-{name}` behind: check that no open PR or
 dispatched run uses it, then ask the client before deleting it and re-running.
-Once the provision run was dispatched (e.g. `Wet PR checks failed`), never re-run `--commit` blindly:
-inspect that run and the wet PR first.
+Once the provision run was dispatched (e.g. `Wet PR checks failed`), never
+re-run `--commit` blindly: inspect that run and the wet PR first.
 
 > **Check this first:** the exact error text and exit code; see
 > `diagnostics.md#fs-forge-cli-error-shapes`.
