@@ -94,7 +94,8 @@ target `<Kind>-<name>` already exists: no separate uniqueness check needed
 from the CLI's side (the skill still pre-checks its own side;
 see `reference.md`'s validation split). `create --commit` on
 TFWorkspaceClaim/SecretsClaim also requires `--path claims/{...}/{name}.yaml`
-(rejected outright for every other kind, which resolve their own path). A `--commit` that fails before dispatch (any of the reasons above) is a CLI
+(rejected outright for every other kind, which resolve their own path). A
+`--commit` that fails before dispatch (any of the reasons above) is a CLI
 error: fix the reported problem and re-run. Once the provision run was
 dispatched (e.g. `Wet PR checks failed`), never re-run `--commit` blindly:
 inspect that run and the wet PR first.
