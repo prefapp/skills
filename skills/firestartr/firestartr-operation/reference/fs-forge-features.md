@@ -81,7 +81,8 @@ npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
 Form is `name@version:{...}` or `name#ref:{...}`; `{...}` is a raw JSON object
 (use `{}` for no args; the `:` and object are required). These do **not**
 fetch or validate against the Feature's schema: run `validate` afterward (below)
-to check `args` against the latest schema before landing the change.
+to check `args` against each Feature's cached schema before landing the change
+(`--refresh` for the latest published one).
 
 ## Validating Feature args
 
@@ -92,8 +93,9 @@ firestartr-pro/docs Feature catalog) and follow the cache rules above.
 Offline, this succeeds only when every attached Feature's schema is already
 cached; otherwise it reports `Feature <name>: ...` and exits 1.
 
-Pass `--source`/`--refresh` to override the defaults (`--refresh` when a cached
-schema may be stale):
+Pass `--source`/`--refresh` to override the defaults. Plain `validate` reuses a
+cached schema by Feature name whatever `--source` says, so add `--refresh` to
+check against the latest schema or when switching `--source`:
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} validate -f {claim-file} --source <source> --refresh
