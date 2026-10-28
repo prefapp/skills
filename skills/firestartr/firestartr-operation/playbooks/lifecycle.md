@@ -66,8 +66,10 @@ runs (`../reference/diagnostics.md`, apply/destroy section) before reporting;
 absent or pending checks mean unconfirmed, so say so. A `checks` entry with
 conclusion `failure`, `cancelled` or `timed_out` is a failed check: stop,
 report it, point to `../reference/diagnostics.md`, and don't close the issue.
-No PR (exit 3), no `checks` entries, or a null (pending) conclusion is
-unconfirmed: say so and point to `../reference/diagnostics.md`.
+No PR (exit 3), no `checks` entries, or any conclusion other than `success`,
+`skipped` or `neutral` (null/pending, `action_required`, `stale`) is
+unconfirmed: say so, point to `../reference/diagnostics.md`, and don't close
+the issue.
 
 > **Check this first:** if the dispatched run failed, the symptom lookup
 > at `troubleshooting.md#symptom-lookup--start-here` routes to the right
