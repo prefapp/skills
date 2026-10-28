@@ -45,13 +45,21 @@ create-claim; that file is the plan. `create` has no `--diff`.
 See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. Always
 add `--wait-for-checks`: it overrides the CLI's own `false` default, so the
 CLI also watches the wet (state-repo) PR's check runs after provisioning
-until they finish.
+until they finish. When `firestartr-config.yaml` sets `state_github_repo` or
+`state_infra_repo`, also pass `--state-repos={state_github_repo},{state_infra_repo}`
+(an unset value uses its default, `{org}/state-github` or `{org}/state-infra`;
+`create`/`edit` only).
 
 ### Step 4: Report the outcome
 
 Don't poll, hydrate, or merge the wet PR yourself: `--commit` already did
 it. Status check: the dispatched `provision-claim.yaml` run. Manual hydrate
 only if the client explicitly asks (manual flow Step 5).
+
+If the output says `No wet PR found for this claim; skipping check watch.`, no
+checks were watched: don't report them as passed. Run
+`npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current`
+(with the same `--state-repos` when set) and report its result.
 
 > **Check this first:** if the dispatched run failed, the symptom lookup
 > at `troubleshooting.md#symptom-lookup--start-here` routes to the right
