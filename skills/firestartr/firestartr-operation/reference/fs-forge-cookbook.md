@@ -25,7 +25,7 @@ npx @firestartr/fs-forge-cli@{version} <args>
 and tell the user:
 
 > `fs-forge` could not be run via `npx`.
-> Ensure `npx` is available (Node >= 18) and that you have network access.
+> Ensure `npx` is available (Node >= 22) and that you have network access.
 > Do not proceed without it.
 
 Never hand-author a claim body when fs-forge is unavailable.
@@ -59,17 +59,13 @@ Local and offline. Each entry's `description` is the schema's own one-line
 summary: prefer it, translated to client terms (never "claim"; Rule 1,
 `../SKILL.md`), over composing your own when explaining what's available.
 
-## Validate a claim file (syntactic only)
+## Validate a claim file
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}
 ```
 
-fs-forge validates schema, types, and enum constraints. It does **not** check
+fs-forge validates schema, types, enum constraints, and attached Feature
+`args` (`fs-forge-features.md`). It does **not** check
 cross-claim references, duplicates, or naming rules: those are the skill's
 responsibility (see the validation split in `reference.md`).
-
-Schema lookup is relative to the current working directory (`{cwd}/schemas/`).
-Run `validate`/`create`/`edit` from a directory that has one, e.g. a
-clone of `{claims_repo}` (which ships it), or a `schemas/` symlink to the CLI's
-bundled copy, not an arbitrary scratch directory like `/tmp`.

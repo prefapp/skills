@@ -6,12 +6,13 @@ Cross-cutting rules `create` and `edit` both lean on. Sibling of
 **Addressing differs by command.** `edit` takes an existing claim as ONE
 argument, `<Kind>-<name>` (e.g. `ComponentClaim-my-repo`): never
 `edit <Kind> <name>`. `delete` is the opposite: kind and name as TWO
-arguments (`delete <Kind> <name>`).
+arguments (`delete <Kind> <name>`). `create` takes the short `id` from
+`kinds --json` (`component`, not `ComponentClaim`).
 
 ## Discover a kind's flags at runtime
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json
+npx @firestartr/fs-forge-cli@{version} create <kind> --help --json
 ```
 
 This (and dynamic Feature help, `fs-forge-features.md`) returns a
@@ -37,8 +38,8 @@ whole.
 **Never hardcode a CLI flag name for a schema field.** Derive schema-field flag
 paths from the FlagSpec entries in `--help --json`'s `.flags[]`. Every other
 flag this cookbook uses is already a fixed, hardcoded name, safe to keep
-hardcoding: `org`, `commit`, and `path` on every kind; `diff` and `json` on
-`edit` only (`create` has neither); ComponentClaim's own
+hardcoding: `org` and `commit` on every kind; `path` on `create` only;
+`diff` and `json` on `edit` only (`create` has neither); ComponentClaim's own
 `feature`/`add-feature`/`remove-feature` (`fs-forge-features.md`'s "Feature
 CRUD"); and the two schema org-field paths documented next, identified by exact
 `path` match, never fuzzy "contains org" matching.
@@ -70,7 +71,7 @@ equivalent JSON parser when following it. To find the schema org field at
 runtime:
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json \
+npx @firestartr/fs-forge-cli@{version} create <kind> --help --json \
   | jq -r '.flags[] | select(.path == "providers.github.org" or .path == "providers.github.orgName") | "--\(.path)=\("{org}")"'
 ```
 
@@ -94,8 +95,12 @@ from the CLI's side (the skill still pre-checks its own side;
 see `reference.md`'s validation split). `create --commit` on
 TFWorkspaceClaim/SecretsClaim also requires `--path claims/{...}/{name}.yaml`
 (rejected outright for every other kind, which resolve their own path). A
-`--commit` that fails for any of these reasons surfaces as a CLI error before
-anything is dispatched: fix the reported problem and re-run.
+`--commit` that fails before dispatch (any of the reasons above) is a CLI
+error: fix the reported problem and re-run. On `Branch already exists`, an
+earlier attempt left `fs-forge/{kind}-{name}` behind: check that no open PR or
+dispatched run uses it, then ask the client before deleting it and re-running.
+Once the provision run was dispatched (e.g. `Wet PR checks failed`), never
+re-run `--commit` blindly: inspect that run and the wet PR first.
 
 > **Check this first:** the exact error text and exit code; see
 > `diagnostics.md#fs-forge-cli-error-shapes`.

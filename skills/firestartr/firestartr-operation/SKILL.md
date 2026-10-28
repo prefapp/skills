@@ -64,10 +64,10 @@ The fs-forge-cli commands and flags documented in this skill and its
 `reference/` files must always match fs-forge-cli's actual current contract:
 this skill is a living mirror, not a frozen snapshot; when the CLI changes,
 update the docs, don't let them drift. The specific fs-forge-cli version a
-given release's instructions were validated against is recorded only in that
+given release's instructions were validated against is recorded in that
 release's release-please-generated CHANGELOG entry (this skill is versioned by
-release-please in monorepo mode; tag `firestartr-operation-vX.Y.Z`): there is
-no duplicate, manually-maintained version note elsewhere.
+release-please in monorepo mode; tag `firestartr-operation-vX.Y.Z`). The only
+other copy is Step 1's skill-target version, the one the version check reads.
 
 ## Step 1: Resolve the target platform
 
@@ -132,13 +132,13 @@ npm dist-tag ls @firestartr/fs-forge-cli | awk '$1 == "latest:" { print $2 }'
   list versions with `npm view @firestartr/fs-forge-cli versions`, ask the
   client to pick one, persist as `cli_version` (show-before-write).
 
-**Skill-target CLI version: `0.10.0`**.
+**Skill-target CLI version: `2.0.1`**.
 Compare `{version}` against it with a plain semver check (no `--help`
 call needed):
 
 - `>= {target version}` → proceed.
-- `< {target version}` and pinned (`cli_version` set): tell the client the pin
-  predates this skill's target and offer to bump it (show-before-write): never
+- `< {target version}` and pinned (`cli_version` set): tell the client the pin is
+  below this skill's target and offer to bump it (show-before-write): never
   override an explicit pin silently. Declined: fall back to `{version}`'s own
   `--help`/`--help --json` output to see what it actually supports, and use
   whatever it reports.
@@ -146,7 +146,7 @@ call needed):
   above: ask the client to pick a version and pin it.
 
 Emit one line confirming the resolved context, e.g.:
-> `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 0.1.0`
+> `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 2.0.1`
 
 **Completion:** you hold a concrete `{org}`, `{claims_repo}`, `{version}`, and
 the matched path.

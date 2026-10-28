@@ -42,16 +42,36 @@ create-claim; that file is the plan. `create` has no `--diff`.
 
 ### Step 3: Re-run with `--commit`
 
-See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. For CLI
-`>= 0.8.0`, always add `--wait-for-checks`: it overrides the CLI's own
-`false` default so the claims-repo PR also waits for its checks before
-merging (the state-repo PR always waits regardless).
+See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. Always
+add `--wait-for-checks`: it overrides the CLI's own `false` default, so the
+CLI also watches the wet (state-repo) PR's check runs after provisioning
+until they finish. When `firestartr-config.yaml` sets `state_github_repo` or
+`state_infra_repo`, also pass `--state-repos={state_github_repo},{state_infra_repo}`
+(an unset value uses its default, `{org}/state-github` or `{org}/state-infra`;
+`create`/`edit` only).
 
 ### Step 4: Report the outcome
 
 Don't poll, hydrate, or merge the wet PR yourself: `--commit` already did
 it. Status check: the dispatched `provision-claim.yaml` run. Manual hydrate
 only if the client explicitly asks (manual flow Step 5).
+
+If the output says `No wet PR found for this claim; skipping check watch.`, no
+checks were watched: don't report them as passed. Run
+`npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current --json`
+(with the same `--state-repos` when set) and report its result. SystemClaim and
+DomainClaim have no state CR (no hydration): report the provisioning run's
+outcome instead. Once the wet PR is merged, also read its merge commit's check
+runs (`../reference/diagnostics.md`, apply/destroy section) before reporting;
+absent or pending checks mean unconfirmed, so say so. A `checks` entry, or a
+merge-commit check run, with conclusion `failure`, `cancelled` or `timed_out`
+is a failed check: stop, report it, point to `../reference/diagnostics.md`, and
+don't close the issue.
+No PR (exit 3), no `checks` entries, a `lastStatePr.state` other than `merged`
+(open, closed, or null after a lookup error), or any conclusion other than
+`success`, `skipped` or `neutral` (null/pending, `action_required`, `stale`) is
+unconfirmed: say so, point to `../reference/diagnostics.md`, and don't close
+the issue.
 
 > **Check this first:** if the dispatched run failed, the symptom lookup
 > at `troubleshooting.md#symptom-lookup--start-here` routes to the right
@@ -64,9 +84,9 @@ auto-generated PR has no `Closes #N` footer (there's no flag for it), so
 the issue is only linked back to the change if you do it here.
 
 A `--commit` that fails (invalid claim, an already-existing target claim for
-`create`, existing `fs-forge/{kind}-{name}` branch, etc.) surfaces as
-a CLI error before anything is dispatched: fix the reported problem and
-re-run.
+`create`, existing `fs-forge/{kind}-{name}` branch, etc.) before dispatch is a
+CLI error: fix the reported problem and re-run. After dispatch, see
+`../reference/fs-forge-mutation-shared.md`'s `--commit` warning.
 
 > **Check this first:** the exact CLI error message; see
 > `troubleshooting.md#fs-forge-cli-command-failures` if it doesn't explain
@@ -97,6 +117,9 @@ gh issue create --repo {claims_repo} --title "{goal}" --body "{what the client a
 ### Step 2: Branch from main
 
 ### Step 3: Write the full file on the branch (create or update)
+
+Offline create: PUT the validated `{preview-file}` contents to
+`claims/{dir}/{name}.yaml` on the branch (`../reference/gh-cookbook.md`).
 
 ### Step 4: Open the PR, show it to the client, merge it (squash)
 
@@ -132,11 +155,10 @@ support differs from every other operation, so check it before planning:
 
 - **Supported**: ComponentClaim, GroupClaim, UserClaim, OrgWebhookClaim,
   TFWorkspaceClaim, SecretsClaim.
-- **Not supported**: SystemClaim, DomainClaim have no delete workflow, old
-  or new. Tell the client, then go straight to "No delete workflow exists"
-  below.
+- **Not supported**: SystemClaim, DomainClaim have no delete workflow. Tell
+  the client, then go straight to "No delete workflow exists" below.
 
-### Primary path: `fs-forge-cli delete` (current CLI version)
+### `fs-forge-cli delete`
 
 #### Step 1: Capture the goal as an issue
 
@@ -145,9 +167,8 @@ Same as the fs-forge-managed flow's Step 1 above, for the audit trail.
 #### Step 2: Decide flags before dry-running
 
 So the dry-run previews the exact command you'll later add `--commit` to:
-- Always include `--wait-for-checks`: it overrides the CLI's own
-  `false` default so the claims-repo PR also waits for its checks before
-  merging (the state-repo PR always waits regardless).
+- Always include `--wait-for-checks`: the unprovision workflow waits for PR
+  Verify on the claims PR before merging it.
 - For TFWorkspaceClaim, ask the client whether to keep variant CRs and
   pass `--include-variants`/`--no-include-variants` accordingly; every
   other kind has no variants, so leave this flag off.
@@ -197,29 +218,11 @@ with:
 Link the merged claim PR in the closing comment (`--commit` has no
 `Closes #N` footer to do this automatically).
 
-### Manual fallback (older CLI, supported kind)
-
-When `{version}` predates the `delete` command (Step 1's version-check
-paragraph), dispatch the platform's per-kind delete workflow directly:
-it removes the claim and its state resources but does **not** merge the
-resulting state PR itself:
-
-```bash
-gh workflow run "GitHub claim: delete" --repo {claims_repo} \
-  --field kind={ClaimKind} --field name={claim-name}
-```
-
-This covers ComponentClaim/GroupClaim/UserClaim/OrgWebhookClaim only:
-TFWorkspaceClaim/SecretsClaim each have their own per-kind delete workflow
-instead; `gh workflow list --repo {claims_repo} --all` finds it
-(`../reference/gh-cookbook.md` has the general workflow-dispatch idiom). Wait
-for the run to finish, then merge the resulting state PR yourself.
-
 ### No delete workflow exists
 
-For SystemClaim/DomainClaim, or any kind if no delete workflow is reachable:
-do not remove the claim file yourself. Tell the client there is no automated
-delete path for this claim kind and they'll need to remove it by hand.
+For SystemClaim/DomainClaim: do not remove the claim file yourself. Tell the
+client there is no automated delete path for this claim kind and they'll need
+to remove it by hand.
 
 Otherwise, confirm removal to the client once the change has landed.
 

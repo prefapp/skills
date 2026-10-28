@@ -16,7 +16,7 @@ refs come from the requested name and that policy, not from another claim.
 "Like X": read X (`edit <Kind>-<name> --org={org}`, no mutating flags;
 see `../reference/fs-forge-edit.md`) for kind and the likeness they asked for
 (Feature names, visibility). Fold that into this request. Do not copy X's
-YAML, run `fs-forge clone`, or hand-copy a claim file.
+YAML or hand-copy a claim file.
 
 The plan is the `create` output: requested fields plus required
 identifiers and `../reference/reference.md`'s policy defaults. Never
@@ -31,7 +31,7 @@ into the file; Step 4 previews what the renderer will add later.
 
 ### Step 1: Discover flags
 
-`create <Kind> --help --json` (`../reference/fs-forge-mutation-shared.md`).
+`create <kind> --help --json` (`../reference/fs-forge-mutation-shared.md`).
 Map client answers + policy defaults onto FlagSpec paths. Never hardcode a
 schema-field flag name; that reference lists the fixed flags safe to
 hardcode.
@@ -48,24 +48,25 @@ reference).
 ### Step 3: Build the claim in one invocation
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} create <Kind> \
+npx @firestartr/fs-forge-cli@{version} create <kind> \
   --org={org} \
   [--<schema-org-flag>={org}] \
   --<flag>=<value> \
   ... \
-  > claims/{dir}/{name}.yaml
+  > {preview-file}
 ```
 
 `--org` is control-plane (required for the `--commit` landing run);
 `--<schema-org-flag>` is the kind's schema org field if it has one: both
 in `../reference/fs-forge-mutation-shared.md` `{org}` passthrough. No
-output flag; redirect stdout to save. TFWorkspaceClaim/SecretsClaim need
+output flag; redirect stdout to `{preview-file}`, a `mktemp` path outside the
+repo (one per claim, reused in Steps 4-5). TFWorkspaceClaim/SecretsClaim need
 `--path claims/{...}/{name}.yaml` only with `--commit` (rejected for every
 other kind). Complex arrays/unions: temp JSON file + FlagSpec `.json`
 escape-hatch `path`, passed verbatim.
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} validate -f claims/{dir}/{name}.yaml
+npx @firestartr/fs-forge-cli@{version} validate -f {preview-file}
 ```
 
 Fix errors before proceeding.
@@ -81,7 +82,7 @@ artifact and declines. `create` never applies these itself, committed or
 not (`../reference/fs-forge-mutation-shared.md` → "Claim defaults"):
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} defaults apply -f claims/{dir}/{name}.yaml --org={org}
+npx @firestartr/fs-forge-cli@{version} defaults apply -f {preview-file} --org={org}
 ```
 
 Compare to Step 3's file; tell the client what the platform will fill in,
@@ -95,7 +96,7 @@ The plan is the Step 3 file plus any Step 4 preview.
   fs-forge-managed flow, which owns the single `--commit` run (with
   `--wait-for-checks`). Re-run it there **without the redirect** so its
   output (including the dispatched provisioning URL) stays visible.
-- **Offline artifact**: hand Step 3's validated file to `lifecycle`'s
+- **Offline artifact**: hand Step 3's validated `{preview-file}` to `lifecycle`'s
   manual flow.
 
 ## Repository → ComponentClaim
@@ -110,7 +111,7 @@ Never `system:firestartr` unless the client names it.
 `features`: repeatable `--feature 'name@version:{...}'` or
 `--feature 'name#ref:{...}'` (`../reference/fs-forge-features.md`), not
 the `.json` hatch: one per Feature. Skips schema validation; run
-`validate --source`/`--refresh` after.
+`validate` after.
 
 ## User → UserClaim
 

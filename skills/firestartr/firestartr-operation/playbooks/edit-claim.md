@@ -14,7 +14,7 @@ current YAML.
 
 ### Step 2: Discover flags
 
-`create <Kind> --help --json` for the target kind (never `edit --help
+`create <kind> --help --json` for the target kind (never `edit --help
 --json`: see the cookbook's mutation-shared reference).
 
 ### Step 3: Dry-run the change
@@ -97,7 +97,6 @@ providers:
 ## TFWorkspaceClaim
 
 `--commit` is mandatory for values, module, and policy (no offline path)
-and requires `--path claims/tfworkspaces/{name}.yaml`
 (`../reference/fs-forge-mutation-shared.md`'s `--commit` warning: it
 hydrates; no manual hydrate after). Create vocabulary:
 `create-claim.md`'s TF workspace section.
@@ -126,8 +125,8 @@ flags from the Feature's own schema. `add`/`edit`/`remove` each still need the
 same dry-run (without `--commit`) → client approval → `--commit` sequence as
 any other edit; `list` is read-only and needs no `--commit`. Use inline
 `edit --add-feature`/`--remove-feature` only when you already know valid
-`args` and don't need schema-derived flags, then run `validate` with
-`--source`/`--refresh` to catch bad `args` before landing.
+`args` and don't need schema-derived flags, then run `validate` to
+catch bad `args` before landing.
 
 ## Manual fallback
 
