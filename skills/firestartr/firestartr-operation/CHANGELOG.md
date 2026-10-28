@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/prefapp/skills/compare/firestartr-operation-v0.4.0...firestartr-operation-v0.4.1) (2026-10-28)
+
+
+### Bug Fixes
+
+* **firestartr-operation:** target fs-forge-cli 2.0.1 ([#138](https://github.com/prefapp/skills/issues/138)) ([9f0814a](https://github.com/prefapp/skills/commit/9f0814a9bafb0850a851466ed37d519ee00ee08d))
+
 ## [0.4.0](https://github.com/prefapp/skills/compare/firestartr-operation-v0.3.0...firestartr-operation-v0.4.0) (2026-09-23)
 
 
