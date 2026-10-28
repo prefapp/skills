@@ -48,6 +48,7 @@ reference).
 ### Step 3: Build the claim in one invocation
 
 ```bash
+mkdir -p claims/{dir}
 npx @firestartr/fs-forge-cli@{version} create <kind> \
   --org={org} \
   [--<schema-org-flag>={org}] \
