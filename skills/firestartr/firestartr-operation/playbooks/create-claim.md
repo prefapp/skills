@@ -49,7 +49,8 @@ reference).
 
 ```bash
 mkdir -p claims/{dir}
-npx @firestartr/fs-forge-cli@{version} create <kind> \
+# test: stop if the file exists (claim conflict, Step 2); the redirect is guarded.
+test ! -e claims/{dir}/{name}.yaml && npx @firestartr/fs-forge-cli@{version} create <kind> \
   --org={org} \
   [--<schema-org-flag>={org}] \
   --<flag>=<value> \
