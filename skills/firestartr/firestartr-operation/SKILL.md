@@ -132,13 +132,13 @@ npm dist-tag ls @firestartr/fs-forge-cli | awk '$1 == "latest:" { print $2 }'
   list versions with `npm view @firestartr/fs-forge-cli versions`, ask the
   client to pick one, persist as `cli_version` (show-before-write).
 
-**Skill-target CLI version: `0.10.0`**.
+**Skill-target CLI version: `2.0.1`**.
 Compare `{version}` against it with a plain semver check (no `--help`
 call needed):
 
 - `>= {target version}` → proceed.
-- `< {target version}` and pinned (`cli_version` set): tell the client the pin
-  predates this skill's target and offer to bump it (show-before-write): never
+- `< {target version}` and pinned (`cli_version` set): tell the client the pin is
+  below this skill's target and offer to bump it (show-before-write): never
   override an explicit pin silently. Declined: fall back to `{version}`'s own
   `--help`/`--help --json` output to see what it actually supports, and use
   whatever it reports.
