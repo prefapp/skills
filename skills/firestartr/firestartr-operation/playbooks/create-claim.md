@@ -95,7 +95,7 @@ The plan is the Step 3 file plus any Step 4 preview.
 
 - **Landing now**: hand the approved Step 3 command to `lifecycle`'s
   fs-forge-managed flow, which owns the single `--commit` run (with
-  `--wait-for-checks`). Re-run it there **without the redirect** so its
+  `--wait-for-checks`). Re-run it there **without the redirect or the `test` guard** so its
   output (including the dispatched provisioning URL) stays visible.
 - **Offline artifact**: hand Step 3's validated file to `lifecycle`'s
   manual flow.

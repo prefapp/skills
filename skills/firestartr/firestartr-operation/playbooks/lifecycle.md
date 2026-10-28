@@ -63,8 +63,9 @@ checks were watched: don't report them as passed. Run
 DomainClaim have no state CR (no hydration): report the provisioning run's
 outcome instead. Once the wet PR is merged, also read its merge commit's check
 runs (`../reference/diagnostics.md`, apply/destroy section) before reporting;
-absent or pending checks mean unconfirmed, so say so. A `checks` entry with
-conclusion `failure`, `cancelled` or `timed_out` is a failed check: stop,
+absent or pending checks mean unconfirmed, so say so. A `checks` entry, or a
+merge-commit check run, with conclusion `failure`, `cancelled` or `timed_out`
+is a failed check: stop,
 report it, point to `../reference/diagnostics.md`, and don't close the issue.
 No PR (exit 3), no `checks` entries, a `lastStatePr.state` other than `merged`
 (open, closed, or null after a lookup error), or any conclusion other than
