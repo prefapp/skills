@@ -10,7 +10,7 @@ talk repos, teams, and users; the skill never talks claims.
 ## ✅ Prerequisites
 
 - 🏗️ A **bootstrapped Firestartr organization** — Prefapp sets this up for you.
-- 🟢 **Node ≥ 18** — the CLI (`@firestartr/fs-forge-cli`) runs via `npx`;
+- 🟢 **Node ≥ 22** — the CLI (`@firestartr/fs-forge-cli`) runs via `npx`;
   nothing to install globally.
 - 🐙 **`gh` CLI**, authenticated (`gh auth login`) — used for the flows the
   CLI doesn't cover, and as the token source below.
