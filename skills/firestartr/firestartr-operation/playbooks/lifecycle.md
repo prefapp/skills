@@ -118,7 +118,8 @@ gh issue create --repo {claims_repo} --title "{goal}" --body "{what the client a
 
 ### Step 3: Write the full file on the branch (create or update)
 
-Offline create: PUT the validated `{preview-file}` contents to `claims/{dir}/{name}.yaml` on the branch (`../reference/gh-cookbook.md`).
+Offline create: PUT the validated `{preview-file}` contents to
+`claims/{dir}/{name}.yaml` on the branch (`../reference/gh-cookbook.md`).
 
 ### Step 4: Open the PR, show it to the client, merge it (squash)
 

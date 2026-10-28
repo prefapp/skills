@@ -96,7 +96,7 @@ The plan is the Step 3 file plus any Step 4 preview.
   fs-forge-managed flow, which owns the single `--commit` run (with
   `--wait-for-checks`). Re-run it there **without the redirect** so its
   output (including the dispatched provisioning URL) stays visible.
-- **Offline artifact**: hand Step 3's validated {preview-file} to `lifecycle`'s
+- **Offline artifact**: hand Step 3's validated `{preview-file}` to `lifecycle`'s
   manual flow.
 
 ## Repository → ComponentClaim
