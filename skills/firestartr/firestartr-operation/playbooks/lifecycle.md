@@ -66,8 +66,9 @@ runs (`../reference/diagnostics.md`, apply/destroy section) before reporting;
 absent or pending checks mean unconfirmed, so say so. A `checks` entry with
 conclusion `failure`, `cancelled` or `timed_out` is a failed check: stop,
 report it, point to `../reference/diagnostics.md`, and don't close the issue.
-No PR (exit 3), no `checks` entries, or any conclusion other than `success`,
-`skipped` or `neutral` (null/pending, `action_required`, `stale`) is
+No PR (exit 3), no `checks` entries, a `lastStatePr.state` other than `merged`
+(open, closed, or null after a lookup error), or any conclusion other than
+`success`, `skipped` or `neutral` (null/pending, `action_required`, `stale`) is
 unconfirmed: say so, point to `../reference/diagnostics.md`, and don't close
 the issue.
 

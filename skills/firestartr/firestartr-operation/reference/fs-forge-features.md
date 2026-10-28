@@ -90,8 +90,8 @@ to check `args` against each Feature's cached schema before landing the change
 Feature's `args` against that Feature's schema, in addition to the claim's own
 schema, types, and enums. Schemas come from `--source` (default: the
 firestartr-pro/docs Feature catalog) and follow the cache rules above.
-Offline, this succeeds only when every attached Feature's schema is already
-cached; otherwise it reports `Feature <name>: ...` and exits 1.
+Offline with the default source, this succeeds only when every attached
+Feature's schema is already cached; otherwise it reports `Feature <name>: ...` and exits 1.
 
 Pass `--source`/`--refresh` to override the defaults. Plain `validate` reuses a
 cached schema by Feature name whatever `--source` says, so add `--refresh` to
