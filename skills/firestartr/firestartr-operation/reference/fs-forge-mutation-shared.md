@@ -6,12 +6,13 @@ Cross-cutting rules `create` and `edit` both lean on. Sibling of
 **Addressing differs by command.** `edit` takes an existing claim as ONE
 argument, `<Kind>-<name>` (e.g. `ComponentClaim-my-repo`): never
 `edit <Kind> <name>`. `delete` is the opposite: kind and name as TWO
-arguments (`delete <Kind> <name>`).
+arguments (`delete <Kind> <name>`). `create` takes the short `id` from
+`kinds --json` (`component`, not `ComponentClaim`).
 
 ## Discover a kind's flags at runtime
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json
+npx @firestartr/fs-forge-cli@{version} create <kind> --help --json
 ```
 
 This (and dynamic Feature help, `fs-forge-features.md`) returns a
@@ -70,7 +71,7 @@ equivalent JSON parser when following it. To find the schema org field at
 runtime:
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} create <Kind> --help --json \
+npx @firestartr/fs-forge-cli@{version} create <kind> --help --json \
   | jq -r '.flags[] | select(.path == "providers.github.org" or .path == "providers.github.orgName") | "--\(.path)=\("{org}")"'
 ```
 

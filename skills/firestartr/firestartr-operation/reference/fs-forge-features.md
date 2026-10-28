@@ -32,7 +32,7 @@ npx @firestartr/fs-forge-cli@{version} features add --name <feature> --help --js
 Resolves the Feature's **latest published schema** from the Feature source
 (`--source`, defaults to `firestartr-pro/docs`) and returns a `CommandHelpJson`
 object whose `.flags[]` includes `args.<field>` entries alongside the fixed
-`name`/`version`/`ref`/`repo` flags: same discovery idiom as `create <Kind>
+`name`/`version`/`ref`/`repo` flags: same discovery idiom as `create <kind>
 --help --json` (`fs-forge-mutation-shared.md`). The reference's own
 `version`/`ref` only pins what the claim stores; it never selects which
 schema validates `args`.
@@ -78,9 +78,10 @@ npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
 ```
 
 Form is `name@version:{...}` or `name#ref:{...}`; `{...}` is a raw JSON object
-and may be omitted for no args. These do **not** fetch or validate against the
-Feature's schema: run `validate` afterward (deep mode, below) to check `args`
-against the latest schema before landing the change.
+(use `{}` for no args; the `:` and object are required). These do **not**
+fetch or validate against the Feature's schema: run `validate` afterward (deep
+mode, below) to check `args` against the latest schema before landing the
+change.
 
 ## Deep validation
 

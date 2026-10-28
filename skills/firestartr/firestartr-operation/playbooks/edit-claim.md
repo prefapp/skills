@@ -14,7 +14,7 @@ current YAML.
 
 ### Step 2: Discover flags
 
-`create <Kind> --help --json` for the target kind (never `edit --help
+`create <kind> --help --json` for the target kind (never `edit --help
 --json`: see the cookbook's mutation-shared reference).
 
 ### Step 3: Dry-run the change

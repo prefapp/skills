@@ -16,7 +16,7 @@ refs come from the requested name and that policy, not from another claim.
 "Like X": read X (`edit <Kind>-<name> --org={org}`, no mutating flags;
 see `../reference/fs-forge-edit.md`) for kind and the likeness they asked for
 (Feature names, visibility). Fold that into this request. Do not copy X's
-YAML, run `fs-forge clone`, or hand-copy a claim file.
+YAML or hand-copy a claim file.
 
 The plan is the `create` output: requested fields plus required
 identifiers and `../reference/reference.md`'s policy defaults. Never
@@ -31,7 +31,7 @@ into the file; Step 4 previews what the renderer will add later.
 
 ### Step 1: Discover flags
 
-`create <Kind> --help --json` (`../reference/fs-forge-mutation-shared.md`).
+`create <kind> --help --json` (`../reference/fs-forge-mutation-shared.md`).
 Map client answers + policy defaults onto FlagSpec paths. Never hardcode a
 schema-field flag name; that reference lists the fixed flags safe to
 hardcode.
@@ -48,7 +48,7 @@ reference).
 ### Step 3: Build the claim in one invocation
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} create <Kind> \
+npx @firestartr/fs-forge-cli@{version} create <kind> \
   --org={org} \
   [--<schema-org-flag>={org}] \
   --<flag>=<value> \
