@@ -96,7 +96,7 @@ identical for Terraform-claim and GitHub-claim kinds, since GitHub claims are
 Terraform-provider runs under the hood.
 
 ```bash
-gh api repos/{wet_pr_owner}/{wet_pr_repo}/commits/{merge_sha}/check-runs \
+gh api --paginate repos/{wet_pr_owner}/{wet_pr_repo}/commits/{merge_sha}/check-runs \
   --jq '.check_runs[] | select(.name | test(" - (synth|apply|destroy)$"))'
 gh pr view {hydrate_pr} --repo {org}/{state-repo} --comments
 ```
