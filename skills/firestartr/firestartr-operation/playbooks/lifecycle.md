@@ -63,7 +63,8 @@ checks were watched: don't report them as passed. Run
 DomainClaim have no state CR (no hydration): report the provisioning run's
 outcome instead. Once the wet PR is merged, also read its merge commit's check
 runs (`../reference/diagnostics.md`, apply/destroy section) before reporting;
-absent or pending checks mean unconfirmed, so say so.
+absent or pending checks mean unconfirmed, so say so. If `--current` finds no PR
+or errors, report the outcome as unconfirmed and point to `../reference/diagnostics.md`.
 
 > **Check this first:** if the dispatched run failed, the symptom lookup
 > at `troubleshooting.md#symptom-lookup--start-here` routes to the right
