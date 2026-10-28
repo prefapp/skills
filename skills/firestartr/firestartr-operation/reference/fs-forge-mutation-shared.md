@@ -38,8 +38,8 @@ whole.
 **Never hardcode a CLI flag name for a schema field.** Derive schema-field flag
 paths from the FlagSpec entries in `--help --json`'s `.flags[]`. Every other
 flag this cookbook uses is already a fixed, hardcoded name, safe to keep
-hardcoding: `org`, `commit`, and `path` on every kind; `diff` and `json` on
-`edit` only (`create` has neither); ComponentClaim's own
+hardcoding: `org` and `commit` on every kind; `path` on `create` only;
+`diff` and `json` on `edit` only (`create` has neither); ComponentClaim's own
 `feature`/`add-feature`/`remove-feature` (`fs-forge-features.md`'s "Feature
 CRUD"); and the two schema org-field paths documented next, identified by exact
 `path` match, never fuzzy "contains org" matching.

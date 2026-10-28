@@ -97,7 +97,6 @@ providers:
 ## TFWorkspaceClaim
 
 `--commit` is mandatory for values, module, and policy (no offline path)
-and requires `--path claims/tfworkspaces/{name}.yaml`
 (`../reference/fs-forge-mutation-shared.md`'s `--commit` warning: it
 hydrates; no manual hydrate after). Create vocabulary:
 `create-claim.md`'s TF workspace section.
