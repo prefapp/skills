@@ -13,10 +13,6 @@ webhooks; use the discovery-based check (`fs-forge-discovery.md`) for those.
 `tfworkspace`'s provider check is always a no-op (claims-only, no TFC client
 yet), only its claims-map check runs.
 
-**Predates this CLI?** `npx @firestartr/fs-forge-cli@{version} preflight --help`
-errors as an unrecognized command when it does: fall back to the
-discovery-based check.
-
 ## Invocation
 
 ```bash

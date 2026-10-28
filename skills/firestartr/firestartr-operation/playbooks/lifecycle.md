@@ -42,10 +42,10 @@ create-claim; that file is the plan. `create` has no `--diff`.
 
 ### Step 3: Re-run with `--commit`
 
-See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. For CLI
-`>= 0.8.0`, always add `--wait-for-checks`: it overrides the CLI's own
-`false` default so the claims-repo PR also waits for its checks before
-merging (the state-repo PR always waits regardless).
+See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. Always
+add `--wait-for-checks`: it overrides the CLI's own `false` default so the
+claims-repo PR also waits for its checks before merging (the state-repo PR
+always waits regardless).
 
 ### Step 4: Report the outcome
 
@@ -132,11 +132,10 @@ support differs from every other operation, so check it before planning:
 
 - **Supported**: ComponentClaim, GroupClaim, UserClaim, OrgWebhookClaim,
   TFWorkspaceClaim, SecretsClaim.
-- **Not supported**: SystemClaim, DomainClaim have no delete workflow, old
-  or new. Tell the client, then go straight to "No delete workflow exists"
-  below.
+- **Not supported**: SystemClaim, DomainClaim have no delete workflow. Tell
+  the client, then go straight to "No delete workflow exists" below.
 
-### Primary path: `fs-forge-cli delete` (current CLI version)
+### Primary path: `fs-forge-cli delete`
 
 #### Step 1: Capture the goal as an issue
 
@@ -197,29 +196,11 @@ with:
 Link the merged claim PR in the closing comment (`--commit` has no
 `Closes #N` footer to do this automatically).
 
-### Manual fallback (older CLI, supported kind)
-
-When `{version}` predates the `delete` command (Step 1's version-check
-paragraph), dispatch the platform's per-kind delete workflow directly:
-it removes the claim and its state resources but does **not** merge the
-resulting state PR itself:
-
-```bash
-gh workflow run "GitHub claim: delete" --repo {claims_repo} \
-  --field kind={ClaimKind} --field name={claim-name}
-```
-
-This covers ComponentClaim/GroupClaim/UserClaim/OrgWebhookClaim only:
-TFWorkspaceClaim/SecretsClaim each have their own per-kind delete workflow
-instead; `gh workflow list --repo {claims_repo} --all` finds it
-(`../reference/gh-cookbook.md` has the general workflow-dispatch idiom). Wait
-for the run to finish, then merge the resulting state PR yourself.
-
 ### No delete workflow exists
 
-For SystemClaim/DomainClaim, or any kind if no delete workflow is reachable:
-do not remove the claim file yourself. Tell the client there is no automated
-delete path for this claim kind and they'll need to remove it by hand.
+For SystemClaim/DomainClaim: do not remove the claim file yourself. Tell the
+client there is no automated delete path for this claim kind and they'll need
+to remove it by hand.
 
 Otherwise, confirm removal to the client once the change has landed.
 
