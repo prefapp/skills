@@ -76,9 +76,9 @@ auto-generated PR has no `Closes #N` footer (there's no flag for it), so
 the issue is only linked back to the change if you do it here.
 
 A `--commit` that fails (invalid claim, an already-existing target claim for
-`create`, existing `fs-forge/{kind}-{name}` branch, etc.) surfaces as
-a CLI error before anything is dispatched: fix the reported problem and
-re-run.
+`create`, existing `fs-forge/{kind}-{name}` branch, etc.) before dispatch is a
+CLI error: fix the reported problem and re-run. After dispatch, see
+`../reference/fs-forge-mutation-shared.md`'s `--commit` warning.
 
 > **Check this first:** the exact CLI error message; see
 > `troubleshooting.md#fs-forge-cli-command-failures` if it doesn't explain
