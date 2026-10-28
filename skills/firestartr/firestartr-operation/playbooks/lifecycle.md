@@ -135,7 +135,7 @@ support differs from every other operation, so check it before planning:
 - **Not supported**: SystemClaim, DomainClaim have no delete workflow. Tell
   the client, then go straight to "No delete workflow exists" below.
 
-### Primary path: `fs-forge-cli delete`
+### `fs-forge-cli delete`
 
 #### Step 1: Capture the goal as an issue
 

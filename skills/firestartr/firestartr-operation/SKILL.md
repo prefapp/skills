@@ -146,7 +146,7 @@ call needed):
   above: ask the client to pick a version and pin it.
 
 Emit one line confirming the resolved context, e.g.:
-> `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 0.1.0`
+> `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 2.0.1`
 
 **Completion:** you hold a concrete `{org}`, `{claims_repo}`, `{version}`, and
 the matched path.
