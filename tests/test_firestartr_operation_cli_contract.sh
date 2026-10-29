@@ -30,6 +30,7 @@ npx @firestartr/fs-forge-cli@{version} validate [-Z] [--bogus-optional]
 npx @firestartr/fs-forge-cli@{version} validate -f {file} --json
 npx @firestartr/fs-forge-cli@{version} validate --help --json | jq '.flags[] | "--not-a-flag"'
 npx @firestartr/fs-forge-cli@{version} features add <component> --args.<field>=<value>
+npx @firestartr/fs-forge-cli@{version} validate "--quoted-bogus" --source 'value --not-a-flag'
 ```
 EOF
 set +e
@@ -45,10 +46,11 @@ for EXPECTED in \
   'contract-test.md:9: unknown flag -Z for validate' \
   'contract-test.md:9: unknown flag --bogus-optional for validate' \
   'contract-test.md:10: unknown flag --json for validate' \
+  'contract-test.md:13: unknown flag --quoted-bogus for validate' \
   '::warning::@firestartr/fs-forge-cli latest 999.0.0 is newer than skill target'; do
   [[ "$OUTPUT" == *"$EXPECTED"* ]] || { printf 'FAIL: missing %s\n%s\n' "$EXPECTED" "$OUTPUT"; exit 1; }
 done
-[ "$(printf '%s\n' "$OUTPUT" | grep -c 'unknown \(command\|flag\)')" -eq 7 ] || {
+[ "$(printf '%s\n' "$OUTPUT" | grep -c 'unknown \(command\|flag\)')" -eq 8 ] || {
   printf 'FAIL: unexpected findings\n%s\n' "$OUTPUT"; exit 1;
 }
 echo 'PASS: unknown commands and flags, source lines, negation, and dynamic kinds'

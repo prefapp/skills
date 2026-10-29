@@ -68,8 +68,9 @@ function invocations(path) {
 }
 
 function flagUses(body) {
-  // Mask quoted values, and stop at a pipe to another shell command (not | in
-  // the documented parenthesized or bracketed flag alternatives).
+  // Mask quoted values (a quoted argument that is itself a flag stays a flag),
+  // and stop at a pipe to another shell command (not | in the documented
+  // parenthesized or bracketed flag alternatives).
   let visible = '', quote = '';
   for (let i = 0; i < body.length; i++) {
     const c = body[i];
@@ -77,6 +78,13 @@ function flagUses(body) {
       if (c === quote && body[i - 1] !== '\\') quote = '';
       visible += c === '\n' ? '\n' : ' ';
     } else if (c === "'" || c === '"') {
+      const end = body.indexOf(c, i + 1);
+      const arg = end < 0 ? '' : body.slice(i + 1, end);
+      if (/(^|\s)$/.test(visible) && /^--?[A-Za-z]\S*$/.test(arg)) {
+        visible += ` ${arg.split('=', 1)[0]} `;
+        i = end;
+        continue;
+      }
       quote = c;
       visible += ' ';
     } else if (c === '|' && /^\|\s+[a-z]/.test(body.slice(i))) {
