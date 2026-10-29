@@ -44,18 +44,33 @@ function markdownFiles(dir) {
   }).sort();
 }
 
-// Return each inline or fenced invocation, joining only shell continuation lines.
+// Return each invocation, joining wrapped inline spans and shell continuations.
 function invocations(path) {
   const lines = readFileSync(path, 'utf8').split(/\r?\n/);
   const result = [];
-  let fence = false;
+  let fence = false, inline = '';
+  function inlineDelimiter(text, open) {
+    for (const match of text.matchAll(/`+/g)) {
+      if (!open) open = match[0];
+      else if (open === match[0]) open = '';
+    }
+    return open;
+  }
   for (let i = 0; i < lines.length; i++) {
     if (/^\s*```/.test(lines[i])) { fence = !fence; continue; }
     const pattern = /\bnpx\s+(?:-y\s+)?@firestartr\/fs-forge-cli@[^\s`]+\s*/g;
     for (const match of lines[i].matchAll(pattern)) {
       let body = lines[i].slice(match.index + match[0].length);
-      if (!fence) body = body.split('`', 1)[0];
-      else {
+      if (!fence) {
+        const delimiter = inlineDelimiter(lines[i].slice(0, match.index), inline);
+        let next = i;
+        let end = delimiter ? [...body.matchAll(/`+/g)].find(ticks => ticks[0] === delimiter)?.index : body.indexOf('`');
+        while (delimiter && end === undefined && next + 1 < lines.length && !/^\s*```/.test(lines[next + 1])) {
+          body += '\n' + lines[++next];
+          end = [...body.matchAll(/`+/g)].find(ticks => ticks[0] === delimiter)?.index;
+        }
+        if (end !== undefined && end >= 0) body = body.slice(0, end);
+      } else {
         let next = i;
         while (/\\\s*$/.test(body) && next + 1 < lines.length) {
           body = body.replace(/\\\s*$/, '') + '\n' + lines[++next];
@@ -63,14 +78,27 @@ function invocations(path) {
       }
       result.push({ body, line: i + 1 });
     }
+    if (!fence) inline = inlineDelimiter(lines[i], inline);
   }
   return result;
 }
 
+function commandBody(body) {
+  let quote = '', alternatives = 0;
+  for (let i = 0; i < body.length; i++) {
+    const c = body[i];
+    if (c === '\\' && quote !== "'") { i++; continue; }
+    if (quote) { if (c === quote) quote = ''; }
+    else if (c === "'" || c === '"') quote = c;
+    else if (c === '[' || c === '(') alternatives++;
+    else if ((c === ']' || c === ')') && alternatives) alternatives--;
+    else if (c === ';' || c === '&' || (c === '|' && !alternatives)) return body.slice(0, i);
+  }
+  return body;
+}
+
 function flagUses(body) {
-  // Mask quoted values (a quoted argument that is itself a flag stays a flag),
-  // and stop at a pipe to another shell command (not | in the documented
-  // parenthesized or bracketed flag alternatives).
+  // Mask quoted values; a quoted argument that is itself a flag stays a flag.
   let visible = '', quote = '';
   for (let i = 0; i < body.length; i++) {
     const c = body[i];
@@ -87,8 +115,6 @@ function flagUses(body) {
       }
       quote = c;
       visible += ' ';
-    } else if (c === '|' && /^\|\s+[a-z]/.test(body.slice(i))) {
-      break;
     } else visible += c;
   }
   const pattern = /(?:^|[\s[(|])(--[A-Za-z][\w.-]*|-[A-Za-z])(?==|[\s\])|]|$|<)/g;
@@ -123,7 +149,9 @@ function check() {
     const topics = new Set([...commands.keys()].filter(id => id.includes(':')).map(id => id.split(':')[0]));
     let errors = 0, checked = 0;
     for (const file of markdownFiles(skill)) {
-      for (const { body, line } of invocations(file)) {
+      for (const invocation of invocations(file)) {
+        const { line } = invocation;
+        const body = commandBody(invocation.body);
         const words = body.trim().split(/\s+/);
         if (['<args>', '...', '…', ''].includes(words[0])) continue;
         checked++;
@@ -143,7 +171,7 @@ function check() {
         const helpRequested = uses.some(({ flag }) => flag === '--help');
         for (const use of uses) {
           const name = use.flag.slice(use.flag.startsWith('--') ? 2 : 1);
-          if (name.startsWith('args.')) continue;
+          if (name.startsWith('args.') && (id === 'features:add' || id === 'features:edit')) continue;
           const valid = use.flag === '--help' || (use.flag === '--json' && helpRequested) || flags.some(flag => {
             if (use.flag.startsWith('--')) return flag.name === name || (name.startsWith('no-') && flag.name === name.slice(3) && flag.allowNo === true);
             return flag.char === name;
