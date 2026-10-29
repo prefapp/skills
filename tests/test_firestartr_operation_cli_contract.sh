@@ -53,6 +53,11 @@ npx @firestartr/fs-forge-cli@{version} validate -f {file}
 --opening-on-previous-line`
 Inline ``npx @firestartr/fs-forge-cli@{version} validate --source 'a ` b'
 --double-delimiter``
+```bash
+npx @firestartr/fs-forge-cli@{version} preflight --org={org} \
+  --kind <repo|team|user|tfworkspace> --name <name> --bogus-after-kind
+npx @firestartr/fs-forge-cli@{version} preflight --kind <repo|team> --help --json|jq -r '.flags[]'
+```
 EOF
 set +e
 OUTPUT="$(PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-operation-cli-contract.mjs" 2>&1)"
@@ -76,10 +81,11 @@ for EXPECTED in \
   'contract-test.md:28: unknown flag --after-quoted-operators for validate' \
   'contract-test.md:33: unknown flag --opening-on-previous-line for validate' \
   'contract-test.md:35: unknown flag --double-delimiter for validate' \
+  'contract-test.md:38: unknown flag --bogus-after-kind for preflight' \
   '::warning::@firestartr/fs-forge-cli latest 999.0.0 is newer than skill target'; do
   [[ "$OUTPUT" == *"$EXPECTED"* ]] || { printf 'FAIL: missing %s\n%s\n' "$EXPECTED" "$OUTPUT"; exit 1; }
 done
-[ "$(printf '%s\n' "$OUTPUT" | grep -c 'unknown \(command\|flag\)')" -eq 16 ] || {
+[ "$(printf '%s\n' "$OUTPUT" | grep -c 'unknown \(command\|flag\)')" -eq 17 ] || {
   printf 'FAIL: unexpected findings\n%s\n' "$OUTPUT"; exit 1;
 }
 echo 'PASS: unknown commands and flags, source lines, negation, and dynamic kinds'

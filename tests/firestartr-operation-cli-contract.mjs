@@ -90,6 +90,7 @@ function commandBody(body) {
     if (c === '\\' && quote !== "'") { i++; continue; }
     if (quote) { if (c === quote) quote = ''; }
     else if (c === "'" || c === '"') quote = c;
+    else if (c === '<' && /^<[^<>\s]+>/.test(body.slice(i))) i = body.indexOf('>', i + 1);
     else if (c === '[' || c === '(') alternatives++;
     else if ((c === ']' || c === ')') && alternatives) alternatives--;
     else if (c === ';' || c === '&' || (c === '|' && !alternatives)) return body.slice(0, i);
