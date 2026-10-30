@@ -1,45 +1,20 @@
 # Reference
 
 Stable platform facts carried inside the skill (portable across deployments).
-Everything org-specific comes from `SKILL.md` Step 1; everything here does not.
+Everything org-specific comes from `../SKILL.md` Step 1; everything here does not.
 
 ## fs-forge
 
 Runnable invocation and validation idioms live in `fs-forge-cookbook.md` (sibling of
 this file). Read it before calling fs-forge or writing any claim.
 
-## Kind ↔ intent
-
-The client never names a kind: you pick it from the intent.
-
-| Intent | Kind |
-|---|---|
-| a repository | ComponentClaim |
-| a user / org member | UserClaim |
-| a team | GroupClaim |
-| a system grouping | SystemClaim |
-| a business domain | DomainClaim |
-| secrets | SecretsClaim |
-| an org webhook | OrgWebhookClaim |
-| a TF workspace | TFWorkspaceClaim |
-
-Per-kind facts (`claimsDirectory`, `requiresPath`, `orgField`, `hydration`,
-`delete`, `variants`, `preflight`, `stateRepo`): `kinds show <id> --json`.
-
 ## Naming rules
 
 - Pattern `^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$`, max 63 chars.
-- Lowercase alphanumeric + `. - _`; must start and end alphanumeric.
 
 **Normalizing a non-compliant name** (uppercase, spaces, non-ASCII): put a
 transliterated slug in `name`, keep the original in `profile.displayName` and (for
 GitHub-backed kinds) `providers.github.name`: GitHub teams accept Unicode.
-
-| Desired | `name` (slug) | `displayName` / `github.name` |
-|---|---|---|
-| My Team! | my-team | My Team! |
-| ひかり | grupo-hikari | ひかり |
-| Équipe Réseau | equipe-reseau | Équipe Réseau |
 
 ## Reference formats
 
@@ -49,22 +24,7 @@ GitHub-backed kinds) `providers.github.name`: GitHub teams accept Unicode.
 
 ## Validation split
 
-fs-forge validates syntax only (schema, types, enums): via `npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}`.
-`edit` runs this same validation automatically before `--commit` and
-refuses to commit an invalid claim; `create --commit` also
-checks name-uniqueness itself (error if the target `<Kind>-<name>` already
-exists). The skill is still responsible for:
-- **References**: `user:`/`group:`/`system:`/… values point at claims that
-  actually exist.
-- **Uniqueness**: `create` without `--commit` is file-based, no claims-map
-  lookup, so the skill must pre-check itself: `preflight`
-  (`fs-forge-preflight.md`) for kinds with a `preflight` value, the discovery
-  commands (`fs-forge-discovery.md`) for every other kind. The CLI's own guard on `create --commit`
-  (`fs-forge-mutation-shared.md`'s `--commit` warning) doesn't replace this:
-  pre-checking first is a friendlier, earlier catch than waiting for that
-  error.
-- **Naming normalization**: the slug, displayName, and github.name rules
-  described above.
+`validate` checks schema and Feature args, not cross-claim references, uniqueness, or naming normalization. The skill checks those before landing (`../playbooks/create-claim.md`, `../playbooks/lifecycle.md`).
 
 ## Default flag values for new claims
 
@@ -79,7 +39,7 @@ These are logical claim-field values, not literal CLI flag names. Map them to th
 matching FlagSpec paths and use each returned `path` when calling
 `npx @firestartr/fs-forge-cli@{version} create`.
 All default `version: "1.0"`. The `{org}` flag value (see
-`fs-forge-mutation-shared.md`) comes from `SKILL.md` Step 1 and is passed to the
+`fs-forge-mutation-shared.md`) comes from `../SKILL.md` Step 1 and is passed to the
 kind's `orgField` flag.
 
 - **ComponentClaim**: `type: service`, `lifecycle: production`,
@@ -125,25 +85,7 @@ genuinely bespoke.
 
 ## Features catalog (ComponentClaim)
 
-Each entry: `name` + (`version` XOR `ref`), optional `repo`, `args`.
-
-| Feature | Purpose |
-|---|
-| claims_repo | hydrate / delete / import workflows |
-| catalog_repo | catalog hydration |
-| state_github | state-github hydration |
-| state_infra | state-infra hydration |
-| state_repo_apps | K8s app state repos (ArgoCD) |
-| build_and_dispatch_docker_images | 5.3.2 | Docker CI/CD |
-| charts_repo | Helm charts |
-| tech_docs | technical docs |
-| release_please | automated releases |
-| issue_templates | issue templates |
-| terraform-infra | terraform infra |
-| state_repo | general state repo |
-| state_repo_sys_services | cluster sys-services state |
-| features_repo | features repo |
-| cloudfront_s3_build_and_deploy | CloudFront/S3 deploy |
+Discover names and versions with `npx @firestartr/fs-forge-cli@{version} features discover --json`; read each Feature's purpose with `features discover --readme <feature-name>` (`../playbooks/feature-advisor.md`).
 
 ## Branch strategies
 
@@ -157,21 +99,9 @@ Each entry: `name` + (`version` XOR `ref`), optional `repo`, `args`.
 create-update-only) → `create-only` (create+sync) → `observe` (sync/plan only).
 The sync policy may never exceed the general policy.
 
-Repo-level claim defaults fill TFWorkspaceClaim's `sync` block
-all-or-nothing, not field-by-field: `fs-forge-mutation-shared.md`'s "Claim
-defaults" section has the rule.
-
 ## Claim → state mapping
 
-| Claim | State repo | State resource |
-|---|---|---|
-| ComponentClaim | state-github | FirestartrGithubRepository (+Feature, +SecretsSection) |
-| GroupClaim | state-github | FirestartrGithubGroup |
-| UserClaim | state-github | FirestartrGithubMembership |
-| OrgWebhookClaim | state-github | FirestartrGithubOrgWebhook |
-| SecretsClaim | state-infra | ExternalSecret |
-| TFWorkspaceClaim | state-infra | FirestartrTerraformWorkspace |
-| all kinds | catalog | Domain / System / Component / Group / User / Resource |
+Resolve the kind's `stateRepo` from `kinds show` to the corresponding repo from `../SKILL.md` Step 1. State resources: ComponentClaim → FirestartrGithubRepository (+Feature, +SecretsSection); GroupClaim → FirestartrGithubGroup; UserClaim → FirestartrGithubMembership; OrgWebhookClaim → FirestartrGithubOrgWebhook; SecretsClaim → ExternalSecret; TFWorkspaceClaim → FirestartrTerraformWorkspace. Catalog entities: Domain / System / Component / Group / User / Resource.
 
 State files carry `metadata.annotations.firestartr.dev/claim-ref` linking back to
 their source claim.

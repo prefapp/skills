@@ -1,8 +1,6 @@
 # gh Cookbook
 
-The repeated `gh` idioms every playbook builds on. `{claims_repo}` comes from
-`SKILL.md` Step 1. Prefer a host-provided composite tool
-when the playbook names one; otherwise use these raw commands.
+Prefer a host-provided composite tool when the playbook names one; otherwise use these raw commands.
 
 ## Read a file (decoded)
 
@@ -103,11 +101,11 @@ Build the `module` field as:
 
 ## Merge the resulting state PR
 
-Hydration opens a PR on the kind's **state repo** (`stateRepo` in `kinds show`).
+Hydration opens a PR on the kind's **state repo** (`stateRepo` in `kinds show`, resolved to `{state_repo}` from `../SKILL.md` Step 1).
 GitHub-claim hydrate auto-merges it; Secrets and TFWorkspace default to
 `automerge: false`, so you **must** merge it.
 
 ```bash
-gh pr list --repo {org}/{state-repo} --limit 5
-gh pr merge {pr} --repo {org}/{state-repo} --squash
+gh pr list --repo {state_repo} --limit 5
+gh pr merge {pr} --repo {state_repo} --squash
 ```

@@ -1,68 +1,38 @@
 # fs-forge Discovery Reference
 
-Read-only ways to inspect an org's claims and render relation graphs. Sibling
-of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
-`SKILL.md` Step 1.
+Read-only claim inventory and relation graphs.
 
 ## Discover an org's elements
 
-List every claim in an org's claims repo straight from the claims-map: no
-clone, no `gh api` path-walking:
+List the claims-map without a clone or `gh api` path-walking:
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} discovery org-elements --org={org}
 ```
 
-Read-only, one API call. Add `--json` for structured output grouped by kind,
-or repeatable `--kind <kind>` to filter (e.g. `--kind component --kind
-group`). `--claims-repo` overrides the default `claims` repo name. This is
-the fast path for "what does this org have": prefer it over `catalog`'s
-hydrated view when raw claim inventory is enough and the catalog may be
-stale.
+One API call. Options: `discovery org-elements --help --json`. Prefer over a potentially stale catalog for raw inventory.
 
 ## Discover an org's relation map (topology, ownership)
 
-Render the ownership/grouping tree derived from claim references, not a
-hydrated catalog view, the live claims-repo relations:
+Render live claims-repo ownership/grouping relations, not the hydrated catalog:
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} discovery map --org={org}
 ```
 
-Read-only but network-bound (downloads one claims-repo tarball; needs auth like `edit`). Recognizes only `owner`, `maintainedBy`,
-`platformOwner`, `subComponentOf`, `system`, `domain`, `parent`, `children`,
-and `members`: API references and inline Features are never part of this
-graph. This is the tool for "show the org structure" / "what's in system Y" /
-topology questions: prefer it over the catalog playbook whenever the catalog
-might be stale, since this reads the claims repo directly with no ~6h
-hydration lag.
+Network-bound: downloads one claims-repo tarball and needs auth like `edit`. Recognizes only `owner`, `maintainedBy`, `platformOwner`, `subComponentOf`, `system`, `domain`, `parent`, `children`, and `members`; never API references or inline Features. Prefer it for topology when the catalog may be stale (~6h hydration lag).
 
-Options: repeatable `--kind <kind>` filters to one or more kinds (short ID
-like `component` or the full `ComponentClaim`: both spellings work here),
-`--ref <branch|tag|commit>` pins the claims repo revision, `--ascii` swaps
-emoji icons for bracket tags, `--json` returns the structured
-**`RelationGraph`** (`{"nodes": [...], "edges": [...]}`; schema:
-`schema show RelationGraph`, `fs-forge-cookbook.md`) instead of the rendered
-tree: use `--json` when the result feeds another step rather than the
-client's eyes.
+Options: `discovery map --help --json`. Use `--json` when the result feeds another step; its `RelationGraph` schema is available via `schema show RelationGraph` (`fs-forge-cookbook.md`).
 
-Each edge carries its `relation` (`owner`, `parent`, `system`, …), so a chain
-question ("who owns X, all the way up") is answered by walking `edges` from
-the target node until none remain: the whole graph is in this one payload.
+For ownership chains, walk `edges` from the target node until none remain; each edge carries its `relation` (`owner`, `parent`, `system`, …).
 
 ## Render an arbitrary relation graph
 
-Same tree renderer as above, but for a graph that has nothing to do with
-claims, e.g. one assembled by hand, by another tool, or by merging
-`discovery map --json` with catalog-only nodes it doesn't track (`Resource`
-entities):
+For non-claim graphs, including `discovery map --json` merged with untracked catalog `Resource` nodes:
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} diagram print --file {graph.json}
 cat {graph.json} | npx @firestartr/fs-forge-cli@{version} diagram print
 ```
 
-Local and offline: no `--org`, no network. Input is the same `RelationGraph`
-shape `discovery map --json` produces (above). Reach for this only when the
-graph isn't claims data; `discovery map` is still the tool for an org's own
-topology.
+Local and offline; no `--org`. Input: same `RelationGraph` shape as `discovery map --json`. For an org's claim topology, use `discovery map`.

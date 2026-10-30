@@ -1,29 +1,10 @@
 # Lifecycle Playbook
 
-The one flow every mutating operation follows. `create-claim` and
-`edit-claim` produce or fetch the claim body; this playbook lands it.
-All bash idioms live in `../reference/gh-cookbook.md`.
-
-Two landing paths: pick by how the claim was produced:
-
-- **fs-forge-managed**: `create`/`edit --commit`. The primary path for
-  `edit-claim` and for `create-claim` when landing immediately. Go to
-  "fs-forge-managed flow" below.
-- **Manual**: `create` without `--commit`, or a `gh`-based edit fallback.
-  Go to "Manual flow" below.
-
-For `create-claim`, the client's own choice of ending decides the path: landing
-immediately routes here to fs-forge-managed; an offline artifact routes to
-manual.
+All mutations land here. `create-claim`/`edit-claim` supply the body; bash: `../reference/gh-cookbook.md`. Immediate landing uses **fs-forge-managed** (`create`/`edit --commit`); offline create or `gh` edit fallback uses **manual**. The client chooses the create ending.
 
 ## Governance
 
-SKILL.md's Common rules (show-plan-before, step commitment, etc.) apply
-here too. This playbook adds: **PR-only, never commit to `main`**: every
-change is a branch → PR → merge, and the host composite tools
-(`create_claim_pr`, `github_create_pr_with_changes`,
-`github_propose_changes_dry_run`, when present) are fallbacks for what
-`fs-forge-cli`/the `gh` cookbook idioms don't cover.
+Apply `../SKILL.md` Common rules. **PR-only; never commit to `main`**: branch → PR → merge. Host composite tools (`create_claim_pr`, `github_create_pr_with_changes`, `github_propose_changes_dry_run`) are fallbacks when `fs-forge-cli`/`gh` cannot cover a task.
 
 ## fs-forge-managed flow (`create`/`edit --commit`)
 
@@ -33,68 +14,39 @@ Same as the manual flow's Step 0 below, for the audit trail.
 
 ### Step 2: Dry-run
 
-**edit**: `edit` with `--diff` (no `--commit`); fix any validation errors;
-show the Claim diff to the client (a unified YAML diff, not a relation tree;
-see `../reference/fs-forge-edit.md`) and get approval.
+**edit:** `edit` with `--diff` (no `--commit`); fix validation errors, show the unified YAML Claim diff, not relation tree, and get approval (`../reference/fs-forge-edit.md`).
 
-**create**: the `create` output (no `--commit`) already shown in
-create-claim; that file is the plan. `create` has no `--diff`.
+**create:** the previously shown `create` output (no `--commit`) is the plan; `create` has no `--diff`.
 
 ### Step 3: Re-run with `--commit`
 
-See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. `--commit`
-also watches the wet (state-repo) PR's check runs after provisioning until they
-finish; `--no-wait-for-checks` skips that.
+See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. After provisioning, it watches wet (state-repo) PR checks until finished; `--no-wait-for-checks` skips that.
 
 ### Step 4: Report the outcome
 
-Don't poll, hydrate, or merge the wet PR yourself: `--commit` already did
-it. Status check: the dispatched `provision-claim.yaml` run. Manual hydrate
-only if the client explicitly asks (manual flow Step 5).
+Don't poll, hydrate or merge the wet PR yourself; `--commit` did it. Check the dispatched `provision-claim.yaml` run. Manual hydrate only if the client explicitly asks (manual flow Step 5).
 
 If the output says `No wet PR found for this claim; skipping check watch.`, no
 checks were watched: don't report them as passed. Run
 `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current --json`
-and report its result. Kinds with `hydration: null` have no state CR: report
-the provisioning run's outcome instead. Once the wet PR is merged, also read its merge commit's check
-runs (`../reference/diagnostics.md`, apply/destroy section) before reporting;
-absent or pending checks mean unconfirmed, so say so. A `checks` entry, or a
-merge-commit check run, with conclusion `failure`, `cancelled` or `timed_out`
-is a failed check: stop, report it, point to `../reference/diagnostics.md`, and
-don't close the issue.
-No PR (exit 3), no `checks` entries, a `lastStatePr.state` other than `merged`
-(open, closed, or null after a lookup error), or any conclusion other than
-`success`, `skipped` or `neutral` (null/pending, `action_required`, `stale`) is
-unconfirmed: say so, point to `../reference/diagnostics.md`, and don't close
-the issue.
+and report its result. For `hydration: null`, report the provisioning run's outcome instead. Once the wet PR merges, read its merge-commit check runs before reporting (`../reference/diagnostics.md`, apply/destroy).
 
-> **Check this first:** if the dispatched run failed, the symptom lookup
-> at `troubleshooting.md#symptom-lookup--start-here` routes to the right
-> surface (PR-verify, hydrate, plan, state-PR merge, or apply).
+- Any `checks` entry or merge-commit check with `failure`, `cancelled` or `timed_out` → failed: stop, report, point to diagnostics, don't close the issue.
+- No PR (exit 3), no `checks` entries, `lastStatePr.state` not `merged` (open, closed or null after lookup error), or conclusion other than `success`, `skipped` or `neutral` (null/pending, `action_required`, `stale`) → unconfirmed: say so, point to diagnostics, don't close the issue. Absent or pending merge-commit checks are also unconfirmed.
+
+Failed run: `troubleshooting.md#symptom-lookup-start-here` routes PR-verify, hydrate, plan, state-PR merge or apply failures.
 
 ### Step 5: Close the audit-trail issue
 
-Link the merged claim PR in the closing comment. `--commit`'s
-auto-generated PR has no `Closes #N` footer (there's no flag for it), so
-the issue is only linked back to the change if you do it here.
+Link the merged claim PR in the closing comment; `--commit`'s auto-generated PR has no `Closes #N` footer or flag.
 
-A `--commit` that fails (invalid claim, an already-existing target claim for
-`create`, existing `fs-forge/{kind}-{name}` branch, etc.) before dispatch is a
-CLI error: fix the reported problem and re-run. After dispatch, see
-`../reference/fs-forge-mutation-shared.md`'s `--commit` warning.
-
-> **Check this first:** the exact CLI error message; see
-> `troubleshooting.md#fs-forge-cli-command-failures` if it doesn't explain
-> the failure.
+Failure and retry: `../reference/fs-forge-mutation-shared.md`'s `--commit` warning; unexplained CLI errors: `troubleshooting.md#fs-forge-cli-command-failures`.
 
 ## Manual flow (`create` without `--commit`, or a `gh`-based edit fallback)
 
 ### Step 0: Capture the goal as an issue
 
-Before touching branches. Fill in the issue template at
-`../templates/claim-issue.md` (client's terms, not "claim") and open it in
-the claims repo. Keep the issue number: reference it in the PR
-(`Closes #N`).
+Before touching branches, fill `../templates/claim-issue.md` in client terms (not "claim") and open it in the claims repo. Reference the issue number in the PR (`Closes #N`).
 
 ```bash
 gh issue create --repo {claims_repo} --title "{goal}" --body "{what the client asked for}"
@@ -106,51 +58,36 @@ gh issue create --repo {claims_repo} --title "{goal}" --body "{what the client a
 - References: every `user:` / `group:` / `system:` / `domain:` /
   `ref:secretsclaim:` points at an existing claim.
 - Naming: matches `^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$`, ≤63 chars (see `../reference/reference.md`).
-- Uniqueness: for a create, no claim of that kind/name already exists. If one
-  does, stop and tell the client it would duplicate an existing entity.
+- Uniqueness: on create, if a claim of that kind/name exists, stop and tell the client it would duplicate it.
 
 ### Step 2: Branch from main
 
 ### Step 3: Write the full file on the branch (create or update)
 
-Offline create: PUT the validated `{preview-file}` contents to
-`claims/{dir}/{name}.yaml` on the branch (`../reference/gh-cookbook.md`;
-`{dir}` is the kind's `claimsDirectory` in `kinds show <id> --json`).
+Offline create: PUT validated `{preview-file}` to `claims/{claimsDirectory}/{name}.yaml`; for `requiresPath: true`, use the destination from `create-claim.md` Step 3 (`../reference/gh-cookbook.md`).
 
 ### Step 4: Open the PR, show it to the client, merge it (squash)
 
 ### Step 5: Hydrate
 
-Trigger the kind's hydrate workflow with the inputs `kinds show <id> --json`
-lists (`hydration`; `../reference/gh-cookbook.md`). Wait for `conclusion:
-success`.
-- When a create adds a new user *and* references it elsewhere (e.g. adds them to
-  a team), hydrate the `UserClaim` **first**, then the dependent claim.
+If `kinds show <id> --json` reports `hydration: null`, skip Steps 5-6; catalog-only kinds rely on claims-index regenerating `claims-map.json` on merge. Otherwise dispatch its `hydration` workflow (`../reference/gh-cookbook.md`) and wait for `conclusion: success`.
+- When a create adds a user and references it elsewhere (e.g. a team), hydrate the `UserClaim` **first**, then the dependent claim.
 
-> **Check this first:** a failed or timed-out run; see
-> `troubleshooting.md#hydrate-workflow-dispatchexecution` if it doesn't
-> explain the failure.
+Failed/timed-out run: `troubleshooting.md#hydrate-workflow-dispatchexecution`.
 
 ### Step 6: Merge the state PR
 
-That hydration opened a PR on the kind's `stateRepo` (`kinds show`): GitHub-claim
-hydrate usually auto-merges it; Secrets and TFWorkspace need you to merge it.
+That hydration opened a PR on the kind's `stateRepo` (`kinds show`, resolved via Step 1's repos): GitHub-claim hydrate usually auto-merges it; Secrets and TFWorkspace need you to merge it.
 
-> **Check this first:** a PR that won't merge; see
-> `troubleshooting.md#state-pr-merge` if it doesn't explain the failure.
+PR won't merge: `troubleshooting.md#state-pr-merge`.
 
 ### Step 7: Report the landed change to the client in plain terms
 
-A change that stops after Step 4 is only half-applied: the platform won't
-reconcile until hydration runs and its state PR merges. Do not stop early.
+When hydration is required, the platform won't reconcile until it succeeds and its state PR merges. Do not stop early.
 
 ## Delete flow
 
-Deletion is governed the same way: it does not just remove the file. Kind
-support differs from every other operation, so check it before planning:
-`kinds show <id> --json` → `delete.supported` says whether the kind has a delete
-workflow, and `delete.workflow` names it. If `delete.supported` is `false`,
-tell the client, then go straight to "No delete workflow exists" below.
+Before planning, check `kinds show <id> --json` → `delete`. If `delete.supported` is false, tell the client and go to "No delete workflow exists".
 
 ### `fs-forge-cli delete`
 
@@ -160,18 +97,11 @@ Same as the fs-forge-managed flow's Step 1 above, for the audit trail.
 
 #### Step 2: Decide flags before dry-running
 
-So the dry-run previews the exact command you'll later add `--commit` to:
-- By default the unprovision workflow waits for PR Verify on the claims PR
-  before merging it; `--no-wait-for-checks` skips that.
-- If `kinds show` says `variants: true` (TFWorkspaceClaim), ask the client
-  whether to keep variant CRs and pass `--include-variants`/`--no-include-variants`
-  accordingly; otherwise leave this flag off.
-- Add `--no-wait` only if the client asks not to wait for the unprovision
-  workflow to finish.
-- Optional fast check first, for kinds with a `preflight` value: `preflight --deletion`
-  (`../reference/fs-forge-preflight.md`) confirms the claim exists in one
-  sub-second call: Step 3's dry-run confirms it either way, so this is a
-  scriptable shortcut, not a replacement.
+Choose flags before the dry-run; use the same command with `--commit` later:
+- Unprovision waits for claims PR Verify before merge by default; `--no-wait-for-checks` skips that.
+- If `kinds show` has `variants: true` (TFWorkspaceClaim), ask whether to keep variant CRs and pass `--include-variants`/`--no-include-variants` accordingly; otherwise omit.
+- Add `--no-wait` only if the client asks not to wait for unprovision.
+- Optional fast existence check for non-null `preflight`: `preflight --deletion` (`../reference/fs-forge-preflight.md`); it doesn't replace Step 3's dry-run.
 
 #### Step 3: Dry-run
 
@@ -182,28 +112,15 @@ npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
   [--include-variants|--no-include-variants]
 ```
 
-Show the client the printed plan: kind, name, `includeVariants`,
-`waitForClaimChecks`: it should match the flags chosen in Step 2.
+Show the printed plan (kind, name, `includeVariants`, `waitForClaimChecks`); it must match Step 2's flags.
 
 #### Step 4: Get approval, then re-run with `--commit`
 
-```bash
-npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
-  [--include-variants|--no-include-variants] --commit
-```
-
-`--commit` dispatches `unprovision-claim.yaml`, which fully self-services:
-it merges both the state-repo PR and the claims-repo PR itself. Don't
-poll or merge anything yourself; report the dispatched run.
+Re-run with `--commit`: `unprovision-claim.yaml` merges both state and claims PRs. Don't poll or merge yourself; report the dispatched run.
 
 #### Step 5: Check run placement
 
-Destroy check runs and commit statuses land on the wet-PR referenced by
-the deleted CR's `firestartr.dev/last-state-pr` annotation, not the
-deletion wet-PR. The deletion wet-PR is merged once its CI passes; destroy
-feedback lives on the `last-state-pr` PR. Fallback: if `last-state-pr` is
-missing, check runs go to the deletion wet-PR. Inspect destroy status
-with:
+Destroy check runs and commit statuses land on the wet PR referenced by the deleted CR's `firestartr.dev/last-state-pr`, not the deletion wet PR (which merges when CI passes). If `last-state-pr` is missing, check runs go to the deletion wet PR. Inspect destroy status:
 `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current`
 
 #### Step 6: Close the audit-trail issue
@@ -213,18 +130,10 @@ Link the merged claim PR in the closing comment (`--commit` has no
 
 ### No delete workflow exists
 
-For a kind with `delete.supported: false`: do not remove the claim file yourself. Tell the
-client there is no automated delete path for this claim kind and they'll need
-to remove it by hand.
+If `delete.supported: false`, don't remove the file yourself. Tell the client no automated path exists; they must remove it by hand.
 
 Otherwise, confirm removal to the client once the change has landed.
 
 ## Hydration name
 
-`kinds show <id> --json` gives the hydrate workflow and inputs (`hydration`). The
-`name` input is the claim's name, not its file path:
-
-- ComponentClaim: the repo name.
-- GroupClaim: the team's normalized slug, not its display name.
-- UserClaim: the GitHub username.
-- Other kinds: the claim name.
+The hydrate name is the claim's name, not its file path; for a group use its normalized slug, not its display name.

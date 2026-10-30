@@ -1,9 +1,6 @@
 # fs-forge config schema
 
-Read by `npx @firestartr/fs-forge-cli context` (`SKILL.md` Step 1); the skill
-writes it through the setup flows below. Location, first set wins: `$FS_FORGE_CONFIG`, then
-`$XDG_CONFIG_HOME/fs-forge/config.yaml`, then `~/.config/fs-forge/config.yaml`.
-It lives outside this skill folder, so it is never committed with it.
+`npx @firestartr/fs-forge-cli context` reads this; the skill writes it. Location precedence: `$FS_FORGE_CONFIG`, `$XDG_CONFIG_HOME/fs-forge/config.yaml`, `~/.config/fs-forge/config.yaml`. Outside this skill folder; never commit with it.
 
 ```yaml
 organizations:
@@ -23,29 +20,18 @@ cli_version: 2.0.1
 | `organizations[].state_github_repo` | no | default `state-github` |
 | `organizations[].state_infra_repo` | no | default `state-infra` |
 | `organizations[].catalog_repo` | no | default `catalog` |
-| `cli_version` | no | top-level pin for `@firestartr/fs-forge-cli`, shared by all orgs; `SKILL.md` Step 1 |
+| `cli_version` | no | top-level pin for `@firestartr/fs-forge-cli`, shared by all orgs; `../SKILL.md` Step 1 |
 
-Any invalid entry makes the whole file unusable: a missing file, a relative
-path, a duplicate org name, or the old `organization: { name }` shape. The CLI
-then returns `NO_CONFIG`. Never migrate old values silently.
+Missing file, relative path, duplicate org, old `organization: { name }` shape, or any invalid entry → `NO_CONFIG`. Never migrate old values silently.
 
 ## Setup flows
 
-Show-before-write: display the whole resulting file and wait for confirmation
-before writing. Declining writes nothing; the prompt reappears next run.
-Collapse paths under the home directory to `~/`. Warn, don't block, if a path
-doesn't exist yet.
+Show the whole resulting file and wait for confirmation before writing. Declining writes nothing; prompt again next run. Collapse home paths to `~/`; warn but don't block on nonexistent paths.
 
 - **`NO_CONFIG`**:
   1. Ask for the GitHub org slug (`name`).
-  2. Ask once whether the repos use the default names (`claims`, `state-github`,
-     `state-infra`, `catalog`); collect overrides for any that differ.
-  3. Propose the current directory as the `paths` entry; take a different
-     path if the client gives one.
+  2. Ask once about default repo names (`claims`, `state-github`, `state-infra`, `catalog`); collect overrides.
+  3. Propose the current directory as `paths`; accept a different path.
   4. Show-before-write.
-- **`NO_MATCH`** (the current directory matches no configured path): list the
-  configured org names plus "new organization". Existing org → append the
-  current directory to its `paths`. "New organization" → the `NO_CONFIG` steps.
-- **`AMBIGUOUS_MATCH`** (two orgs claim one path; only by hand-editing): show
-  the whole file with the conflict highlighted; ask which org should own the
-  path; remove it from the other entry.
+- **`NO_MATCH`** (no configured path matches current directory): list configured orgs plus "new organization". Existing org → append current directory to `paths`; new → `NO_CONFIG` steps.
+- **`AMBIGUOUS_MATCH`** (two orgs claim one path, only by hand-editing): show the whole file highlighting the conflict; ask which org owns the path; remove it from the other.
