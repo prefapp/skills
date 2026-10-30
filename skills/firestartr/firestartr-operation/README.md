@@ -41,8 +41,9 @@ npx skills add prefapp/skills --skill firestartr-operation
 This installs the skill via the `skills` npm CLI (vercel-labs) — no clone of
 this repo required, and always installs `main` HEAD. If you do have the repo
 cloned, run `./install.sh --fs` from the repo root instead: it uses the same
-`skills` CLI but installs **from your local checkout**, whatever branch or
-tag you have checked out is what gets installed.
+`skills` CLI but installs **the latest release**, whatever you have checked
+out. To try a change before it is released, `./install.sh --fs-local` installs
+**from your local checkout**.
 
 ### 🔄 Updating
 
@@ -51,13 +52,13 @@ does not update it. Either:
 
 - **No clone**: re-run the install command above (always tracks `main` HEAD),
   or run `npx skills update`, which re-fetches whatever was last installed.
-- **With a clone**: `git pull` (or check out the ref you want), then re-run
-  `./install.sh --fs` to reinstall from your local checkout.
+- **With a clone**: re-run `./install.sh --fs` to move to the newest release.
+  For `--fs-local`, `git pull` (or check out the ref you want) and re-run it.
 
 ### 📌 Pinning to a release
 
-With a clone, pinning is just git: check out the release tag and re-run
-`./install.sh --fs`.
+With a clone, pinning is just git: check out the release tag and run
+`./install.sh --fs-local`.
 
 Without a clone, the `--skill` flag has no version pin — it always installs
 from `main` HEAD. To pin, point the install at a tag's tree instead: the

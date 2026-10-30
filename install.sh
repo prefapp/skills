@@ -3,8 +3,9 @@
 # The workflow set is symlinked flat per-skill from skills/workflow into
 # ~/.agents/skills and, when Claude Code is detected, ~/.claude/skills.
 # Idempotent — safe to re-run. Symlinks only, never copies.
-# The Firestartr operational skill is installed via `npx skills add` — a hard
-# network dependency with no fallback, same policy as fs-forge (see
+# The Firestartr operational skill is installed via `npx skills add` from its
+# latest release, or from this checkout with --fs-local — a hard network
+# dependency with no fallback, same policy as fs-forge (see
 # skills/firestartr/firestartr-operation/reference/fs-forge-cookbook.md).
 #
 # Run without arguments for usage. Install the workflow set, the Firestartr
@@ -15,29 +16,46 @@ REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILLS_DIR="$REPO_DIR/skills/workflow"
 NAMESPACE="prefapp-workflow"
 SKILLS_CLI_VERSION="1.5.23"
+RELEASE_REPO_URL="https://github.com/prefapp/skills"
+RELEASE_SKILL_PATH="skills/firestartr/firestartr-operation"
 
 usage() {
   cat <<'EOF'
 Usage: ./install.sh OPTION
 
 Options:
-  --all       Install workflow and Firestartr skills
-  --workflow  Install workflow skills
-  --fs        Install the Firestartr operational skill
-  -h, --help  Show this help
+  --all         Install workflow skills and the latest Firestartr release
+  --workflow    Install workflow skills
+  --fs          Install the latest release of the Firestartr operational skill
+  --fs-local    Install the Firestartr operational skill from this checkout
+  -h, --help    Show this help
 EOF
 }
 
 INSTALL_WORKFLOW=0
 INSTALL_FIRESTARTR=0
+FIRESTARTR_LOCAL=0
 case "${1:-}" in
   --all) INSTALL_WORKFLOW=1; INSTALL_FIRESTARTR=1 ;;
   --workflow) INSTALL_WORKFLOW=1 ;;
   --fs) INSTALL_FIRESTARTR=1 ;;
+  --fs-local) INSTALL_FIRESTARTR=1; FIRESTARTR_LOCAL=1 ;;
   ""|-h|--help) usage; exit 0 ;;
   *) echo "unknown option: $1" >&2; usage >&2; exit 2 ;;
 esac
 [ "$#" -eq 1 ] || { echo "expected one option" >&2; usage >&2; exit 2; }
+
+# Print the newest stable firestartr-operation release tag (empty if none).
+# Rolling major tags and prereleases don't match X.Y.Z, so they are ignored.
+latest_firestartr_release() {
+  local refs
+  refs="$(git ls-remote --tags --refs "$RELEASE_REPO_URL" 'firestartr-operation-v*')" || return 1
+  printf '%s\n' "$refs" \
+    | sed -n 's|.*refs/tags/firestartr-operation-v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p' \
+    | sort -t. -k1,1n -k2,2n -k3,3n \
+    | tail -n 1 \
+    | sed 's|^.|firestartr-operation-v&|'
+}
 
 # Read the `name:` field from a skill's SKILL.md frontmatter (empty if absent).
 skill_frontmatter_name() {
@@ -114,7 +132,19 @@ if [ "$INSTALL_WORKFLOW" -eq 1 ]; then
 fi
 
 if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
-  echo "prefapp-firestartr: installing via npx skills@$SKILLS_CLI_VERSION add"
+  if [ "$FIRESTARTR_LOCAL" -eq 1 ]; then
+    source="$REPO_DIR/skills"
+    echo "prefapp-firestartr: installing this checkout via npx skills@$SKILLS_CLI_VERSION add"
+  else
+    tag="$(latest_firestartr_release)" || tag=""
+    if [ -z "$tag" ]; then
+      echo "prefapp-firestartr: could not resolve the latest release from $RELEASE_REPO_URL — no fallback." >&2
+      echo "Check your network access, or use --fs-local to install from this checkout." >&2
+      exit 1
+    fi
+    source="$RELEASE_REPO_URL/tree/$tag/$RELEASE_SKILL_PATH"
+    echo "prefapp-firestartr: installing $tag via npx skills@$SKILLS_CLI_VERSION add"
+  fi
   # Drop stale links left by earlier versions of this script (pre-npx): the
   # prefapp-firestartr namespace link, and any per-skill firestartr-operation
   # link from the old flat layout. The npx install never creates them, and they
@@ -135,7 +165,7 @@ if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
     fi
   done
   rc=0
-  npx --yes "skills@$SKILLS_CLI_VERSION" add "$REPO_DIR/skills" --skill firestartr-operation --global || rc=$?
+  npx --yes "skills@$SKILLS_CLI_VERSION" add "$source" --skill firestartr-operation --global || rc=$?
   if [ "$rc" -ne 0 ]; then
     echo "prefapp-firestartr: 'npx skills@$SKILLS_CLI_VERSION add' failed (exit $rc) — hard dependency, no fallback." >&2
     echo "Ensure npx is available (Node >= 18) and that you have network access. Do not proceed without it." >&2
