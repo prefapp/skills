@@ -42,8 +42,9 @@ This installs the skill via the `skills` npm CLI (vercel-labs) — no clone of
 this repo required, and always installs `main` HEAD. If you do have the repo
 cloned, run `./install.sh --fs` from the repo root instead: it uses the same
 `skills` CLI but installs **the latest release**, whatever you have checked
-out. To try a change before it is released, `./install.sh --fs-local` installs
-**from your local checkout**.
+out. `./install.sh --fs-local` installs **from your local checkout**, including
+unreleased work. It is meant for development only, to try a change before it is
+released; for regular use, install with `--fs`.
 
 ### 🔄 Updating
 

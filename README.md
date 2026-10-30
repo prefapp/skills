@@ -18,9 +18,12 @@ cd ~/work/prefapp/skills
 
 ./install.sh --workflow   # workflow set: symlinked; git pull updates
 ./install.sh --fs         # firestartr-operation: latest release, via npx skills add
-./install.sh --fs-local   # firestartr-operation: from this checkout
+./install.sh --fs-local   # firestartr-operation: from this checkout, development only
 ./install.sh --all        # workflow set and the latest firestartr-operation release
 ```
+
+`--fs-local` is meant for development only: it installs whatever the checkout
+holds, including unreleased work. For regular use, install with `--fs`.
 
 Run `./install.sh` with no arguments for all options. Install details,
 per-harness layout, updating, and version pinning: see each set's README.
