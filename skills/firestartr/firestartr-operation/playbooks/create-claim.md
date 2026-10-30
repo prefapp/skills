@@ -1,8 +1,7 @@
 # Create Claim Playbook
 
 Author a new claim with `create`, then land it via `lifecycle`: `--commit`
-now, or an offline file to the manual flow. Policy defaults and kind paths:
-`../reference/reference.md`. Read `../reference/fs-forge-cookbook.md` before
+now, or an offline file to the manual flow. Policy defaults: `../reference/reference.md`. Kind facts: `kinds show <id> --json`. Read `../reference/fs-forge-cookbook.md` before
 invoking fs-forge.
 
 Ask the client only for what you can't infer or default.
@@ -60,9 +59,9 @@ npx @firestartr/fs-forge-cli@{version} create <kind> \
 `--<schema-org-flag>` is the kind's schema org field if it has one: both
 in `../reference/fs-forge-mutation-shared.md` `{org}` passthrough. No
 output flag; redirect stdout to `{preview-file}`, a `mktemp` path outside the
-repo (one per claim, reused in Steps 4-5). TFWorkspaceClaim/SecretsClaim need
-`--path claims/{...}/{name}.yaml` only with `--commit` (rejected for every
-other kind). Complex arrays/unions: temp JSON file + FlagSpec `.json`
+repo (one per claim, reused in Steps 4-5). `requiresPath: true` kinds (TFWorkspaceClaim, SecretsClaim) need
+`--path claims/{...}/{name}.yaml` only with `--commit`; every other kind rejects
+`--path`. Complex arrays/unions: temp JSON file + FlagSpec `.json`
 escape-hatch `path`, passed verbatim.
 
 ```bash
@@ -93,8 +92,8 @@ distinct from the file.
 The plan is the Step 3 file plus any Step 4 preview.
 
 - **Landing now**: hand the approved Step 3 command to `lifecycle`'s
-  fs-forge-managed flow, which owns the single `--commit` run (with
-  `--wait-for-checks`). Re-run it there **without the redirect** so its
+  fs-forge-managed flow, which owns the single `--commit` run. Re-run it there **without the redirect**
+  so its
   output (including the dispatched provisioning URL) stays visible.
 - **Offline artifact**: hand Step 3's validated `{preview-file}` to `lifecycle`'s
   manual flow.
@@ -153,5 +152,5 @@ hydrates; no manual hydrate after).
 
 ## Other kinds
 
-Same flow. Paths and policy defaults: `../reference/reference.md`.
+Same flow. Policy defaults: `../reference/reference.md`.
 DomainClaim has no special defaults.

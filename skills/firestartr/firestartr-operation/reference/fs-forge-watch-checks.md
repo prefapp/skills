@@ -1,7 +1,7 @@
 # fs-forge watch-checks Reference
 
 Monitor check runs on state-repo PRs produced by `create`/`edit`/`delete --commit`. Sibling of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
-`firestartr-config.yaml`. Flags, exit codes, and output shapes: `watch-checks --help --json`.
+`SKILL.md` Step 1. Flags, exit codes, and output shapes: `watch-checks --help --json`.
 
 ## Modes
 
@@ -16,8 +16,8 @@ Two modes, mutually exclusive:
 
 ## State-repo discovery
 
-Resolves state repos from `--org`: `<org>/state-github` and `<org>/state-infra`.
-Override with `--state-repos` when the org uses non-default names.
+Resolves state repos from the org's config entry (`config-schema.md`; defaults
+`state-github` and `state-infra`). `--state-repos` overrides both.
 
 Exit 1 (a failed check) routes to
 `../playbooks/troubleshooting.md#terraform-plan-status-check-pre-merge`.

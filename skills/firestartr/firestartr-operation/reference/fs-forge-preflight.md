@@ -2,14 +2,14 @@
 
 Read-only collision check before create/edit/delete: faster and scriptable
 versus eyeballing a claims listing. Sibling of `fs-forge-cookbook.md`;
-`{org}`/`{version}` come from `firestartr-config.yaml`.
+`{org}`/`{version}` come from `SKILL.md` Step 1.
 
 ## Coverage
 
-Four kinds only, and under a **different short ID** than the rest of the
-CLI: `repo` (not `component`), `team`, `user`, `tfworkspace`; any other
-value is rejected. No preflight for system, domain, secrets, or org
-webhooks; use the discovery-based check (`fs-forge-discovery.md`) for those.
+Only kinds with a `preflight` value in `kinds show <id> --json`. Pass that
+value to `--kind`, not the kind's short ID (component → `repo`); any other value
+is rejected. Kinds with `preflight: null`: use the discovery-based check
+(`fs-forge-discovery.md`).
 `tfworkspace`'s provider check is always a no-op (claims-only, no TFC client
 yet), only its claims-map check runs.
 
@@ -37,7 +37,7 @@ whether the GitHub login exists.
 | 1 | claim conflict: `<Kind>-<name>` already in claims-map | `--create` |
 | 2 | provider conflict: exists at GitHub, no matching claim | any |
 | 3 | not found: referenced claim doesn't exist | `--edition`/`--deletion` |
-| 4 | `GITHUB_TOKEN` missing scopes (`read:org`, `repo`) | any |
+| 4 | token missing scopes (`read:org`, `repo`) | any |
 | 5 | provider API unreachable | any |
 
 A provider conflict (2): tell the client plainly that the resource already
@@ -47,8 +47,8 @@ process to route them to yet.
 ## `--json`
 
 `{"status": "<ok|conflict|not_found|error>", "kind": "<ClaimKind>", "name": "…", "conflict": "<claim|provider>"}`:
-`kind` is always the full claim kind, even though `--kind` takes the short
-ID; `conflict` is present only when `status` is `"conflict"`. `--edition`
+`kind` is always the full claim kind, even though `--kind` takes the
+`preflight` value; `conflict` is present only when `status` is `"conflict"`. `--edition`
 with an actual identity change prints **two** JSON lines (old name's claims
 check, then the new name's provider check): read every stdout line, don't
 assume a single JSON document.

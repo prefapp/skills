@@ -1,7 +1,7 @@
 # fs-forge Mutation Shared Reference
 
 Cross-cutting rules `create` and `edit` both lean on. Sibling of
-`fs-forge-cookbook.md`; `{org}`/`{version}` come from `firestartr-config.yaml`.
+`fs-forge-cookbook.md`; `{org}`/`{version}` come from `SKILL.md` Step 1.
 
 **Addressing differs by command.** `edit` takes an existing claim as ONE
 argument, `<Kind>-<name>` (e.g. `ComponentClaim-my-repo`): never
@@ -55,27 +55,21 @@ tell them apart by FlagSpec `path`, never by name alone:
   network call actually happens: `--commit`, `edit`, a `defaults`
   command: a plain, uncommitted `create` needs neither it nor network access.
 - **Schema org field**: which GitHub org the claim's own resource (repo,
-  team, …) belongs to. Path varies by kind, and several kinds have none at
-  all:
-  - Most kinds: `providers.github.org`
-  - OrgWebhookClaim: `providers.github.orgName`
+  team, …) belongs to: the kind's `orgField` in `kinds show <id> --json`
+  (`null` when the kind has none).
 
-The `{org}` value from `firestartr-config.yaml` is usually the same GitHub
-org for both, but pass it to each flag under its own discovered name: never
+The `{org}` value from `SKILL.md` Step 1 is usually the same GitHub org for
+both, but pass it to each flag under its own `orgField`: never
 assume one flag also sets the other. This distinction doesn't go away for
 `edit`: it still needs the control-plane flag on top of it for
 every network call (`fs-forge-edit.md`).
 
-The example below uses `jq` to parse FlagSpec JSON; install `jq` or use an
-equivalent JSON parser when following it. To find the schema org field at
-runtime:
+Read the kind's org field from `kinds show`, then pass `--<orgField>={org}` to
+`create` or `edit` (`jq` or any JSON parser):
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} create <kind> --help --json \
-  | jq -r '.flags[] | select(.path == "providers.github.org" or .path == "providers.github.orgName") | "--\(.path)=\("{org}")"'
+npx @firestartr/fs-forge-cli@{version} kinds show <kind> --json | jq -r '.orgField'
 ```
-
-Pass the resulting `--<flag>=<value>` to `create` or `edit`.
 
 ## The `--commit` warning
 
@@ -92,9 +86,9 @@ manual hydrate (`gh-cookbook.md`) if they explicitly ask for one.
 `create --commit` additionally errors up front if the
 target `<Kind>-<name>` already exists: no separate uniqueness check needed
 from the CLI's side (the skill still pre-checks its own side;
-see `reference.md`'s validation split). `create --commit` on
-TFWorkspaceClaim/SecretsClaim also requires `--path claims/{...}/{name}.yaml`
-(rejected outright for every other kind, which resolve their own path). A
+see `reference.md`'s validation split). `create --commit` on a kind with `requiresPath: true` (`kinds show`:
+TFWorkspaceClaim, SecretsClaim) also requires `--path claims/{...}/{name}.yaml`;
+every other kind rejects `--path`. A
 `--commit` that fails before dispatch (any of the reasons above) is a CLI
 error: fix the reported problem and re-run. On `Branch already exists`, an
 earlier attempt left `fs-forge/{kind}-{name}` behind: check that no open PR or
@@ -133,7 +127,7 @@ defaults; no validation, no write. `show` prints one kind's defaults on
 their own (an empty result for a kind with none defined, an error for an
 unrecognized kind id). `list` prints which kinds have any defaults defined
 for the org: table by default, `--json` for structured output. All three
-need the same `GITHUB_TOKEN`/`--org` prerequisites as `edit`.
+need the same `--org` and auth as `edit`.
 
 Some fields default as an **all-or-nothing block** rather than field-by-field:
 currently TFWorkspaceClaim's `providers.terraform.sync` block (see

@@ -2,7 +2,7 @@
 
 ComponentClaim-only: discovering, attaching, editing, and removing Feature
 references. Sibling of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
-`firestartr-config.yaml`.
+`SKILL.md` Step 1.
 
 ## Discovering the feature catalog
 

@@ -1,7 +1,7 @@
 # fs-forge Cookbook
 
 The repeated `fs-forge` idioms every mutating playbook builds on. `{org}` and
-`{version}` are resolved from `firestartr-config.yaml` before any of these run.
+`{version}` come from `SKILL.md` Step 1 before any of these run.
 Beyond invocation and validation, idioms are split by topic: read the sibling
 that matches the task instead of assuming everything lives here:
 
@@ -49,13 +49,16 @@ output needs more certainty than this cookbook's prose gives:
 (`fs-forge-discovery.md`), `MutationDiff` for `edit --diff --json
 --show-defaults` (`fs-forge-edit.md`).
 
-## List supported claim kinds
+## List and inspect claim kinds
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} kinds --json
+npx @firestartr/fs-forge-cli@{version} kinds show <id> --json
 ```
 
-Local and offline. Each entry's `description` is the schema's own one-line
+Local and offline. `kinds show` gives one kind's `claimsDirectory`,
+`requiresPath`, `orgField`, `hydration`, `delete`, `variants`, `preflight`, and
+`stateRepo`: read it instead of copying values from another kind. Each entry's `description` is the schema's own one-line
 summary: prefer it, translated to client terms (never "claim"; Rule 1,
 `../SKILL.md`), over composing your own when explaining what's available.
 

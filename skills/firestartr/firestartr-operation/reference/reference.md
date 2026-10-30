@@ -1,30 +1,30 @@
 # Reference
 
 Stable platform facts carried inside the skill (portable across deployments).
-Everything org-specific comes from `firestartr-config.yaml`; everything here does not.
+Everything org-specific comes from `SKILL.md` Step 1; everything here does not.
 
 ## fs-forge
 
 Runnable invocation and validation idioms live in `fs-forge-cookbook.md` (sibling of
 this file). Read it before calling fs-forge or writing any claim.
 
-## Kind ↔ intent ↔ path
+## Kind ↔ intent
 
 The client never names a kind: you pick it from the intent.
 
-| Intent | Kind | Path |
-|---|---|---|
-| a repository | ComponentClaim | `claims/components/{name}.yaml` |
-| a user / org member | UserClaim | `claims/users/{name}.yaml` |
-| a team | GroupClaim | `claims/groups/{name}.yaml` |
-| a system grouping | SystemClaim | `claims/systems/{name}.yaml` |
-| a business domain | DomainClaim | `claims/domains/{name}.yaml` |
-| secrets | SecretsClaim | `claims/secrets/{name}.yaml` |
-| an org webhook | OrgWebhookClaim | `claims/orgwebhooks/{name}.yaml` |
-| a TF workspace | TFWorkspaceClaim | `claims/tfworkspaces/{name}.yaml` |
+| Intent | Kind |
+|---|---|
+| a repository | ComponentClaim |
+| a user / org member | UserClaim |
+| a team | GroupClaim |
+| a system grouping | SystemClaim |
+| a business domain | DomainClaim |
+| secrets | SecretsClaim |
+| an org webhook | OrgWebhookClaim |
+| a TF workspace | TFWorkspaceClaim |
 
-`../playbooks/lifecycle.md`'s "Kind → hydration name" table has the hydration
-name per kind.
+Per-kind facts (`claimsDirectory`, `requiresPath`, `orgField`, `hydration`,
+`delete`, `variants`, `preflight`, `stateRepo`): `kinds show <id> --json`.
 
 ## Naming rules
 
@@ -58,9 +58,8 @@ exists). The skill is still responsible for:
   actually exist.
 - **Uniqueness**: `create` without `--commit` is file-based, no claims-map
   lookup, so the skill must pre-check itself: `preflight`
-  (`fs-forge-preflight.md`) for ComponentClaim/GroupClaim/UserClaim/
-  TFWorkspaceClaim, the discovery commands (`fs-forge-discovery.md`) for
-  every other kind. The CLI's own guard on `create --commit`
+  (`fs-forge-preflight.md`) for kinds with a `preflight` value, the discovery
+  commands (`fs-forge-discovery.md`) for every other kind. The CLI's own guard on `create --commit`
   (`fs-forge-mutation-shared.md`'s `--commit` warning) doesn't replace this:
   pre-checking first is a friendlier, earlier catch than waiting for that
   error.
@@ -80,8 +79,8 @@ These are logical claim-field values, not literal CLI flag names. Map them to th
 matching FlagSpec paths and use each returned `path` when calling
 `npx @firestartr/fs-forge-cli@{version} create`.
 All default `version: "1.0"`. The `{org}` flag value (see
-`fs-forge-mutation-shared.md`) is resolved from `firestartr-config.yaml` and
-passed to the kind's org field flag.
+`fs-forge-mutation-shared.md`) comes from `SKILL.md` Step 1 and is passed to the
+kind's `orgField` flag.
 
 - **ComponentClaim**: `type: service`, `lifecycle: production`,
   `system: system:default-system` (never `system:firestartr` unless the client

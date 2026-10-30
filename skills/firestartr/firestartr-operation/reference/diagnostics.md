@@ -1,9 +1,9 @@
 # Diagnostics Reference
 
 Raw commands and lookup tables for `../playbooks/troubleshooting.md`. `{org}`
-and `{version}` are resolved from `firestartr-config.yaml`; `{claims_repo}` is
-`{org}/claims`, same as `gh-cookbook.md`. `{state-repo}` is `state-github` or
-`state-infra`: pick per `reference.md`'s claim→state map. Bounded to what's
+and `{version}` come from `SKILL.md` Step 1, as does `{claims_repo}`.
+`{state-repo}` is the kind's `stateRepo` (`kinds show`; `state-github` or
+`state-infra`). Bounded to what's
 observable via `gh`/`gh api`/`fs-forge-cli`, never cluster/`kubectl` access
 to the operator.
 
@@ -166,7 +166,7 @@ treated as "no defaults." Only *multiple* candidates is ambiguous.
 | Surface | Escalate when | Otherwise |
 |---|---|---|
 | Environment & tooling | never | client-fixable (Node/network) |
-| Config & CLI-version resolution | `npm dist-tag ls`/`npm view` show zero published versions | client-fixable, self-service via `SKILL.md` Step 1 |
+| Config & CLI-version resolution | `npm view @firestartr/fs-forge-cli@{target} version` returns 404 | client-fixable, self-service via `SKILL.md` Step 1 |
 | fs-forge-cli command failures | see the fs-forge-cli error shapes table above | see the fs-forge-cli error shapes table above |
 | PR-verify / render-pipeline denial | error doesn't match a render error shape | client-fixable |
 | Hydrate-workflow dispatch/execution | failed step's log doesn't match a recognized fs-forge/render shape | client-fixable (see the one known error string above) |

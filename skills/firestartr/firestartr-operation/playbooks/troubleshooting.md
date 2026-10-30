@@ -14,7 +14,7 @@ top to bottom.
 | Symptom | Failure surface |
 |---|---|
 | `npx`/`fs-forge` won't run, no network, wrong Node | [Environment & tooling](#environment--tooling) |
-| No usable org/CLI-version config, no published CLI release | [Config & CLI-version resolution](#config--cli-version-resolution) |
+| No usable config, no GitHub auth, or no published CLI release | [Config & CLI-version resolution](#config--cli-version-resolution) |
 | A `create`/`edit`/`defaults` command errored | [fs-forge-cli command failures](#fs-forge-cli-command-failures) |
 | A claims-repo PR's checks are failing (PR Verify / render) | [PR-verify / render-pipeline denial](#pr-verify--render-pipeline-denial) |
 | A hydrate workflow run failed, or no state PR ever appeared | [Hydrate-workflow dispatch/execution](#hydrate-workflow-dispatchexecution) |
@@ -79,11 +79,10 @@ or tell the client and stop.
 
 ## Config & CLI-version resolution
 
-Never escalate: both are self-service via `SKILL.md` Step 1 (missing/invalid
-`firestartr-config.yaml`, unpinned/stale `cli_version`). One exception:
-`npm dist-tag ls`/`npm view @firestartr/fs-forge-cli versions` showing **zero
-published versions at all**: that's a Prefapp-owned publishing failure,
-escalate.
+Never escalate: all are self-service via `SKILL.md` Step 1 (`NO_CONFIG`,
+`NO_MATCH`, `AMBIGUOUS_MATCH`, `NO_AUTH`, or a pin below the target). One
+exception: `npm view @firestartr/fs-forge-cli@{target} version` returns 404. The
+target was never published: a Prefapp-owned publishing failure, escalate.
 
 ## fs-forge-cli command failures
 

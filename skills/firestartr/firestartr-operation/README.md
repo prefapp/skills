@@ -13,9 +13,8 @@ talk repos, teams, and users; the skill never talks claims.
 - 🟢 **Node ≥ 22** — the CLI (`@firestartr/fs-forge-cli`) runs via `npx`;
   nothing to install globally.
 - 🐙 **`gh` CLI**, authenticated (`gh auth login`) — used for the flows the
-  CLI doesn't cover, and as the token source below.
-- 🔑 **`GITHUB_TOKEN`** in the environment — the CLI reads it directly.
-  Populate it once per session: `export GITHUB_TOKEN=$(gh auth token)`
+  CLI doesn't cover.
+- 🔑 **GitHub auth** — `gh auth login`, or `GITHUB_TOKEN` in the environment.
 
 ## 🤖 Install a harness
 
@@ -76,18 +75,17 @@ Invoke `/firestartr-operation` (or explicitly ask your agent to use the
 `firestartr-operation` skill), then just describe what you want.
 
 On first run the skill asks for your organization's GitHub org slug and
-proposes your current directory as its `paths` entry, then writes a
-git-ignored `firestartr-config.yaml` beside `SKILL.md` — nothing
-client-specific is ever committed. The whole file is shown to you before it's
-written. Subsequent runs from that folder skip the question; running the
+proposes your current directory as its `paths` entry, then writes the config
+to `~/.config/fs-forge/config.yaml` (or `$FS_FORGE_CONFIG` / `$XDG_CONFIG_HOME`
+when set), outside this skill folder, so nothing client-specific is ever
+committed. The whole file is shown to you before it's written. Subsequent runs from that folder skip the question; running the
 skill from a folder it doesn't recognize offers to attach it to an existing
 organization or create a new one, so you can work across several
 Firestartr-managed platforms from one install. A missing, empty, or
 unrecognized-shape config — including the old single-organization format —
 is never migrated or carried forward; the skill treats it as unset and walks
-you through setup fresh. To set or fix the config yourself, copy
-`firestartr-config.example.yaml` to `firestartr-config.yaml` and fill it in
-per the schema in `reference/config-schema.md`.
+you through setup fresh. To set or fix the config yourself, follow the schema
+in `reference/config-schema.md`.
 
 If details are missing from your request, the skill interviews you one
 question at a time, each with a recommended answer — it prefers exploring the
@@ -95,7 +93,7 @@ repos over asking.
 
 ## ⚙️ How it works
 
-1. 🔍 **Resolve** — the skill reads `firestartr-config.yaml`, matches your
+1. 🔍 **Resolve** — `fs-forge-cli context` reads the config, matches your
    current directory against each organization's registered `paths` (longest
    prefix wins), and pins down your org, claims repo, and CLI version.
 2. 🧭 **Classify** — your request is mapped to one of its playbooks (create,

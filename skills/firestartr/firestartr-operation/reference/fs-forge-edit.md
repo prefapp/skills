@@ -3,13 +3,11 @@
 `edit` and a committing `create` are the network-bound fs-forge
 commands: they read and write the claims repo directly over the GitHub API.
 Sibling of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
-`firestartr-config.yaml`.
+`SKILL.md` Step 1.
 
 All need `--org={org}` on every invocation: the control-plane flag
 (`fs-forge-mutation-shared.md`'s `{org}` passthrough); always pass it
-explicitly rather than relying on an env var default. Auth is the
-`GITHUB_TOKEN` inline prefix from `../SKILL.md`'s Common rules: every
-command below assumes it.
+explicitly rather than relying on an env var default.
 
 Claims are addressed as `<Kind>-<name>` (e.g. `ComponentClaim-my-repo`): the
 same key the claims-map uses. Use this notation everywhere you need to name an

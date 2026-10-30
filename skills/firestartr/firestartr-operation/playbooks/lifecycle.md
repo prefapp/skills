@@ -42,13 +42,9 @@ create-claim; that file is the plan. `create` has no `--diff`.
 
 ### Step 3: Re-run with `--commit`
 
-See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. Always
-add `--wait-for-checks`: it overrides the CLI's own `false` default, so the
-CLI also watches the wet (state-repo) PR's check runs after provisioning
-until they finish. When `firestartr-config.yaml` sets `state_github_repo` or
-`state_infra_repo`, also pass `--state-repos={state_github_repo},{state_infra_repo}`
-(an unset value uses its default, `{org}/state-github` or `{org}/state-infra`;
-`create`/`edit` only).
+See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. `--commit`
+also watches the wet (state-repo) PR's check runs after provisioning until they
+finish; `--no-wait-for-checks` skips that.
 
 ### Step 4: Report the outcome
 
@@ -59,9 +55,8 @@ only if the client explicitly asks (manual flow Step 5).
 If the output says `No wet PR found for this claim; skipping check watch.`, no
 checks were watched: don't report them as passed. Run
 `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current --json`
-(with the same `--state-repos` when set) and report its result. SystemClaim and
-DomainClaim have no state CR (no hydration): report the provisioning run's
-outcome instead. Once the wet PR is merged, also read its merge commit's check
+and report its result. Kinds with `hydration: null` have no state CR: report
+the provisioning run's outcome instead. Once the wet PR is merged, also read its merge commit's check
 runs (`../reference/diagnostics.md`, apply/destroy section) before reporting;
 absent or pending checks mean unconfirmed, so say so. A `checks` entry, or a
 merge-commit check run, with conclusion `failure`, `cancelled` or `timed_out`
@@ -119,15 +114,16 @@ gh issue create --repo {claims_repo} --title "{goal}" --body "{what the client a
 ### Step 3: Write the full file on the branch (create or update)
 
 Offline create: PUT the validated `{preview-file}` contents to
-`claims/{dir}/{name}.yaml` on the branch (`../reference/gh-cookbook.md`).
+`claims/{dir}/{name}.yaml` on the branch (`../reference/gh-cookbook.md`;
+`{dir}` is the kind's `claimsDirectory` in `kinds show <id> --json`).
 
 ### Step 4: Open the PR, show it to the client, merge it (squash)
 
 ### Step 5: Hydrate
 
-With the workflow for the claim's family (see the hydrate table in
-`../reference/gh-cookbook.md`): GitHub claims take `kind`+`name`;
-Secrets/TFWorkspace take `name` only. Wait for `conclusion: success`.
+Trigger the kind's hydrate workflow with the inputs `kinds show <id> --json`
+lists (`hydration`; `../reference/gh-cookbook.md`). Wait for `conclusion:
+success`.
 - When a create adds a new user *and* references it elsewhere (e.g. adds them to
   a team), hydrate the `UserClaim` **first**, then the dependent claim.
 
@@ -137,8 +133,8 @@ Secrets/TFWorkspace take `name` only. Wait for `conclusion: success`.
 
 ### Step 6: Merge the state PR
 
-That hydration opened: on `state-github` (GitHub claims, usually
-auto-merged) or `state-infra` (Secrets/TFWorkspace, merge it yourself).
+That hydration opened a PR on the kind's `stateRepo` (`kinds show`): GitHub-claim
+hydrate usually auto-merges it; Secrets and TFWorkspace need you to merge it.
 
 > **Check this first:** a PR that won't merge; see
 > `troubleshooting.md#state-pr-merge` if it doesn't explain the failure.
@@ -152,11 +148,9 @@ reconcile until hydration runs and its state PR merges. Do not stop early.
 
 Deletion is governed the same way: it does not just remove the file. Kind
 support differs from every other operation, so check it before planning:
-
-- **Supported**: ComponentClaim, GroupClaim, UserClaim, OrgWebhookClaim,
-  TFWorkspaceClaim, SecretsClaim.
-- **Not supported**: SystemClaim, DomainClaim have no delete workflow. Tell
-  the client, then go straight to "No delete workflow exists" below.
+`kinds show <id> --json` → `delete.supported` says whether the kind has a delete
+workflow, and `delete.workflow` names it. If `delete.supported` is `false`,
+tell the client, then go straight to "No delete workflow exists" below.
 
 ### `fs-forge-cli delete`
 
@@ -167,15 +161,14 @@ Same as the fs-forge-managed flow's Step 1 above, for the audit trail.
 #### Step 2: Decide flags before dry-running
 
 So the dry-run previews the exact command you'll later add `--commit` to:
-- Always include `--wait-for-checks`: the unprovision workflow waits for PR
-  Verify on the claims PR before merging it.
-- For TFWorkspaceClaim, ask the client whether to keep variant CRs and
-  pass `--include-variants`/`--no-include-variants` accordingly; every
-  other kind has no variants, so leave this flag off.
+- By default the unprovision workflow waits for PR Verify on the claims PR
+  before merging it; `--no-wait-for-checks` skips that.
+- If `kinds show` says `variants: true` (TFWorkspaceClaim), ask the client
+  whether to keep variant CRs and pass `--include-variants`/`--no-include-variants`
+  accordingly; otherwise leave this flag off.
 - Add `--no-wait` only if the client asks not to wait for the unprovision
   workflow to finish.
-- Optional fast check first, for ComponentClaim/GroupClaim/UserClaim/
-  TFWorkspaceClaim: `preflight --deletion`
+- Optional fast check first, for kinds with a `preflight` value: `preflight --deletion`
   (`../reference/fs-forge-preflight.md`) confirms the claim exists in one
   sub-second call: Step 3's dry-run confirms it either way, so this is a
   scriptable shortcut, not a replacement.
@@ -186,7 +179,7 @@ No `--commit`, to confirm the claim exists and preview the dispatch:
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
-  --wait-for-checks [--include-variants|--no-include-variants]
+  [--include-variants|--no-include-variants]
 ```
 
 Show the client the printed plan: kind, name, `includeVariants`,
@@ -196,7 +189,7 @@ Show the client the printed plan: kind, name, `includeVariants`,
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
-  --wait-for-checks [--include-variants|--no-include-variants] --commit
+  [--include-variants|--no-include-variants] --commit
 ```
 
 `--commit` dispatches `unprovision-claim.yaml`, which fully self-services:
@@ -220,19 +213,18 @@ Link the merged claim PR in the closing comment (`--commit` has no
 
 ### No delete workflow exists
 
-For SystemClaim/DomainClaim: do not remove the claim file yourself. Tell the
+For a kind with `delete.supported: false`: do not remove the claim file yourself. Tell the
 client there is no automated delete path for this claim kind and they'll need
 to remove it by hand.
 
 Otherwise, confirm removal to the client once the change has landed.
 
-## Kind → hydration name
+## Hydration name
 
-Hydration keys on the **claim name**, not the file path:
+`kinds show <id> --json` gives the hydrate workflow and inputs (`hydration`). The
+`name` input is the claim's name, not its file path:
 
-| Kind | `name` field |
-|---|---|
-| ComponentClaim | repo name |
-| GroupClaim | team name (the normalized slug, not the display name) |
-| UserClaim | github username |
-| SystemClaim / DomainClaim / SecretsClaim / OrgWebhookClaim / TFWorkspaceClaim | claim name |
+- ComponentClaim: the repo name.
+- GroupClaim: the team's normalized slug, not its display name.
+- UserClaim: the GitHub username.
+- Other kinds: the claim name.

@@ -23,10 +23,6 @@ a command's own output fully before reaching for another tool. Fall back to raw
 
 Apply to every invocation, on top of whatever the matched playbook adds:
 
-- **fs-forge auth.** Prefix every invocation with the token inline:
-  `GITHUB_TOKEN="$(gh auth token)" npx @firestartr/fs-forge-cli@{version} …`
-  so it stays in that process's environment. Never run `gh auth token` on
-  its own, never print the value, never pass it as a flag or in chat.
 - **Step commitment.** Once Step 2 classifies the intent and the client
   approves the resulting plan, only the matched playbook's own numbered
   steps execute. A need discovered mid-flow is a new request: re-classify
@@ -66,85 +62,35 @@ enforces it.
 
 ## Step 1: Resolve the target platform
 
-Read `firestartr-config.yaml` from this skill's directory: schema:
-`reference/config-schema.md`.
-
-If the file is missing, empty, or doesn't match that schema (e.g. the old
-single `organization: { name }` shape), tell the client (e.g. "no usable
-config found: let's set one up") and treat it as unset. Never migrate or
-carry forward old values silently.
-
-**Path resolution.** Normalize the current working directory (expand `~`,
-strip any trailing slash) and normalize every organization's `paths` entries
-the same way before comparing: stored paths may be in `~`-form. Match on
-path-segment boundaries: a stored path matches when it equals the directory
-or is a prefix of it ending on a `/` (so `/home/me/proj` never matches
-`/home/me/projectX`). The organization with the longest matching path is the
-target.
-
-- **Ambiguity** (two organizations tie, only reachable by hand-editing the
-  file inconsistent): show the whole file highlighting the conflict, ask the
-  client which organization should own that path, remove it from the losing
-  entry, show-before-write.
-- **No match** (unset, or the directory matches nothing registered): present
-  a numbered list of configured organization names plus "new organization"
-  (the only option when unset). Existing org → append the current directory
-  to its `paths`, show-before-write. "New organization" → the flow below. The
-  client may decline instead; nothing is written, the same prompt reappears
-  next run.
-
-**New-organization flow:**
-1. Ask for the GitHub org slug (`name`).
-2. Ask once: do the repos follow the default names (`{name}/claims`,
-   `{name}/state-github`, `{name}/state-infra`, `{name}/catalog`)? Collect
-   overrides for any that differ.
-3. Propose the current directory as the `paths` entry; wait for confirmation
-   or a different path.
-4. Show-before-write.
-
-**Show-before-write:** before writing any change to `firestartr-config.yaml`
-(collapsing any path back to `~`-form when it's under the home directory),
-display the whole resulting file and wait for confirmation. Declining writes
-nothing; the same prompt reappears next run. Warn, don't block, if a new path
-doesn't exist on disk yet.
-
-Do not touch any repository until the organization resolves to a concrete
-value.
-
-**Resolve the CLI version** once the organization is known. Always read
-`cli_version` and look up latest:
+**Skill-target CLI version: `2.0.1-snapshot.f24938d5`**
 
 ```bash
-npm dist-tag ls @firestartr/fs-forge-cli | awk '$1 == "latest:" { print $2 }'
+npx @firestartr/fs-forge-cli@{target} context --json
 ```
 
-- Lookup fails: say so. Pin set → keep-as-is vs retry. Do not invent a version.
-- Pin equals latest: use it as `{version}` (no ask).
-- Pin differs from latest (older or newer): tell both versions; ask whether to
-  update the pin to latest (show-before-write) or keep the set version. Do not
-  start until they answer, never override a pin silently.
-- Unset: use latest as `{version}`. Empty or `snapshot` → no stable release:
-  list versions with `npm view @firestartr/fs-forge-cli versions`, ask the
-  client to pick one, persist as `cli_version` (show-before-write).
+`{target}` is the version above. From the output: `org` → `{org}`;
+`repos.claims` → `{claims_repo}`; `repos.stateGithub`, `repos.stateInfra`,
+`repos.catalog` → the other repos; `cli.pinned` → the pin (`null` when unset).
 
-**Skill-target CLI version: `2.0.1`**.
-Compare `{version}` against it with a plain semver check (no `--help`
-call needed):
+On error (exit 1; stderr `{"error":{"code","message"}}`):
+- `NO_CONFIG`, `NO_MATCH`, `AMBIGUOUS_MATCH`: run the setup flow in
+  `reference/config-schema.md`.
+- `NO_AUTH`: tell the client to run `gh auth login` or set `GITHUB_TOKEN`.
 
-- `>= {target version}` → proceed.
-- `< {target version}` and pinned (`cli_version` set): tell the client the pin is
-  below this skill's target and offer to bump it (show-before-write): never
-  override an explicit pin silently. Declined: fall back to `{version}`'s own
-  `--help`/`--help --json` output to see what it actually supports, and use
-  whatever it reports.
-- `< {target version}` and unpinned: same as the "no stable release found" flow
-  above: ask the client to pick a version and pin it.
+Touch no repository until `context` succeeds.
+
+`{version}` = `cli.pinned` if set, else `{target}`:
+- Unset or equal to `{target}`: no question.
+- Pinned below `{target}` (semver): offer to bump the pin to `{target}`
+  (show-before-write). Declined: use the pin and consult its `--help`.
+- Pinned above `{target}`: use it and say so.
+- Never ask because npm's `latest` differs.
 
 Emit one line confirming the resolved context, e.g.:
 > `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 2.0.1`
 
 **Completion:** you hold a concrete `{org}`, `{claims_repo}`, `{version}`, and
-the matched path.
+`matchedPath`.
 
 ## Step 2: Classify the intent
 

@@ -2,7 +2,7 @@
 
 Read-only ways to inspect an org's claims and render relation graphs. Sibling
 of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
-`firestartr-config.yaml`.
+`SKILL.md` Step 1.
 
 ## Discover an org's elements
 
@@ -29,8 +29,7 @@ hydrated catalog view, the live claims-repo relations:
 npx @firestartr/fs-forge-cli@{version} discovery map --org={org}
 ```
 
-Read-only but network-bound (downloads one claims-repo tarball; needs
-`GITHUB_TOKEN` like `edit`). Recognizes only `owner`, `maintainedBy`,
+Read-only but network-bound (downloads one claims-repo tarball; needs auth like `edit`). Recognizes only `owner`, `maintainedBy`,
 `platformOwner`, `subComponentOf`, `system`, `domain`, `parent`, `children`,
 and `members`: API references and inline Features are never part of this
 graph. This is the tool for "show the org structure" / "what's in system Y" /
