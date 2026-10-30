@@ -1,9 +1,6 @@
 # fs-forge Cookbook
 
-The repeated `fs-forge` idioms every mutating playbook builds on. `{org}` and
-`{version}` are resolved from `firestartr-config.yaml` before any of these run.
-Beyond invocation and validation, idioms are split by topic: read the sibling
-that matches the task instead of assuming everything lives here:
+Read the reference for the task:
 
 | Need to… | Read |
 |---|---|
@@ -11,7 +8,7 @@ that matches the task instead of assuming everything lives here:
 | read or edit an existing claim | `fs-forge-edit.md` |
 | list an org's claims, render its topology, or print an arbitrary relation graph | `fs-forge-discovery.md` |
 | check whether a name is free before create/edit/delete | `fs-forge-preflight.md` |
-| watch check runs on a state-repo PR, or get point-in-time check status | `fs-forge-watch-checks.md` |
+| watch check runs on a state-repo PR, or get point-in-time check status | `../playbooks/reconciliation.md` |
 | discover, attach, edit, or remove a Feature on a ComponentClaim | `fs-forge-features.md` |
 | author a brand-new claim with `create` | `../playbooks/create-claim.md`; the invocation lives there, not here |
 
@@ -32,32 +29,21 @@ Never hand-author a claim body when fs-forge is unavailable.
 
 ## Discover the CLI's own machine-readable contracts
 
-Local and offline: no `--org`, no network, no claims-repo checkout:
+Local and offline: discover the published contracts and inspect one as JSON Schema:
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} schema list --json
-npx @firestartr/fs-forge-cli@{version} schema show CommandHelpJson
-npx @firestartr/fs-forge-cli@{version} schema show RelationGraph
-npx @firestartr/fs-forge-cli@{version} schema show MutationDiff
+npx @firestartr/fs-forge-cli@{version} schema show <Name>
 ```
 
-`schema list --json` prints the three published contract names; `schema show
-<Name>` prints that JSON Schema verbatim. Read one whenever a command's JSON
-output needs more certainty than this cookbook's prose gives:
-`CommandHelpJson` for `--help --json` (`fs-forge-mutation-shared.md`),
-`RelationGraph` for `discovery map --json`/`diagram print`
-(`fs-forge-discovery.md`), `MutationDiff` for `edit --diff --json
---show-defaults` (`fs-forge-edit.md`).
-
-## List supported claim kinds
+## List and inspect claim kinds
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} kinds --json
+npx @firestartr/fs-forge-cli@{version} kinds show <id> --json
 ```
 
-Local and offline. Each entry's `description` is the schema's own one-line
-summary: prefer it, translated to client terms (never "claim"; Rule 1,
-`../SKILL.md`), over composing your own when explaining what's available.
+Local and offline. Prefer each entry's `description`, translated to client terms, when explaining what's available.
 
 ## Validate a claim file
 

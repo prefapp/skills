@@ -1,30 +1,21 @@
 # fs-forge Preflight Reference
 
-Read-only collision check before create/edit/delete: faster and scriptable
-versus eyeballing a claims listing. Sibling of `fs-forge-cookbook.md`;
-`{org}`/`{version}` come from `firestartr-config.yaml`.
+Read-only collision check before create/edit/delete.
 
 ## Coverage
 
-Four kinds only, and under a **different short ID** than the rest of the
-CLI: `repo` (not `component`), `team`, `user`, `tfworkspace`; any other
-value is rejected. No preflight for system, domain, secrets, or org
-webhooks; use the discovery-based check (`fs-forge-discovery.md`) for those.
-`tfworkspace`'s provider check is always a no-op (claims-only, no TFC client
-yet), only its claims-map check runs.
+Pass the `preflight` value from `kinds show <id> --json` to `--kind`, not the short ID (component → `repo`); other values are rejected. For `preflight: null`, use `fs-forge-discovery.md`. `tfworkspace` checks claims-map only: its provider check is a no-op (no TFC client).
 
 ## Invocation
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} preflight --org={org} \
-  --kind <repo|team|user|tfworkspace> --name <name> \
+  --kind <preflight-value> --name <name> \
   (--create | --edition --old-name <old-name> | --deletion) \
   [--scope claims|provider|all] [--json]
 ```
 
-`--edition` checks the *old* name's claim exists, then, unless `--scope
-claims`, or `--name` equals `--old-name` (no identity change): the *new*
-name's provider availability.
+`--edition` checks the old claim, then the new provider name unless `--scope claims` or the name is unchanged. This check is not a rename flow; `edit` cannot rename claims.
 
 `repo`/`team` check resource existence; `user` checks **org membership**, not
 whether the GitHub login exists.
@@ -37,18 +28,12 @@ whether the GitHub login exists.
 | 1 | claim conflict: `<Kind>-<name>` already in claims-map | `--create` |
 | 2 | provider conflict: exists at GitHub, no matching claim | any |
 | 3 | not found: referenced claim doesn't exist | `--edition`/`--deletion` |
-| 4 | `GITHUB_TOKEN` missing scopes (`read:org`, `repo`) | any |
+| 4 | token missing scopes (`read:org`, `repo`) | any |
 | 5 | provider API unreachable | any |
 
-A provider conflict (2): tell the client plainly that the resource already
-exists at GitHub outside Firestartr's tracking, and stop: there's no import
-process to route them to yet.
+Provider conflict (2): tell the client the resource exists at GitHub outside Firestartr tracking; stop. There is no import process.
 
 ## `--json`
 
 `{"status": "<ok|conflict|not_found|error>", "kind": "<ClaimKind>", "name": "…", "conflict": "<claim|provider>"}`:
-`kind` is always the full claim kind, even though `--kind` takes the short
-ID; `conflict` is present only when `status` is `"conflict"`. `--edition`
-with an actual identity change prints **two** JSON lines (old name's claims
-check, then the new name's provider check): read every stdout line, don't
-assume a single JSON document.
+`kind` is the full claim kind; `conflict` appears only for `"conflict"` status. Identity-changing `--edition` prints **two** JSON lines (old claim, then new provider check): read every line, not one JSON document.

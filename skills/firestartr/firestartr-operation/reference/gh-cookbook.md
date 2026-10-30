@@ -1,8 +1,6 @@
 # gh Cookbook
 
-The repeated `gh` idioms every playbook builds on. `{claims_repo}` is
-`{org}/claims` from `firestartr-config.yaml`. Prefer a host-provided composite tool
-when the playbook names one; otherwise use these raw commands.
+Prefer a host-provided composite tool when the playbook names one; otherwise use these raw commands.
 
 ## Read a file (decoded)
 
@@ -55,29 +53,28 @@ If merge fails with "Base branch was modified", wait 3–5s and retry.
 
 ## Trigger hydration and wait
 
-Each claim family has its **own** hydrate workflow, not interchangeable, and they
-take different inputs. Pick by the claim you landed:
-
-| Claim family | Workflow (💧 name) | Inputs | State repo |
-|---|---|---|---|
-| Component / User / Group / OrgWebhook | `GitHub claim: hydrate` | `kind` + `name` | state-github |
-| Secrets | `Secrets claim: hydrate` | `name` | state-infra |
-| TFWorkspace | `TFWorkspace claim: hydrate` | `name` **only** (no `kind`) | state-infra |
-
-Workflow **IDs are per-deployment**, never hardcode them; display names carry
-emoji prefixes so bare-name matching fails. List, then trigger by ID:
+Each kind has its **own** hydrate workflow, and workflows take different
+inputs. Read them from the registry:
 
 ```bash
-gh workflow list --repo {claims_repo} --all      # find the matching 💧 workflow + ID
-gh workflow run {workflow-id} --repo {claims_repo} \
-  --field name={claim-name}                        # add --field kind={Kind} for GitHub claims ONLY
+npx @firestartr/fs-forge-cli@{version} kinds show <id> --json   # hydration.{workflow,key,inputs}, stateRepo
+```
+
+`hydration: null` means nothing to hydrate. Dispatch by `hydration.workflow`, a
+file name: display names carry emoji prefixes, so never match on them.
+`hydration.key` is the input that takes the claim name; `hydration.inputs` lists
+every input the workflow accepts.
+
+```bash
+gh workflow run {hydration.workflow} --repo {claims_repo} \
+  --field {hydration.key}={claim-name}      # add --field kind={Kind} when hydration.inputs has kind
 sleep 30
-gh run list --repo {claims_repo} --workflow {workflow-id} --limit 1 \
+gh run list --repo {claims_repo} --workflow {hydration.workflow} --limit 1 \
   --json databaseId,status,conclusion
 ```
 
-Passing an input the workflow doesn't declare (e.g. `kind` to TFWorkspace hydrate)
-fails HTTP 422. Proceed only when `conclusion` is `success`.
+Passing an input the workflow doesn't declare fails HTTP 422. Proceed only when
+`conclusion` is `success`.
 
 > **Check this first:** a run that didn't reach `success`; see
 > `../playbooks/troubleshooting.md#hydrate-workflow-dispatchexecution`.
@@ -104,11 +101,11 @@ Build the `module` field as:
 
 ## Merge the resulting state PR
 
-Hydration opens a PR on the target **state repo**: `state-github` for GitHub
-claims, `state-infra` for Secrets/TFWorkspace. GitHub-claim hydrate auto-merges it;
-Secrets/TFWorkspace hydrate default `automerge: false`, so you **must** merge it.
+Hydration opens a PR on the kind's **state repo** (`stateRepo` in `kinds show`, resolved to `{state_repo}` from `../SKILL.md` Step 1).
+GitHub-claim hydrate auto-merges it; Secrets and TFWorkspace default to
+`automerge: false`, so you **must** merge it.
 
 ```bash
-gh pr list --repo {org}/{state-repo} --limit 5
-gh pr merge {pr} --repo {org}/{state-repo} --squash
+gh pr list --repo {state_repo} --limit 5
+gh pr merge {pr} --repo {state_repo} --squash
 ```
