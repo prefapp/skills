@@ -41,28 +41,28 @@ npx skills add prefapp/skills --skill firestartr-operation
 This installs the skill via the `skills` npm CLI (vercel-labs) — no clone of
 this repo required, and always installs `main` HEAD. If you do have the repo
 cloned, run `./install.sh --fs` from the repo root instead: it uses the same
-`skills` CLI but installs **from your local checkout**, whatever branch or
-tag you have checked out is what gets installed.
+`skills` CLI but installs **the latest release**, whatever you have checked
+out. To try a change before it is released, `./install.sh --fs-local` installs
+**from your local checkout**.
 
 ### 🔄 Updating
 
 The install is **not** a symlink to a local clone, so `git pull` on a clone
 does not update it. Either:
 
-- **No clone**: re-run the install command above (always tracks `main` HEAD),
-  or run `npx skills update`, which re-fetches whatever was last installed.
-- **With a clone**: `git pull` (or check out the ref you want), then re-run
-  `./install.sh --fs` to reinstall from your local checkout.
+- **No clone**: after installing from `main` HEAD, re-run the install command
+  above or run `npx skills update`.
+- **With a clone**: re-run `./install.sh --fs` to move to the newest release.
+  For `--fs-local`, `git pull` and re-run it. If you check out another ref,
+  use `--fs-local` only if that ref's installer supports it; otherwise, use a
+  tag-tree URL below for a release.
 
 ### 📌 Pinning to a release
 
-With a clone, pinning is just git: check out the release tag and re-run
-`./install.sh --fs`.
-
-Without a clone, the `--skill` flag has no version pin — it always installs
-from `main` HEAD. To pin, point the install at a tag's tree instead: the
-exact release tag pins exactly, and a rolling `firestartr-operation-vN` major
-tag (if published) tracks new `vN.*.*` releases without tracking `main`:
+Whether or not you have a clone, point the install at a tag's tree to pin a
+release. The exact release tag pins exactly, and a rolling
+`firestartr-operation-vN` major tag (if published) tracks new `vN.*.*` releases
+without tracking `main`:
 
 ```sh
 npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-v1/skills/firestartr/firestartr-operation

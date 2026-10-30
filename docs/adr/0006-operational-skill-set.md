@@ -32,12 +32,14 @@ group stays isolated from the other.
   first run.
 - **Governance.** Every change is PR-only, never committed to main — stated once
   in `lifecycle`.
-- **Opt-in install.** `install.sh --fs` (or `--all`) shells out to
-  `npx skills add prefapp/skills --skill firestartr-operation`; the default
-  install is unchanged (workflow set only). Versioned independently via
-  release-please (`firestartr-operation-vX.Y.Z` tags). `--skill` always
-  installs `main` HEAD — to pin a release, install from that tag's tree
-  directly (`.../tree/firestartr-operation-vX.Y.Z/...`) instead. The
+- **Opt-in install.** `install.sh --fs` (or `--all`) installs the latest
+  release through `npx skills add`, from that tag's tree; `--fs-local` installs
+  from the checkout. The default install is unchanged (workflow set only).
+  Versioned independently via release-please (`firestartr-operation-vX.Y.Z`
+  tags). Without a clone, `npx skills add prefapp/skills --skill
+  firestartr-operation` always installs `main` HEAD — to pin a release, install
+  from that tag's tree directly (`.../tree/firestartr-operation-vX.Y.Z/...`)
+  instead. The
   `release_please` Feature (attached via the `prefapp/claims` ComponentClaim,
   prefapp/claims#72) also supports a rolling `firestartr-operation-vN` major
   tag via its `release_please_generate_rolling_tag`/

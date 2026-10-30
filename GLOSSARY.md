@@ -20,8 +20,8 @@ _Avoid_: skill bundle, skill pack.
 The opt-in Firestartr skills under `skills/firestartr/` (namespace
 `prefapp-firestartr`) that drive a Prefapp-managed platform. Separate audience
 (client developers) and charter from the workflow set. Installed with
-`install.sh --fs` or `--all`, which shells out to
-`npx skills add prefapp/skills --skill firestartr-operation`.
+`install.sh --fs` or `--all`, which install the latest release through
+`npx skills add`.
 
 **Playbook**:
 A disclosed `.md` file loaded on demand by the single entry skill
@@ -221,14 +221,13 @@ every harness's skills location — no namespace-dir wrapper:
 - pi, OpenCode, VS Code Copilot: `~/.agents/skills/<skill> → <repo>/skills/workflow/<skill>`
 - Claude Code: same flat layout under `~/.claude/skills/`
 
-The **operational skill set** is opt-in: `./install.sh --fs` installs
-`firestartr-operation` via `npx skills add prefapp/skills --skill
-firestartr-operation`, which always tracks `main` HEAD (versioned release
-tags exist but aren't reachable through that command; see ADR-0006). The npx
-install is not a symlink to a local clone — updates require re-running `--fs`
-(tracks `main`) or `npx skills update` (re-fetches whatever was last
-installed). To pin instead of tracking `main`, point the install at a tag's
-tree: the full semver tag pins exactly; a rolling `firestartr-operation-vN`
+The **operational skill set** is opt-in: `./install.sh --fs` installs the
+latest `firestartr-operation` release, and `./install.sh --fs-local` installs
+from the local checkout. Without a clone, `npx skills add prefapp/skills --skill
+firestartr-operation` always tracks `main` HEAD (see ADR-0006). None of these
+is a symlink to a local clone — re-run `--fs` to move to the newest release. To
+pin without a clone, point the install at a tag's tree: the full semver tag
+pins exactly; a rolling `firestartr-operation-vN`
 major tag is also available from the `release_please` Feature (once enabled
 on the `prefapp/skills` claim) and tracks new releases within that major
 without tracking `main`:

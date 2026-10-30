@@ -17,8 +17,9 @@ git clone https://github.com/prefapp/skills.git ~/work/prefapp/skills
 cd ~/work/prefapp/skills
 
 ./install.sh --workflow   # workflow set: symlinked; git pull updates
-./install.sh --fs         # firestartr-operation: via npx skills add
-./install.sh --all        # both
+./install.sh --fs         # firestartr-operation: latest release, via npx skills add
+./install.sh --fs-local   # firestartr-operation: from this checkout
+./install.sh --all        # workflow set and the latest firestartr-operation release
 ```
 
 Run `./install.sh` with no arguments for all options. Install details,

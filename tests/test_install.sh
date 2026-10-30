@@ -14,7 +14,10 @@ CLAUDE="$TMP/.claude/skills"
 WORKFLOW_NS="$AGENTS/prefapp-workflow"
 NARGS="$TMP/npx-args.log"
 SKILLS_CLI_VERSION="1.5.23"
-EXPECTED_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add $REPO_DIR/skills --skill firestartr-operation --global"
+GIT_ARGS="$TMP/git-args.log"
+RELEASE_URL="https://github.com/prefapp/skills/tree/firestartr-operation-v0.10.0/skills/firestartr/firestartr-operation"
+EXPECTED_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add $RELEASE_URL --skill firestartr-operation --global"
+EXPECTED_LOCAL_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add $REPO_DIR/skills --skill firestartr-operation --global"
 
 # Stub npx so --all/--fs never touch the real one (no network, no node
 # dependency): it records its invocation args and exits with FAKE_NPX_EXIT.
@@ -25,6 +28,22 @@ echo "$@" >> "$NARGS"
 exit "${FAKE_NPX_EXIT:-0}"
 EOF
 chmod +x "$TMP/bin/npx"
+
+# Stub git so the release lookup needs no network. It lists tags out of version
+# order, with a rolling major tag and a prerelease that must be ignored, unless
+# FAKE_GIT_REFS replaces them. FAKE_GIT_EXIT makes the lookup fail.
+cat >"$TMP/bin/git" <<'EOF'
+#!/usr/bin/env bash
+echo "$@" >> "$GIT_ARGS"
+[ "${FAKE_GIT_EXIT:-0}" -eq 0 ] || exit "$FAKE_GIT_EXIT"
+printf '%s\n' "${FAKE_GIT_REFS-aaa	refs/tags/firestartr-operation-v0.9.0
+bbb	refs/tags/firestartr-operation-v0.10.0
+ccc	refs/tags/firestartr-operation-v1
+ddd	refs/tags/firestartr-operation-v2.0.0-rc.1
+eee	refs/tags/firestartr-operation-v0.2.0}"
+EOF
+chmod +x "$TMP/bin/git"
+export GIT_ARGS
 
 run() { HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" "$@"; }
 reset() { rm -rf "$TMP/.agents" "$TMP/.claude"; }
@@ -45,6 +64,7 @@ assert_flat_links() {
 # No option shows help and installs nothing.
 HELP="$(run)"
 printf '%s' "$HELP" | grep -q -- '--all'
+printf '%s' "$HELP" | grep -q -- '--fs-local'
 [ ! -e "$AGENTS" ] || { echo "FAIL: help installed skills"; exit 1; }
 
 # Workflow-only install: flat per-skill links from skills/workflow, no namespace dir.
@@ -107,6 +127,55 @@ set -e
 [ "$FS_RC" -eq 7 ] || { echo "FAIL: --fs did not propagate npx exit 7 (got $FS_RC)"; exit 1; }
 printf '%s' "$FS_ERR" | grep -q -- 'hard dependency' \
   || { echo "FAIL: --fs failure did not report the hard dependency: $FS_ERR"; exit 1; }
+
+# --all installs the same release as --fs.
+reset
+: > "$NARGS"
+run --all >/dev/null
+[ "$(cat "$NARGS")" = "$EXPECTED_NPX_ARGS" ] \
+  || { echo "FAIL: --all npx invocation: $(cat "$NARGS")"; exit 1; }
+
+# --fs says which release it installs.
+reset
+OUT="$(run --fs)"
+printf '%s' "$OUT" | grep -q -- 'firestartr-operation-v0.10.0' \
+  || { echo "FAIL: --fs did not name the release: $OUT"; exit 1; }
+
+# --fs-local installs from the checkout and never looks up a release.
+reset
+: > "$NARGS"
+: > "$GIT_ARGS"
+run --fs-local >/dev/null
+[ "$(cat "$NARGS")" = "$EXPECTED_LOCAL_NPX_ARGS" ] \
+  || { echo "FAIL: --fs-local npx invocation: $(cat "$NARGS")"; exit 1; }
+[ ! -s "$GIT_ARGS" ] || { echo "FAIL: --fs-local looked up a release: $(cat "$GIT_ARGS")"; exit 1; }
+[ ! -e "$AGENTS/firestartr-operation" ] || { echo "FAIL: --fs-local created a firestartr-operation symlink"; exit 1; }
+
+# --fs-local still removes stale links.
+reset
+mkdir -p "$AGENTS"
+ln -sfn "$REPO_DIR/firestartr" "$AGENTS/prefapp-firestartr"
+run --fs-local >/dev/null
+[ ! -L "$AGENTS/prefapp-firestartr" ] || { echo "FAIL: --fs-local kept a stale namespace link"; exit 1; }
+
+# A failed lookup or no stable release stops before npx, with no fallback.
+assert_lookup_failure() {
+  local label="$1" err rc
+  : > "$NARGS"
+  set +e
+  err="$(HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs 2>&1 >/dev/null)"
+  rc=$?
+  set -e
+  [ "$rc" -ne 0 ] || { echo "FAIL: $label exited 0"; exit 1; }
+  printf '%s' "$err" | grep -q -- 'could not resolve the latest release' \
+    || { echo "FAIL: $label did not report the lookup: $err"; exit 1; }
+  [ ! -s "$NARGS" ] || { echo "FAIL: $label still called npx: $(cat "$NARGS")"; exit 1; }
+}
+reset
+FAKE_GIT_EXIT=128 assert_lookup_failure "failed lookup"
+FAKE_GIT_REFS="" assert_lookup_failure "empty tag list"
+FAKE_GIT_REFS="ccc	refs/tags/firestartr-operation-v1
+ddd	refs/tags/firestartr-operation-v2.0.0-rc.1" assert_lookup_failure "no stable release"
 
 # Install both sets and remain idempotent.
 reset
