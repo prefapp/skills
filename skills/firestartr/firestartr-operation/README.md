@@ -21,12 +21,10 @@ talk repos, teams, and users; the skill never talks claims.
 
 The skill runs inside an agent harness. If you don't have one yet, pick either:
 
-- **[OpenCode](https://opencode.ai)** — install with
-  `curl -fsSL https://opencode.ai/install | bash`
-  ([docs](https://opencode.ai/docs/))
-- **[Pi](https://pi.dev)** — install with
-  `curl -fsSL https://pi.dev/install.sh | sh`
-  ([docs](https://pi.dev/docs/latest))
+- **[OpenCode](https://opencode.ai)** — see the
+  [install docs](https://opencode.ai/docs/)
+- **[Pi](https://pi.dev)** — see the
+  [install docs](https://pi.dev/docs/latest)
 
 Both discover skills from `~/.agents/skills/`, one of the locations the
 installer puts this skill. Claude Code is also supported via
