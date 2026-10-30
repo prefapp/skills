@@ -1,0 +1,33 @@
+---
+name: Validate Firestartr Operation CLI Contract
+
+on:
+  pull_request:
+    paths:
+      - 'skills/firestartr/firestartr-operation/**'
+      - 'tests/firestartr-operation-cli-contract.mjs'
+      - 'tests/test_firestartr_operation_cli_contract.sh'
+      - '.github/workflows/firestartr-operation-cli-contract.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-cli-contract:
+    name: Validate CLI Contract
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Check documented CLI invocations
+        run: node tests/firestartr-operation-cli-contract.mjs
+
+      - name: Test the contract check
+        run: bash tests/test_firestartr_operation_cli_contract.sh
