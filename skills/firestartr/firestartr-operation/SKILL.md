@@ -31,7 +31,7 @@ Apply to every invocation, on top of whatever the matched playbook adds:
 
 ## Step 1: Resolve the target platform
 
-**Skill-target CLI version: `2.0.1-snapshot.f24938d5`**
+**Skill-target CLI version: `2.0.1-snapshot.ac560c24`**
 
 ```bash
 npx @firestartr/fs-forge-cli@{target} context --json

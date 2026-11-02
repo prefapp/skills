@@ -8,37 +8,31 @@ Apply `../SKILL.md` Common rules. **PR-only; never commit to `main`**: branch �
 
 ## fs-forge-managed flow (`create`/`edit --commit`)
 
-### Step 1: Capture the goal as an issue
-
-Same as the manual flow's Step 0 below, for the audit trail.
-
-### Step 2: Dry-run
+### Step 1: Dry-run
 
 **edit:** `edit` with `--diff` (no `--commit`); fix validation errors, show the unified YAML Claim diff, not relation tree, and get approval (`../reference/fs-forge-edit.md`).
 
 **create:** the previously shown `create` output (no `--commit`) is the plan; `create` has no `--diff`.
 
-### Step 3: Re-run with `--commit`
+### Step 2: Re-run with `--commit` and the audit-issue flags
 
 See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. After provisioning, it watches wet (state-repo) PR checks until finished; `--no-wait-for-checks` skips that.
 
-### Step 4: Report the outcome
+### Step 3: Report the outcome
 
-Don't poll, hydrate or merge the wet PR yourself; `--commit` did it. Check the dispatched `provision-claim.yaml` run. Manual hydrate only if the client explicitly asks (manual flow Step 5).
+Don't poll, hydrate or merge the wet PR yourself; `--commit` did it. Check the dispatched `provision-claim.yaml` run and link the audit issue. Manual hydrate only if the client explicitly asks (manual flow Step 5).
 
 If the output says `No wet PR found for this claim; skipping check watch.`, no
 checks were watched: don't report them as passed. Run
 `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current --json`
 and report its result. For `hydration: null`, report the provisioning run's outcome instead. Once the wet PR merges, read its merge-commit check runs before reporting (`../reference/diagnostics.md`, apply/destroy).
 
-- Any `checks` entry or merge-commit check with `failure`, `cancelled` or `timed_out` → failed: stop, report, point to diagnostics, don't close the issue.
-- No PR (exit 3), no `checks` entries, `lastStatePr.state` not `merged` (open, closed or null after lookup error), or conclusion other than `success`, `skipped` or `neutral` (null/pending, `action_required`, `stale`) → unconfirmed: say so, point to diagnostics, don't close the issue. Absent or pending merge-commit checks are also unconfirmed.
+- Any `checks` entry or merge-commit check with `failure`, `cancelled` or `timed_out` → failed: stop, report, point to diagnostics.
+- No PR (exit 3), no `checks` entries, `lastStatePr.state` not `merged` (open, closed or null after lookup error), or conclusion other than `success`, `skipped` or `neutral` (null/pending, `action_required`, `stale`) → unconfirmed: say so, point to diagnostics. Absent or pending merge-commit checks are also unconfirmed.
+
+On either result, reopen the issue the merged claim PR closed: `gh issue reopen {N} --repo {claims_repo}`.
 
 Failed run: `troubleshooting.md#symptom-lookup-start-here` routes PR-verify, hydrate, plan, state-PR merge or apply failures.
-
-### Step 5: Close the audit-trail issue
-
-Link the merged claim PR in the closing comment; `--commit`'s auto-generated PR has no `Closes #N` footer or flag.
 
 Failure and retry: `../reference/fs-forge-mutation-shared.md`'s `--commit` warning; unexplained CLI errors: `troubleshooting.md#fs-forge-cli-command-failures`.
 
@@ -46,7 +40,7 @@ Failure and retry: `../reference/fs-forge-mutation-shared.md`'s `--commit` warni
 
 ### Step 0: Capture the goal as an issue
 
-Before touching branches, fill `../templates/claim-issue.md` in client terms (not "claim") and open it in the claims repo. Reference the issue number in the PR (`Closes #N`).
+Before touching branches, open it in the claims repo, in client terms (not "claim"). Reference the issue number in the PR (`Closes #N`).
 
 ```bash
 gh issue create --repo {claims_repo} --title "{goal}" --body "{what the client asked for}"
@@ -91,19 +85,15 @@ Before planning, check `kinds show <id> --json` → `delete`. If `delete.support
 
 ### `fs-forge-cli delete`
 
-#### Step 1: Capture the goal as an issue
-
-Same as the fs-forge-managed flow's Step 1 above, for the audit trail.
-
-#### Step 2: Decide flags before dry-running
+#### Step 1: Decide flags before dry-running
 
 Choose flags before the dry-run; use the same command with `--commit` later:
 - Unprovision waits for claims PR Verify before merge by default; `--no-wait-for-checks` skips that.
 - If `kinds show` has `variants: true` (TFWorkspaceClaim), ask whether to keep variant CRs and pass `--include-variants`/`--no-include-variants` accordingly; otherwise omit.
 - Add `--no-wait` only if the client asks not to wait for unprovision.
-- Optional fast existence check for non-null `preflight`: `preflight --deletion` (`../reference/fs-forge-preflight.md`); it doesn't replace Step 3's dry-run.
+- Optional fast existence check for non-null `preflight`: `preflight --deletion` (`../reference/fs-forge-preflight.md`); it doesn't replace Step 2's dry-run.
 
-#### Step 3: Dry-run
+#### Step 2: Dry-run
 
 No `--commit`, to confirm the claim exists and preview the dispatch:
 
@@ -112,21 +102,16 @@ npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
   [--include-variants|--no-include-variants]
 ```
 
-Show the printed plan (kind, name, `includeVariants`, `waitForClaimChecks`); it must match Step 2's flags.
+Show the printed plan (kind, name, `includeVariants`, `waitForClaimChecks`); it must match Step 1's flags.
 
-#### Step 4: Get approval, then re-run with `--commit`
+#### Step 3: Get approval, then re-run with `--commit` and the audit-issue flags
 
-Re-run with `--commit`: `unprovision-claim.yaml` merges both state and claims PRs. Don't poll or merge yourself; report the dispatched run.
+Audit-issue flags: `../reference/fs-forge-mutation-shared.md`'s `--commit` warning. `unprovision-claim.yaml` merges both state and claims PRs. Don't poll or merge yourself; report the dispatched run.
 
-#### Step 5: Check run placement
+#### Step 4: Check run placement
 
 Destroy check runs and commit statuses land on the wet PR referenced by the deleted CR's `firestartr.dev/last-state-pr`, not the deletion wet PR (which merges when CI passes). If `last-state-pr` is missing, check runs go to the deletion wet PR. Inspect destroy status:
 `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current`
-
-#### Step 6: Close the audit-trail issue
-
-Link the merged claim PR in the closing comment (`--commit` has no
-`Closes #N` footer to do this automatically).
 
 ### No delete workflow exists
 

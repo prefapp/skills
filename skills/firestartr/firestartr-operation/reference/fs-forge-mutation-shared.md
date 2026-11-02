@@ -20,7 +20,18 @@ npx @firestartr/fs-forge-cli@{version} kinds show <kind> --json | jq -r '.orgFie
 
 ## The `--commit` warning
 
-`create`/`edit --commit` creates a branch, commits the claim and dispatches `provision-claim.yaml`, which opens the PR, waits for verify, merges, dispatches and waits for hydration when applicable, and merges the wet PR. Never use before client approval or follow with manual hydration. For status, check the dispatched run; trigger a separate manual hydrate (`gh-cookbook.md`) only if explicitly requested.
+`create`/`edit --commit` creates a branch, commits the claim, opens the PR and dispatches `provision-claim.yaml`, which waits for verify, merges, dispatches and waits for hydration when applicable, and merges the wet PR. Never use before client approval or follow with manual hydration. For status, check the dispatched run; trigger a separate manual hydrate (`gh-cookbook.md`) only if explicitly requested.
+
+Every `--commit`, on any command, carries an audit issue:
+
+```bash
+npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} ... --commit \
+  --create-issue --issue-title "{goal}" --issue-body "{what the client asked for}"
+```
+
+Write both in client terms; the CLI's default text says "claim". If an issue already exists, including one a failed attempt opened, pass `--issue <N>` instead; never open a second one.
+
+The CLI links the issue to the claims PR (`Closes #N`), comments the run URL and comments failures, reopening it once a workflow was dispatched. `delete` closes it after the run succeeds; with `--no-wait` it stays open, so say so. Don't link or close it yourself.
 
 A `--commit` that fails before dispatch is a CLI error: fix the reported problem and re-run. On `Branch already exists`, an
 earlier attempt left `fs-forge/{kind}-{name}` behind: check that no open PR or
