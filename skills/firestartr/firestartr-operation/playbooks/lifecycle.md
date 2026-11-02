@@ -113,6 +113,8 @@ Audit-issue flags: `../reference/fs-forge-mutation-shared.md`'s `--commit` warni
 Destroy check runs and commit statuses land on the wet PR referenced by the deleted CR's `firestartr.dev/last-state-pr`, not the deletion wet PR (which merges when CI passes). If `last-state-pr` is missing, check runs go to the deletion wet PR. Inspect destroy status:
 `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current`
 
+If destroy is failed or unconfirmed (rules in fs-forge-managed Step 3), reopen the issue the unprovision run closed: `gh issue reopen {N} --repo {claims_repo}`.
+
 ### No delete workflow exists
 
 If `delete.supported: false`, don't remove the file yourself. Tell the client no automated path exists; they must remove it by hand.
