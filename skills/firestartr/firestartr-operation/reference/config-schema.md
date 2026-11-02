@@ -9,7 +9,7 @@ organizations:
       - ~/work/prefapp-demo
       - ~/work/prefapp-demo-fork
     claims_repo: claims
-cli_version: 2.0.1
+cli_version: 3.0.0
 ```
 
 | Field | Required | Meaning |

@@ -31,7 +31,7 @@ Apply to every invocation, on top of whatever the matched playbook adds:
 
 ## Step 1: Resolve the target platform
 
-**Skill-target CLI version: `2.0.1-snapshot.ac560c24`**
+**Skill-target CLI version: `3.0.0`**
 
 ```bash
 npx @firestartr/fs-forge-cli@{target} context --json
@@ -56,7 +56,7 @@ Touch no repository until `context` succeeds.
 - Never ask because npm's `latest` differs.
 
 Emit one line confirming the resolved context, e.g.:
-> `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 2.0.1`
+> `Using org: prefapp-demo (~/work/prefapp) | fs-forge: 3.0.0`
 
 **Completion:** `{org}`, `{claims_repo}`, `{version}`, and `matchedPath` (possibly null). All playbooks and references use these values.
 
