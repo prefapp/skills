@@ -25,7 +25,7 @@ Don't poll, hydrate or merge the wet PR yourself; `--commit` did it. Check the d
 If the output says `No wet PR found for this claim; skipping check watch.`, no
 checks were watched: don't report them as passed. Run
 `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current --json`
-and report its result. For `hydration: null`, report the provisioning run's outcome instead. Once the wet PR merges, read its merge-commit check runs before reporting (`../reference/diagnostics.md`, apply/destroy).
+and report its result. For `catalogOnly: true` kinds, report the provisioning run's outcome instead; other `hydration: null` kinds are unconfirmed. Once the wet PR merges, read its merge-commit check runs before reporting (`../reference/diagnostics.md`, apply/destroy).
 
 - Any `checks` entry or merge-commit check with `failure`, `cancelled` or `timed_out` → failed: stop, report, point to diagnostics.
 - No PR (exit 3), no `checks` entries, `lastStatePr.state` not `merged` (open, closed or null after lookup error), or conclusion other than `success`, `skipped` or `neutral` (null/pending, `action_required`, `stale`) → unconfirmed: say so, point to diagnostics. Absent or pending merge-commit checks are also unconfirmed.
@@ -64,7 +64,7 @@ Offline create: PUT validated `{preview-file}` to `claims/{claimsDirectory}/{nam
 
 ### Step 5: Hydrate
 
-If `kinds show <id> --json` reports `hydration: null`, skip Steps 5-6; catalog-only kinds rely on claims-index regenerating `claims-map.json` on merge. Otherwise dispatch its `hydration` workflow (`../reference/gh-cookbook.md`) and wait for `conclusion: success`.
+If `kinds show <id> --json` reports `hydration: null`, skip Steps 5-6: for `catalogOnly: true`, claims-index regenerates `claims-map.json` on merge; otherwise no workflow hydrates the claim, so report the change as unconfirmed (`../reference/diagnostics.md`). If `hydration` is set, dispatch its workflow (`../reference/gh-cookbook.md`) and wait for `conclusion: success`.
 - When a create adds a user and references it elsewhere (e.g. a team), hydrate the `UserClaim` **first**, then the dependent claim.
 
 Failed/timed-out run: `troubleshooting.md#hydrate-workflow-dispatchexecution`.

@@ -60,7 +60,7 @@ inputs. Read them from the registry:
 npx @firestartr/fs-forge-cli@{version} kinds show <id> --json   # hydration.{workflow,key,inputs}, stateRepo
 ```
 
-`hydration: null` means nothing to hydrate. Dispatch by `hydration.workflow`, a
+`hydration: null` means no hydrate workflow (`../playbooks/lifecycle.md` Step 5). Dispatch by `hydration.workflow`, a
 file name: display names carry emoji prefixes, so never match on them.
 `hydration.key` is the input that takes the claim name; `hydration.inputs` lists
 every input the workflow accepts.
