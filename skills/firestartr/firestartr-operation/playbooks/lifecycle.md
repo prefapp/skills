@@ -110,10 +110,16 @@ Audit-issue flags: `../reference/fs-forge-mutation-shared.md`'s `--commit` warni
 
 #### Step 4: Check run placement
 
-Destroy check runs and commit statuses land on the wet PR referenced by the deleted CR's `firestartr.dev/last-state-pr`, not the deletion wet PR (which merges when CI passes). If `last-state-pr` is missing, check runs go to the deletion wet PR. Inspect destroy status:
-`npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current`
+Destroy results land on each deleted CR's `last-state-pr` PR, not the deletion wet PR (which merges when CI passes); without the annotation, on the deletion wet PR. `watch-checks` doesn't report destroy results: once the state PR merges, the CR is off the default branch and `--current` exits 3 (`No CRs found`). Per state repo:
 
-If destroy is failed or unconfirmed (rules in fs-forge-managed Step 3), reopen the issue the unprovision run closed: `gh issue reopen {N} --repo {claims_repo}`.
+```bash
+DEL=$(gh pr list --repo {state_repo} --state merged --search 'in:title "Automated deletion"' --limit 200 \
+  --json number,body --jq '[.[] | select(.body | contains("{name}"))][0].number')
+BASE=$(gh pr view $DEL --repo {state_repo} --json baseRefOid --jq .baseRefOid)
+gh pr view $DEL --repo {state_repo} --json files --jq '.files[].path'
+```
+
+For each removed file, read its `last-state-pr` at `$BASE` (`../reference/diagnostics.md`, claim ↔ state), then the destroy results on that PR's merge commit (no annotation: `$DEL`; `../reference/diagnostics.md`, apply/destroy). A CR is confirmed by a success `<Kind> - destroy` check run or `Terraform Destroy <cr-name>` status. Failed or unconfirmed on any CR (fs-forge-managed Step 3 rules): reopen the issue the unprovision run closed, `gh issue reopen {N} --repo {claims_repo}`. All confirmed: leave it closed.
 
 ### No delete workflow exists
 

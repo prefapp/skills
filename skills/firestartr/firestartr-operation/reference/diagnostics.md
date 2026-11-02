@@ -65,6 +65,8 @@ Post-merge: GitHub **Check Runs** (`"<Kind> - synth"` / `"<Kind> - apply"` or `"
 ```bash
 gh api --paginate repos/{wet_pr_owner}/{wet_pr_repo}/commits/{merge_sha}/check-runs \
   --jq '.check_runs[] | select(.name | test(" - (synth|apply|destroy)$"))'
+gh api repos/{wet_pr_owner}/{wet_pr_repo}/commits/{merge_sha}/status \
+  --jq '.statuses[] | select(.context | startswith("Terraform Destroy"))'
 gh pr view {hydrate_pr} --repo {state_repo} --comments
 ```
 
@@ -90,7 +92,7 @@ claim '<name>' (<kind>). The claim may not exist.`: check name/kind spelling, cl
 ## Claim ↔ state cross-referencing
 
 ```bash
-# Known filename (<CrKind>.<cr-name>.yaml, at the state repo's root):
+# Known filename (<CrKind>.<cr-name>.yaml, at the state repo's root); deleted CR: append `?ref=<deletion PR baseRefOid>`:
 gh api repos/{state_repo}/contents/{CrKind}.{cr-name}.yaml \
   --jq -r '.content' | base64 -d | grep -E 'firestartr.dev/(claim-ref|last-state-pr):'
 

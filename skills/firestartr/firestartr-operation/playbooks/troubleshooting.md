@@ -80,9 +80,7 @@ Read `terraform_plan` check-run `output.summary` for the verbatim plan/error on 
 
 Read sticky PR comment / check-run `output.summary` first (`../reference/diagnostics.md`). CR `.status.conditions` confirms failure, not cause. GitHub-claim kinds use the same check-run pair and sticky comment, not a cluster-only failure class.
 
-> **Deleted claims:** destroy check runs land on the `last-state-pr` PR (from
-> the CR's `firestartr.dev/last-state-pr` annotation), not the deletion
-> wet-PR. Inspect destroy status with `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current` (it follows `last-state-pr`).
+> **Deleted claims:** `watch-checks` doesn't report destroy results; verify with `lifecycle.md` delete flow Step 4.
 
 ## Read-only playbooks' own failure modes
 
