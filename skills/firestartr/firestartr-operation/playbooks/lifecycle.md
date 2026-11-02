@@ -123,7 +123,7 @@ for N in $(gh pr list --repo {state_repo} --state merged --search 'in:title "Aut
 done
 ```
 
-For each removed file, read its `last-state-pr` at `$BASE` (`../reference/diagnostics.md`, claim ↔ state), then the destroy results on that PR's merge commit (no annotation: `$DEL`; `../reference/diagnostics.md`, apply/destroy). A CR is confirmed by a success `<Kind> - destroy` check run or `Terraform Destroy <cr-name>` status. No `$DEL`, or any CR failed or unconfirmed (fs-forge-managed Step 3 rules): reopen the issue the unprovision run closed, `gh issue reopen {N} --repo {claims_repo}`. All confirmed: leave it closed.
+For each removed file, read its `last-state-pr` at `$BASE` (`../reference/diagnostics.md`, claim ↔ state), then check that PR's merge commit (no annotation: `$DEL`) for a success `Terraform Destroy <cr-name>` status (`../reference/diagnostics.md`, apply/destroy). That status is keyed by name, not kind, so it confirms a CR only when no other removed file has that name (a Repository and its SecretsSection share one). `<Kind> - destroy` check runs name no CR, so they never confirm one. No `$DEL`, or any CR failed or unconfirmed (fs-forge-managed Step 3 rules): reopen the issue the unprovision run closed, `gh issue reopen {N} --repo {claims_repo}`. All confirmed: leave it closed.
 
 ### No delete workflow exists
 

@@ -70,7 +70,7 @@ gh api repos/{wet_pr_owner}/{wet_pr_repo}/commits/{merge_sha}/status \
 gh pr view {hydrate_pr} --repo {state_repo} --comments
 ```
 
-`Terraform Apply <cr-name>` commit status is defined but never called; don't rely on `gh api .../statuses` for apply. `Terraform Destroy <cr-name>` is called only on success; failed destroy appears in the check run + PR comment.
+`Terraform Apply <cr-name>` commit status is defined but never called; don't rely on `gh api .../statuses` for apply. `Terraform Destroy <cr-name>` is called only on success; failed destroy appears in the check run + PR comment. `<Kind> - destroy` check runs carry only the kind (no CR name), so they can't tell CRs of one kind apart. `Terraform Destroy <cr-name>` is keyed by name, so kinds sharing a name (a Repository and its SecretsSection) share one status.
 
 The CR's `.status.conditions` has generic `ERROR` (`An
 error occurred while executing the Terraform apply operation.`): confirms failure, not cause; use the check run / PR comment.
