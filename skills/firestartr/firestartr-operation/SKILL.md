@@ -51,7 +51,7 @@ Touch no repository until `context` succeeds.
 `{version}` = `cli.pinned` if set, else `{target}`:
 - Unset or equal to `{target}`: no question.
 - Pinned below `{target}` (semver): offer to bump the pin to `{target}`
-  (show-before-write). Declined: use the pin and consult its `--help`.
+  (show-before-write). Declined: use the pin only if its `--help` shows `kinds show` and `--create-issue`; otherwise stop and tell the client.
 - Pinned above `{target}`: use it and say so.
 - Never ask because npm's `latest` differs.
 
