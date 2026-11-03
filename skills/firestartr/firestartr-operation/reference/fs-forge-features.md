@@ -10,7 +10,7 @@ Names, READMEs, schemas, versions and changelogs: `../playbooks/feature-advisor.
 
 Dedicated subcommands mutate one `features[]` entry at a time. Positional `<component>` is the **bare** name, not `ComponentClaim-<name>`. Targets:
 
-- `<component> --org={org}`: resolved through the claims-map as
+- `<component>`: resolved through the claims-map as
   `ComponentClaim-<component>`.
 - `-f {claim-file}`: a local ComponentClaim YAML file; skips the claims-map.
 
@@ -25,7 +25,7 @@ npx @firestartr/fs-forge-cli@{version} features add --name <feature> --help --js
 This discovers `args.*` from the Feature's **latest published schema**. The reference's `version`/`ref` pins the claim, not the schema used to validate args.
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} features add <component> --org={org} \
+npx @firestartr/fs-forge-cli@{version} features add <component> \
   --name <feature> --version <v> \
   --args.<field>=<value> ... \
   --commit
@@ -39,8 +39,8 @@ npx @firestartr/fs-forge-cli@{version} features add <component> --org={org} \
 ### Remove / list: no schema resolution
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} features remove <component> --org={org} --name <feature> --commit
-npx @firestartr/fs-forge-cli@{version} features list <component> --org={org} --json
+npx @firestartr/fs-forge-cli@{version} features remove <component> --name <feature> --commit
+npx @firestartr/fs-forge-cli@{version} features list <component> --json
 ```
 
 `remove` needs no `--source`/schema fetch.
@@ -51,7 +51,7 @@ To attach on create or add/remove without a schema round-trip, use repeatable in
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} create component ... --feature 'name@1.2.3:{"enabled":true}'
-npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
+npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> \
   --add-feature 'name#main:{"enabled":true}' --remove-feature other-name --commit
 ```
 

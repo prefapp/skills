@@ -6,7 +6,7 @@ Change an existing claim via `fs-forge edit` (`../reference/fs-forge-edit.md`), 
 
 ### Step 1: Read the current claim
 
-`edit <Kind>-<name> --org={org}` with no mutating flags prints the full
+`edit <Kind>-<name>` with no mutating flags prints the full
 current YAML.
 
 ### Step 2: Discover flags

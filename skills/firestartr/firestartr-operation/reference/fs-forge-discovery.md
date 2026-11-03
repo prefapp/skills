@@ -7,7 +7,7 @@ Read-only claim inventory and relation graphs.
 List the claims-map without a clone or `gh api` path-walking:
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} discovery org-elements --org={org}
+npx @firestartr/fs-forge-cli@{version} discovery org-elements
 ```
 
 One API call. Options: `discovery org-elements --help --json`. Prefer over a potentially stale catalog for raw inventory.
@@ -17,7 +17,7 @@ One API call. Options: `discovery org-elements --help --json`. Prefer over a pot
 Render live claims-repo ownership/grouping relations, not the hydrated catalog:
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} discovery map --org={org}
+npx @firestartr/fs-forge-cli@{version} discovery map
 ```
 
 Network-bound: downloads one claims-repo tarball and needs auth like `edit`. Recognizes only `owner`, `maintainedBy`, `platformOwner`, `subComponentOf`, `system`, `domain`, `parent`, `children`, and `members`; never API references or inline Features. Prefer it for topology when the catalog may be stale (~6h hydration lag).
@@ -35,4 +35,4 @@ npx @firestartr/fs-forge-cli@{version} diagram print --file {graph.json}
 cat {graph.json} | npx @firestartr/fs-forge-cli@{version} diagram print
 ```
 
-Local and offline; no `--org`. Input: same `RelationGraph` shape as `discovery map --json`. For an org's claim topology, use `discovery map`.
+Local and offline. Input: same `RelationGraph` shape as `discovery map --json`. For an org's claim topology, use `discovery map`.

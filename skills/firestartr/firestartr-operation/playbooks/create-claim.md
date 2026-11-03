@@ -8,7 +8,7 @@ Ask the client only for what you can't infer or default.
 
 Construct from the request and policy (`../reference/reference.md`): derive name, provider identity and refs from those, not another claim.
 
-"Like X": read X (`edit <Kind>-<name> --org={org}`, no mutating flags; `../reference/fs-forge-edit.md`) for kind and requested likeness (Feature names, visibility); don't copy its YAML or hand-copy a claim file.
+"Like X": read X (`edit <Kind>-<name>`, no mutating flags; `../reference/fs-forge-edit.md`) for kind and requested likeness (Feature names, visibility); don't copy its YAML or hand-copy a claim file.
 
 Plan = `create` output with requested fields, required identifiers and policy defaults. Never inherit credentials, vars, Features, annotations, provider settings (sync, org permissions, merge, technology), or `tfStateKey`; omit unless requested. Apply documented policy defaults (e.g. ComponentClaim/UserClaim `sync`), but don't bake in live claims-repo defaults; Step 4 previews the renderer's additions.
 
@@ -27,16 +27,14 @@ Non-null kind `preflight` → `preflight --create` (claims-map and provider; `..
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} create <kind> \
-  --org={org} \
   [--<schema-org-flag>={org}] \
   --<flag>=<value> \
   ... \
   > {preview-file}
 ```
 
-`--org` is control-plane (required for the `--commit` landing run);
-`--<schema-org-flag>` is the kind's schema org field if it has one: both
-in `../reference/fs-forge-mutation-shared.md` `{org}` passthrough. No
+`--<schema-org-flag>` is the kind's schema org field if it has one
+(`../reference/fs-forge-mutation-shared.md` `{org}` passthrough). No
 output flag; redirect stdout to `{preview-file}`, a `mktemp` path outside the
 repo (one per claim, reused in Steps 4-5). For `requiresPath: true`, discover the destination convention from existing claims; if none exists, ask the client for a normalized `claims/{...}/{name}.yaml` path. Pass `--path` on `--commit` only for these kinds; others reject it. Complex arrays/unions: temp JSON file + FlagSpec
 `.json` escape-hatch `path`, passed verbatim.
@@ -53,10 +51,10 @@ Fix errors before proceeding.
 
 ### Step 4: Offer to preview the org's repo-level claim defaults
 
-Needs network and `--org`; skip if the client wants a fully offline artifact and declines. `create` never applies these (`../reference/fs-forge-mutation-shared.md` → "Claim defaults"):
+Needs network; skip if the client wants a fully offline artifact and declines. `create` never applies these (`../reference/fs-forge-mutation-shared.md` → "Claim defaults"):
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} defaults apply -f {preview-file} --org={org}
+npx @firestartr/fs-forge-cli@{version} defaults apply -f {preview-file}
 ```
 
 Compare to Step 3's file; tell the client what the platform will fill in,

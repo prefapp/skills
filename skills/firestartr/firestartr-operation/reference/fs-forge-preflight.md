@@ -9,7 +9,7 @@ Pass the `preflight` value from `kinds show <id> --json` to `--kind`, not the sh
 ## Invocation
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} preflight --org={org} \
+npx @firestartr/fs-forge-cli@{version} preflight \
   --kind <preflight-value> --name <name> \
   (--create | --edition --old-name <old-name> | --deletion) \
   [--scope claims|provider|all] [--json]
