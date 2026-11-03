@@ -27,8 +27,8 @@ checks were watched: don't report them as passed. Run
 `npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --current --json`
 and report its result. For `catalogOnly: true` kinds, report the provisioning run's outcome instead; other `hydration: null` kinds are unconfirmed. Once the wet PR merges, read its merge-commit check runs before reporting (`../reference/diagnostics.md`, apply/destroy).
 
-- Any `checks` entry or merge-commit check with `failure`, `cancelled` or `timed_out` → failed: stop, report, point to diagnostics.
-- No PR (exit 3), no `checks` entries, `lastStatePr.state` not `merged` (open, closed or null after lookup error), or conclusion other than `success`, `skipped` or `neutral` (null/pending, `action_required`, `stale`) → unconfirmed: say so, point to diagnostics. Absent or pending merge-commit checks are also unconfirmed.
+- Any `checks` entry or merge-commit check with `failure`, `cancelled`, `timed_out`, `action_required` or `stale` → failed: stop, report, point to diagnostics.
+- No PR (exit 3), no `checks` entries, `lastStatePr.state` not `merged` (open, closed or null after lookup error), or conclusion other than `success`, `skipped` or `neutral` (null/pending) → unconfirmed: say so, point to diagnostics. Absent or pending merge-commit checks are also unconfirmed.
 
 On either result, reopen the issue the merged claim PR closed: `gh issue reopen {N} --repo {claims_repo}`.
 
