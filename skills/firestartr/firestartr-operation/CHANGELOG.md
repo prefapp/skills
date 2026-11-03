@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/prefapp/skills/compare/firestartr-operation-v0.5.0...firestartr-operation-v0.5.1) (2026-11-03)
+
+
+### Bug Fixes
+
+* **firestartr-operation:** align with fs-forge-cli 3.0.0 org resolution and check conclusions ([#145](https://github.com/prefapp/skills/issues/145)) ([1f4e3c2](https://github.com/prefapp/skills/commit/1f4e3c242c2b099af8c6d59630a85ab00aada77d))
+
 ## [0.5.0](https://github.com/prefapp/skills/compare/firestartr-operation-v0.4.1...firestartr-operation-v0.5.0) (2026-11-03)
 
 
