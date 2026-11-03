@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/prefapp/skills/compare/firestartr-operation-v0.4.1...firestartr-operation-v0.5.0) (2026-11-03)
+
+
+### Features
+
+* **firestartr-operation:** install the latest release with install.sh --fs ([#142](https://github.com/prefapp/skills/issues/142)) ([847f24d](https://github.com/prefapp/skills/commit/847f24dcb3f38df8bc996154fa60c8e1779def7e))
+* **firestartr-operation:** use the fs-forge-cli context and kind capabilities ([#144](https://github.com/prefapp/skills/issues/144)) ([4224ad5](https://github.com/prefapp/skills/commit/4224ad57b9b4636b526161780d2611c52cca104e))
+
 ## [0.4.1](https://github.com/prefapp/skills/compare/firestartr-operation-v0.4.0...firestartr-operation-v0.4.1) (2026-10-28)
 
 
