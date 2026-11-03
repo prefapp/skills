@@ -1,9 +1,6 @@
 # Edit Claim Playbook
 
-Change an existing claim, then land it via `lifecycle`. Prefer `fs-forge edit`
-over hand-editing the file: see `../reference/fs-forge-edit.md` for the
-invocation idiom. Fall back to the manual `gh`-based edit only when a field
-isn't reachable through `edit`'s flags.
+Change an existing claim via `fs-forge edit` (`../reference/fs-forge-edit.md`), then `lifecycle`. Use manual `gh` edit only when `edit` flags cannot reach a field.
 
 ## Primary flow: `fs-forge edit`
 
@@ -19,10 +16,7 @@ current YAML.
 
 ### Step 3: Dry-run the change
 
-Same command with the relevant `--<flag>=<value>` / `--unset <path>`,
-`--diff`, and `--show-defaults` (unconditionally). Fix any validation
-errors, then show the printed Claim diff to the client and get approval
-(`../reference/fs-forge-edit.md` has the diff/defaults format).
+Same command with relevant `--<flag>=<value>` / `--unset <path>`, `--diff`, and always `--show-defaults`. Fix validation errors, show the Claim diff and get approval (`../reference/fs-forge-edit.md`).
 
 > **Check this first:** an unexpected diff, or a rejected `--commit`;
 > see `troubleshooting.md#fs-forge-cli-command-failures`.
@@ -31,29 +25,22 @@ errors, then show the printed Claim diff to the client and get approval
 
 See `../reference/fs-forge-mutation-shared.md`'s `--commit` warning.
 
-Array fields (e.g. `members`) are **replaced**, not appended to: always
-compute the full desired array from what Step 1 read before passing it.
+Array fields (e.g. `members`) **replace**, not append: compute the full desired array from Step 1.
 
 ## Team membership (GroupClaim)
 
 `members` is a **root-level** array of `user:{username}` references, never under
 `providers.github`, never under `spec`.
 
-- **Add**: read the current `members` (Step 1), append `user:{name}`, pass the
-  **whole** array back. Each user must already have a UserClaim; if not, create
-  it first and hydrate it before editing the group.
-- **Remove**: read the current `members`, drop the entries, pass the whole
-  remaining array. If it becomes empty, use `--unset members` instead.
-- **List / check**: Step 1's read is the answer: no PR needed for a read-only ask.
+- **Add:** append `user:{name}` to current `members` and pass the **whole** array. Each user needs a UserClaim; create and hydrate it before editing the group if absent.
+- **Remove:** drop entries from current `members` and pass the whole remainder; if empty, use `--unset members`.
+- **List / check:** Step 1's read suffices; no PR.
 
-Adding the same users to several teams → one `edit` per `GroupClaim`, each
-producing its own dry-run/approval/commit cycle (they're separate commits and
-separate provision runs).
+For several teams, use one `edit` per `GroupClaim`, each with its own dry-run/approval/commit cycle and provision run.
 
 ## Repository permissions (ComponentClaim)
 
-Seven fields, at three levels. Placing a field at the wrong level triggers a
-"must NOT have additional properties" schema error: level matters.
+Wrong field level triggers "must NOT have additional properties".
 
 | Field | Level | Format | Purpose |
 |---|---|---|---|
@@ -70,36 +57,12 @@ Rules:
 - `maintainedBy`, `additionalRules[].owners`, `owner`, `platformOwner` reference
   in-org users/groups (must have claims). Only `overrides.*` and `maintainedBy`
   accept `collaborator:`: external logins that need **no** UserClaim.
-- Array fields replace, so read the current value (step 1) before editing one;
-  empty an array → `--unset` its path instead of passing `[]`.
-- Change a collaborator's permission by moving them between the `additional*`
-  arrays (read current, edit, pass whole arrays back).
-
-Example resulting file (root-level `maintainedBy`, `providers.github`
-CODEOWNERS + collaborators):
-
-```yaml
-owner: group:my-team
-maintainedBy:
-  - group:another-team
-  - collaborator:external-user
-platformOwner: group:platform-team
-providers:
-  github:
-    additionalRules:
-      - path: /docs
-        owners: [group:docs-team]
-    overrides:
-      additionalWriters:
-        - collaborator:external-dev
-```
+- Read arrays before editing; empty array → `--unset` its path, not `[]`.
+- Change collaborator permission by moving them between `additional*` arrays; pass whole arrays.
 
 ## TFWorkspaceClaim
 
-`--commit` is mandatory for values, module, and policy (no offline path)
-(`../reference/fs-forge-mutation-shared.md`'s `--commit` warning: it
-hydrates; no manual hydrate after). Create vocabulary:
-`create-claim.md`'s TF workspace section.
+Values, module and policy require `--commit` (no offline path); it hydrates, so no manual hydrate after (`../reference/fs-forge-mutation-shared.md`). Create vocabulary: `create-claim.md` TF workspace section.
 
 - **values:** Step 1 is the current object. Rebuild it from the module's
   `variables.tf` plus the client's changes; pass through the discovered
@@ -112,29 +75,12 @@ hydrates; no manual hydrate after). Create vocabulary:
 
 ## Any other field
 
-Same procedure for any existing claim of any kind: read (Step 1), dry-run the
-flag change, get approval, commit. Consult `../reference/reference.md` for the
-field's kind, level, and format.
+Any kind: read (Step 1), dry-run, approve, commit. Field kind/level/format: `../reference/reference.md`.
 
 ## Features (ComponentClaim)
 
-Don't recompute the whole `features[]` array by hand: use the dedicated
-`features add`/`edit`/`remove`/`list` subcommands (`../reference/fs-forge-features.md`
-→ "Feature CRUD"), which mutate one reference at a time and derive `args.*`
-flags from the Feature's own schema. `add`/`edit`/`remove` each still need the
-same dry-run (without `--commit`) → client approval → `--commit` sequence as
-any other edit; `list` is read-only and needs no `--commit`. Use inline
-`edit --add-feature`/`--remove-feature` only when you already know valid
-`args` and don't need schema-derived flags, then run `validate` to
-catch bad `args` before landing.
+Don't recompute `features[]` by hand: use `features add`/`edit`/`remove`/`list` (`../reference/fs-forge-features.md` → "Feature CRUD"); they target one reference and derive `args.*` flags. For `add`/`edit`/`remove`: dry-run without `--commit` → client approval → `--commit`. `list` is read-only. Use inline `edit --add-feature`/`--remove-feature` only with known valid `args` and no need for schema-derived flags; run `validate` before landing.
 
 ## Manual fallback
 
-Only when the field you need to change isn't reachable through `edit`'s
-flags (e.g. rewriting one element inside an array of objects that has no
-dedicated CRUD subcommand, via the `.json` escape hatch): read the file
-(`gh-cookbook.md` → "Read a file"), edit it, write the **whole** file back
-preserving everything else, validate
-(`npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}`), then land
-it via `lifecycle`'s manual flow: `edit`'s built-in commit isn't available
-for a hand-edited file.
+Only if `edit` flags cannot reach the field (e.g. one array-of-objects element without dedicated CRUD, via `.json`): read (`../reference/gh-cookbook.md` → "Read a file"), edit, write the **whole** file preserving everything else, validate (`npx @firestartr/fs-forge-cli@{version} validate -f {claim-file}`), then land via `lifecycle` manual flow. Built-in `edit` commit cannot land hand edits.

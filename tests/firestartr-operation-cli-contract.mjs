@@ -160,7 +160,8 @@ function check() {
         if (topics.has(id)) {
           const subcommand = words[1];
           if (id === 'create' && subcommand === '<kind>') flags = createFlags;
-          else if (!subcommand || subcommand.startsWith('--')) flags = [];
+          // A command that is also a topic keeps its own flags when no subcommand follows.
+          else if (!subcommand || subcommand.startsWith('--')) flags = commands.get(id) ?? [];
           else { id += `:${subcommand}`; flags = commands.get(id); }
         }
         if (!flags) {

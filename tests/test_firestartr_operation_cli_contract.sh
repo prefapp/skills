@@ -102,3 +102,26 @@ OUTPUT="$(PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-operation-cli-contra
   printf 'FAIL: missing latest warning\n%s\n' "$OUTPUT"; exit 1;
 }
 echo 'PASS: valid negation and latest warning do not fail the check'
+
+cat > "$TMP/skills/firestartr/firestartr-operation/contract-test.md" <<'EOF'
+```bash
+npx @firestartr/fs-forge-cli@{version} kinds --json
+npx @firestartr/fs-forge-cli@{version} kinds show component --json
+npx @firestartr/fs-forge-cli@{version} kinds --bogus-after-kinds
+npx @firestartr/fs-forge-cli@{version} kinds show component --bogus-after-show
+```
+EOF
+set +e
+OUTPUT="$(PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-operation-cli-contract.mjs" 2>&1)"
+STATUS=$?
+set -e
+[ "$STATUS" -eq 1 ] || { printf 'FAIL: expected exit 1, got %s\n%s\n' "$STATUS" "$OUTPUT"; exit 1; }
+for EXPECTED in \
+  'contract-test.md:4: unknown flag --bogus-after-kinds for kinds' \
+  'contract-test.md:5: unknown flag --bogus-after-show for kinds show'; do
+  [[ "$OUTPUT" == *"$EXPECTED"* ]] || { printf 'FAIL: missing %s\n%s\n' "$EXPECTED" "$OUTPUT"; exit 1; }
+done
+[ "$(printf '%s\n' "$OUTPUT" | grep -c 'unknown \(command\|flag\)')" -eq 2 ] || {
+  printf 'FAIL: unexpected findings\n%s\n' "$OUTPUT"; exit 1;
+}
+echo 'PASS: flags after a command that is also a topic check its own flags'

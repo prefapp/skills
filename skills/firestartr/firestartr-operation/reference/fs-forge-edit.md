@@ -1,19 +1,6 @@
 # fs-forge Edit Reference
 
-`edit` and a committing `create` are the network-bound fs-forge
-commands: they read and write the claims repo directly over the GitHub API.
-Sibling of `fs-forge-cookbook.md`; `{org}`/`{version}` come from
-`firestartr-config.yaml`.
-
-All need `--org={org}` on every invocation: the control-plane flag
-(`fs-forge-mutation-shared.md`'s `{org}` passthrough); always pass it
-explicitly rather than relying on an env var default. Auth is the
-`GITHUB_TOKEN` inline prefix from `../SKILL.md`'s Common rules: every
-command below assumes it.
-
-Claims are addressed as `<Kind>-<name>` (e.g. `ComponentClaim-my-repo`): the
-same key the claims-map uses. Use this notation everywhere you need to name an
-existing claim.
+Use `--org={org}` explicitly on every call (`fs-forge-mutation-shared.md`); address claims as `<Kind>-<name>`.
 
 ## Read an existing claim
 
@@ -37,27 +24,10 @@ Always dry-run before committing:
 npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
   --<flag>=<value> ... \
   --unset <dotted.path> ... \
-  --diff
+  --diff --show-defaults
 ```
 
-`--diff` prints a **Claim diff** to stderr (not a relation/topology tree:
-that's `discovery map`'s job, `fs-forge-discovery.md`). Add `--json` for the
-structured form: a flat `ClaimDiff[]` array: `{path, before, after}` per
-changed field; no separate published schema of its own.
-
-Add `--show-defaults` **unconditionally, every time**: it implies `--diff`
-and fetches the same repo-level claim defaults `edit` already applies
-automatically (`fs-forge-mutation-shared.md`'s "Claim defaults"), widening
-the diff's "after" side to the fully-defaulted claim: defaults show up as
-ordinary `+` lines alongside the client's own field changes. Combined with
-`--json`, the structured shape becomes the published **`MutationDiff`**
-contract: `{"changes": [...], "defaults": {...}}`, same `{path, before,
-after}` items as the flat array plus the defaulted paths (schema: `schema
-show MutationDiff`, `fs-forge-cookbook.md`): `--diff --json` alone, without
-`--show-defaults`, keeps the flat `ClaimDiff[]` shape untouched. Show the
-printed diff to the client and get approval. Only then re-run the same
-command with `--commit` appended (`fs-forge-mutation-shared.md`'s `--commit`
-warning):
+`--diff` prints a Claim diff to stderr, not a relation tree. Always add `--show-defaults`: the after side includes repo defaults (`fs-forge-mutation-shared.md`). With `--json`, see `schema show MutationDiff` (`fs-forge-cookbook.md`); without `--show-defaults`, `--diff --json` emits a flat `ClaimDiff[]` of `{path, before, after}`. Show the diff and get approval before re-running with `--commit` (`fs-forge-mutation-shared.md`):
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
