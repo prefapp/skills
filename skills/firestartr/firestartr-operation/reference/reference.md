@@ -33,7 +33,7 @@ fallback starting point for `create`, not a live mirror of any org's actual
 configuration. For the org's real, current repo-level claim defaults
 (auto-applied by `edit`, previewable for `create`; see
 `fs-forge-mutation-shared.md`'s "Claim defaults" section), run
-`npx @firestartr/fs-forge-cli@{version} defaults show <kind> --org={org}`.
+`npx @firestartr/fs-forge-cli@{version} defaults show <kind>`.
 
 These are logical claim-field values, not literal CLI flag names. Map them to the
 matching FlagSpec paths and use each returned `path` when calling

@@ -10,9 +10,9 @@ npx @firestartr/fs-forge-cli@{version} create <kind> --help --json
 
 Read `.flags[]` and `relationships` from the returned `CommandHelpJson` (schema: `npx @firestartr/fs-forge-cli@{version} schema show CommandHelpJson`). Prefer the command's own description, translated to client terms. **Never hardcode schema-field flags**: pass the discovered `path` as `--<path>=<value>`. Repeated `multiple` flags replace the whole array; read and rebuild it first.
 
-## `{org}` passthrough: two distinct flags
+## `{org}` passthrough: the kind's org flag
 
-Control-plane `--org={org}` selects the claims repo; it does not set the claim resource's org. For `create` or `edit`, also pass `--<orgField>={org}` when the kind's `orgField` is non-null. Discover that exact path:
+The CLI resolves the claims repo's org the way `context` does (`FSCRT_ORG`, then the config entry matching the cwd): run every command from `context`'s cwd and env, without `--org`. That does not set the claim resource's org. For `create` or `edit`, also pass `--<orgField>={org}` when the kind's `orgField` is non-null. Discover that exact path:
 
 ```bash
 npx @firestartr/fs-forge-cli@{version} kinds show <kind> --json | jq -r '.orgField'
@@ -25,7 +25,7 @@ npx @firestartr/fs-forge-cli@{version} kinds show <kind> --json | jq -r '.orgFie
 Every `--commit`, on any command, carries an audit issue:
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} ... --commit \
+npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> ... --commit \
   --create-issue --issue-title "{goal}" --issue-body "{what the client asked for}"
 ```
 
@@ -49,10 +49,10 @@ re-run `--commit` blindly: inspect that run and the wet PR first.
 **`create` never applies defaults**, with or without `--commit`; output contains only flag-described fields. Preview additions with the read-only commands below and tell the client "the platform will also apply: …", distinct from the file.
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} defaults apply <Kind>-<name> --org={org}
-npx @firestartr/fs-forge-cli@{version} defaults apply -f {claim-file} --org={org}
-npx @firestartr/fs-forge-cli@{version} defaults show <kind> --org={org}
-npx @firestartr/fs-forge-cli@{version} defaults list --org={org} [--json]
+npx @firestartr/fs-forge-cli@{version} defaults apply <Kind>-<name>
+npx @firestartr/fs-forge-cli@{version} defaults apply -f {claim-file}
+npx @firestartr/fs-forge-cli@{version} defaults show <kind>
+npx @firestartr/fs-forge-cli@{version} defaults list [--json]
 ```
 
 `apply` does not validate or write; the local file must have a `kind` field. Command flags: `--help --json`.

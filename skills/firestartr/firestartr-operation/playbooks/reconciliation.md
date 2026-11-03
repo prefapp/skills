@@ -7,7 +7,7 @@ Answer repo/team sync and drift questions. **Read-only:** route fixes to `create
 Before a manual field diff, get a point-in-time check-status snapshot:
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current [--cr-name=<name>]
+npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --current [--cr-name=<name>]
 ```
 
 Exit 0 (all checks passed) without drift suspicion → report aligned; otherwise [compare](#the-comparison). Live watch: omit `--current` to wait until checks finish or timeout. Configured state repos are the default; `--state-repos` overrides them. Flags: `watch-checks --help --json`. Exit 1: `troubleshooting.md#terraform-plan-status-check-pre-merge`.

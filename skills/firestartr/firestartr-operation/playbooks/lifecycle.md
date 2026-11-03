@@ -24,7 +24,7 @@ Don't poll, hydrate or merge the wet PR yourself; `--commit` did it. Check the d
 
 If the output says `No wet PR found for this claim; skipping check watch.`, no
 checks were watched: don't report them as passed. Run
-`npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --org={org} --current --json`
+`npx @firestartr/fs-forge-cli@{version} watch-checks <Kind>-<name> --current --json`
 and report its result. For `catalogOnly: true` kinds, report the provisioning run's outcome instead; other `hydration: null` kinds are unconfirmed. Once the wet PR merges, read its merge-commit check runs before reporting (`../reference/diagnostics.md`, apply/destroy).
 
 - Any `checks` entry or merge-commit check with `failure`, `cancelled` or `timed_out` → failed: stop, report, point to diagnostics.
@@ -98,7 +98,7 @@ Choose flags before the dry-run; use the same command with `--commit` later:
 No `--commit`, to confirm the claim exists and preview the dispatch:
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> --org={org} \
+npx @firestartr/fs-forge-cli@{version} delete <Kind> <name> \
   [--include-variants|--no-include-variants]
 ```
 

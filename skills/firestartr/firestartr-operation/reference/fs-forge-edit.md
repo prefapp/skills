@@ -1,10 +1,10 @@
 # fs-forge Edit Reference
 
-Use `--org={org}` explicitly on every call (`fs-forge-mutation-shared.md`); address claims as `<Kind>-<name>`.
+Address claims as `<Kind>-<name>`.
 
 ## Read an existing claim
 
-`edit <Kind>-<name> --org={org}` with no mutating flags is the preferred way
+`edit <Kind>-<name>` with no mutating flags is the preferred way
 to read a claim: it goes through the claims-map instead of hand-rolling a
 `gh api` path lookup, and prints the current claim YAML to stdout. Fall back
 to `gh-cookbook.md`'s "Read a file" only if the claims-map lookup itself is
@@ -21,7 +21,7 @@ known until the reference argument is parsed: don't use it for discovery.
 Always dry-run before committing:
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
+npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> \
   --<flag>=<value> ... \
   --unset <dotted.path> ... \
   --diff --show-defaults
@@ -30,7 +30,7 @@ npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
 `--diff` prints a Claim diff to stderr, not a relation tree. Always add `--show-defaults`: the after side includes repo defaults (`fs-forge-mutation-shared.md`). With `--json`, see `schema show MutationDiff` (`fs-forge-cookbook.md`); without `--show-defaults`, `--diff --json` emits a flat `ClaimDiff[]` of `{path, before, after}`. Show the diff and get approval before re-running with `--commit` (`fs-forge-mutation-shared.md`):
 
 ```bash
-npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> --org={org} \
+npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> \
   --<flag>=<value> ... --commit
 ```
 
