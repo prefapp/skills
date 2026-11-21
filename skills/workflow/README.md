@@ -4,7 +4,7 @@ The end-to-end development workflow Prefapp developers (and clients'
 developers) follow on any repository, packaged as 23 harness-agnostic agent
 skills: plan → spec → implement → review. Extracted from a proven,
 repo-specific skill set and generalized to work anywhere. Runs in pi,
-OpenCode, Claude Code, and VS Code Copilot.
+OpenCode, Claude Code, VS Code Copilot, and Antigravity (`agy`).
 
 ## Install
 
@@ -21,7 +21,8 @@ with no arguments for all options.
 ### Where the skills land
 
 One symlink per skill, flat, into `~/.agents/skills/` (pi, OpenCode, VS Code
-Copilot) and `~/.claude/skills/` if Claude Code is detected — e.g.
+Copilot), `~/.claude/skills/` if Claude Code is detected, and
+`~/.gemini/config/skills/` if Antigravity (`agy`) is detected — e.g.
 `~/.agents/skills/tdd → <repo>/skills/workflow/tdd`. Re-running `install.sh`
 is safe. A name already taken by something that isn't ours is skipped with a
 warning.
@@ -61,6 +62,9 @@ fire automatically when the situation matches.
 
 - **`implement`** *(explicit)* — Use when implementing from a spec or ticket,
   at the agreed seams. **Never commits** — it stops and reports what changed.
+- **`implement-spec`** *(explicit)* — Use when implementing an entire `/to-spec`
+  and `/to-tickets` task graph on a single integration branch using parallel
+  background implementer sub-agents.
 - **`tdd`** — Use when building test-first: red-green-refactor, one test at a
   time.
 - **`coding`** — Use when writing or changing code: think before coding,

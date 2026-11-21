@@ -71,6 +71,19 @@ entry.
 _Avoid_: capability, plugin (both suggest something more generic than this
 catalog-bound unit).
 
+**App**:
+The deployable unit of a client's platform. It has one `.firestartr/apps/<app>.yaml`
+entry, one state repo `app-<app>`, and one ArgoCD ApplicationSet.
+_Avoid_: using "service" for the deployable unit.
+
+**Service**:
+The code repo (a component) that builds the images an App deploys. For now, an
+App has exactly one Service.
+
+**Deployment target**:
+One (cluster, tenant, env) combination of an App. Adding an env to an App adds a
+Deployment target.
+
 **Validation sweep**:
 A whole-repo dispatch of `validate-claims.yaml` that renders every claim to
 confirm the claims repo is structurally sound, including that every
@@ -176,6 +189,7 @@ the skill.
 | `to-tickets` | explicit | Break a spec/plan into independently-grabbable tracer-bullet tickets, each declaring its blocking edges, published as GitHub issues. |
 | `triage` | explicit | Move issues through a state machine of triage roles; optionally include external PRs when the repo config enables PRs as a triage surface — categorise, verify, grill if needed, write agent-ready briefs, and record rejections in `.out-of-scope/`. |
 | `implement` | explicit | Implement from spec/tickets at agreed seams. **Never commits.** |
+| `implement-spec` | explicit | Implement an entire `/to-spec` + `/to-tickets` task graph on a single integration branch with parallel implementer sub-agents. |
 | `tdd` | auto | Red-green-refactor, one test at a time. |
 | `coding` | auto | Behaviour guide while writing code: surface assumptions, keep it simple, make surgical changes, verify against success criteria. |
 | `zero-tech-debt` | auto | Rebuild a feature toward its intended shape, removing compatibility cruft and dead abstractions. Not for hotfixes. |
