@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/prefapp/skills/compare/firestartr-operation-v0.5.1...firestartr-operation-v0.6.0) (2026-11-21)
+
+
+### Features
+
+* **install:** support Antigravity (agy) harness ([4de6ab4](https://github.com/prefapp/skills/commit/4de6ab466395d18aedec8fc121bc98fc69eeddcf))
+
 ## [0.5.1](https://github.com/prefapp/skills/compare/firestartr-operation-v0.5.0...firestartr-operation-v0.5.1) (2026-11-03)
 
 
