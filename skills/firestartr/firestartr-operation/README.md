@@ -26,8 +26,8 @@ The skill runs inside an agent harness. If you don't have one yet, pick either:
   [install docs](https://pi.dev/docs/latest)
 
 Both discover skills from `~/.agents/skills/`, one of the locations the
-installer puts this skill. Claude Code is also supported via
-`~/.claude/skills/`.
+installer puts this skill. Claude Code (`~/.claude/skills/`) and
+Antigravity (`~/.gemini/config/skills/`) are also supported.
 
 ## 📦 Install
 

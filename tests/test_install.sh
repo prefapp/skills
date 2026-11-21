@@ -11,6 +11,7 @@ trap 'rm -rf "$TMP"' EXIT
 
 AGENTS="$TMP/.agents/skills"
 CLAUDE="$TMP/.claude/skills"
+AGY="$TMP/.gemini/config/skills"
 WORKFLOW_NS="$AGENTS/prefapp-workflow"
 NARGS="$TMP/npx-args.log"
 SKILLS_CLI_VERSION="1.5.23"
@@ -46,7 +47,7 @@ chmod +x "$TMP/bin/git"
 export GIT_ARGS
 
 run() { HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" "$@"; }
-reset() { rm -rf "$TMP/.agents" "$TMP/.claude"; }
+reset() { rm -rf "$TMP/.agents" "$TMP/.claude" "$TMP/.gemini"; }
 
 assert_flat_links() {
   # Every skill under $1 (a src dir) resolves to a flat symlink under $2 (a dest dir).
@@ -191,6 +192,14 @@ run --all >/dev/null
 [ ! -e "$CLAUDE/prefapp-workflow" ] || { echo "FAIL: claude got a namespace dir"; exit 1; }
 assert_flat_links "$REPO_DIR/skills/workflow" "$CLAUDE" "claude"
 [ ! -e "$CLAUDE/firestartr-operation" ] || { echo "FAIL: claude got a firestartr-operation link"; exit 1; }
+
+# Antigravity (agy) gets one flat link per skill in ~/.gemini/config/skills too.
+reset
+mkdir -p "$TMP/.gemini"
+run --all >/dev/null
+[ ! -e "$AGY/prefapp-workflow" ] || { echo "FAIL: agy got a namespace dir"; exit 1; }
+assert_flat_links "$REPO_DIR/skills/workflow" "$AGY" "agy"
+[ ! -e "$AGY/firestartr-operation" ] || { echo "FAIL: agy got a firestartr-operation link"; exit 1; }
 
 # Re-running is idempotent and does not warn about its own links.
 ERR="$(run --all 2>&1 >/dev/null)"

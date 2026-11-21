@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Install prefapp-workflow skills into detected agent harnesses.
 # The workflow set is symlinked flat per-skill from skills/workflow into
-# ~/.agents/skills and, when Claude Code is detected, ~/.claude/skills.
+# ~/.agents/skills, ~/.claude/skills when Claude Code is detected, and
+# ~/.gemini/config/skills when Antigravity (agy) is detected.
 # Idempotent — safe to re-run. Symlinks only, never copies.
 # The Firestartr operational skill is installed via `npx skills add` from its
 # latest release, or from this checkout with --fs-local — a hard network
@@ -123,6 +124,9 @@ link_into_harnesses() {
   link_flat "$src" "$ns" "$HOME/.agents/skills" "agents"
   if command -v claude >/dev/null 2>&1 || [ -d "$HOME/.claude" ]; then
     link_flat "$src" "$ns" "$HOME/.claude/skills" "claude"
+  fi
+  if command -v agy >/dev/null 2>&1 || [ -d "$HOME/.gemini" ]; then
+    link_flat "$src" "$ns" "$HOME/.gemini/config/skills" "agy"
   fi
 }
 
