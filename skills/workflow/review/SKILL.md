@@ -11,7 +11,7 @@ Three-axis review of the diff between `HEAD` and a fixed point the user supplies
 - **Spec**: does the code faithfully implement the originating ticket / spec?
 - **Debt**: does the change leave the code carrying more history than its intended shape needs?
 
-The axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
+The axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings. Start every sub-agent with a fresh context window.
 
 The issue tracker is GitHub (`gh` CLI). For conventions, see [setup-workflow/issue-tracker-github.md](../setup-workflow/issue-tracker-github.md).
 
@@ -36,7 +36,7 @@ Look for the originating spec, in this order:
 
 ### 3. Identify the standards sources
 
-The repo's documented standards: `AGENTS.md`, `CLAUDE.md`, any `CONTRIBUTING.md`, and any coding-standards docs those files point at.
+Search the repo for every file that documents how code should be written: `AGENTS.md`, `CLAUDE.md`, `CODING_STANDARDS.md`, `CONTRIBUTING.md` (when present), and any coding-standards docs they point at.
 
 On top of whatever the repo documents, the Standards axis always carries the **smell baseline** below: a fixed set of Fowler code smells (_Refactoring_, ch.3) that applies even when a repo documents nothing. Two rules bind it:
 
@@ -60,7 +60,7 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 ### 4. Spawn the sub-agents in parallel
 
-Launch one sub-agent per axis in parallel with your harness's sub-agent tool (Claude Code: one message with one `Agent` call per axis, `general-purpose` subagent). If your harness has none, run each axis yourself from its prompt below, finishing one report before starting the next.
+Launch one sub-agent per axis in parallel, in the foreground, with your harness's sub-agent tool (Claude Code: one message with one `Agent` call per axis, `general-purpose` subagent), and aggregate the reports they return. If your harness has none, run each axis yourself from its prompt below, finishing one report before starting the next.
 
 **Standards sub-agent prompt**: include:
 

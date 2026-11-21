@@ -58,7 +58,7 @@ Before writing any code:
 - [ ] List the behaviors to test (not implementation steps)
 - [ ] Get user approval on the plan
 
-Ask: "What should the public interface look like? Which behaviors are most important to test?"
+Ask: "What should the public interface look like? Which behaviors are most important to test?" Give each proposed seam a one-line note on what it catches and what it misses.
 
 **You can't test everything.** Confirm with the user exactly which behaviors matter most. Focus testing effort on critical paths and complex logic, not every possible edge case.
 

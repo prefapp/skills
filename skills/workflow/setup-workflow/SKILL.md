@@ -23,7 +23,7 @@ you found, confirm with the user, then write.
 
 Read whatever exists; don't assume:
 
-- `git remote -v`: confirm this is a GitHub repo.
+- `git remote -v`: confirm this is a GitHub repo. If no `git remote` points at GitHub, get the repo URL from the user and wire it up (`git init` if needed, `git remote add origin <url>`) before going further. Done when `gh repo view` prints the project from inside this directory; if it can't, stop and tell the user what's missing.
 - `AGENTS.md` (and `CLAUDE.md`) at the repo root: does an `## Agent skills` (or workflow routing) section already exist?
 - `GLOSSARY.md` and `GLOSSARY-MAP.md` at the repo root.
 - Legacy `CONTEXT.md` / `CONTEXT-MAP.md` anywhere in the repo (the old names for the same files).
@@ -60,7 +60,7 @@ roles and five state roles) to real label strings. Write
 `docs/agents/triage-labels.md` with the defaults (each label
 equal to its canonical name) unless the user's tracker already uses other
 strings, then collect the overrides so `triage` applies existing labels instead
-of creating duplicates.
+of creating duplicates. Create each configured label the repo lacks (`gh label create`).
 
 **Single-context:**
 

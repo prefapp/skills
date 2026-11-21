@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 Implement the work described by the user in the spec or tickets.
 
+If the user passes a ticket reference, fetch it from the issue tracker and state its title before starting. If the reference is ambiguous, ask.
+
 Before exploring, follow the context-doc rules in [domain-modeling/domain.md](../domain-modeling/domain.md).
 
 Use /tdd where possible, at pre-agreed seams. Follow /coding as you write.

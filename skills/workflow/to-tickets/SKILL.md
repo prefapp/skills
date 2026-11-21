@@ -59,7 +59,7 @@ Iterate until the user approves the breakdown.
 
 ### 5. Publish the tickets to the issue tracker
 
-For each approved ticket, publish a new GitHub issue (`gh issue create`) in dependency order (blockers first) so each ticket's blocking edges can reference real issue identifiers. Use the issue body template below. Use GitHub's native blocking / sub-issue relationship where it's available; otherwise set each ticket's "Blocked by" to the blocking issues. Do not apply triage labels unless the user asks.
+For each approved ticket, publish a new GitHub issue (`gh issue create`) in dependency order (blockers first) so each ticket's blocking edges can reference real issue identifiers. Use the issue body template below. Use GitHub's native blocking relationship where it's available; otherwise set each ticket's "Blocked by" to the blocking issues. If the source was an existing issue, make each ticket its sub-issue (see the tracker doc). Do not apply triage labels unless the user asks.
 
 <issue-template>
 
@@ -80,7 +80,7 @@ Avoid specific file paths or code snippets: they go stale fast. Exception: if a 
 
 ## Blocked by
 
-- A reference to each blocking ticket, or "None (can start immediately)".
+- A reference to each blocking ticket, or "None (can start immediately)". Omit this section when blockers were set as native edges.
 
 </issue-template>
 
