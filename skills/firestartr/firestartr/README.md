@@ -1,4 +1,4 @@
-# 🔥 Firestartr Operation
+# 🔥 Firestartr
 
 Firestartr is Prefapp's platform layer that manages your GitHub org's repos,
 teams, and users as declarative claims. This skill is the single entry point
@@ -32,8 +32,11 @@ Antigravity (`~/.gemini/config/skills/`) are also supported.
 ## 📦 Install
 
 ```sh
-npx skills add prefapp/skills --skill firestartr-operation
+npx skills add prefapp/skills --skill firestartr
 ```
+
+`firestartr-operation` still works as a deprecated alias; `install.sh` installs
+both names during the transition.
 
 This installs the skill via the `skills` npm CLI (vercel-labs) — no clone of
 this repo required, and always installs `main` HEAD. If you do have the repo
@@ -59,18 +62,18 @@ does not update it. Either:
 
 Whether or not you have a clone, point the install at a tag's tree to pin a
 release. The exact release tag pins exactly, and a rolling
-`firestartr-operation-vN` major tag (if published) tracks new `vN.*.*` releases
+`firestartr-vN` major tag (if published) tracks new `vN.*.*` releases
 without tracking `main`:
 
 ```sh
-npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-v1/skills/firestartr/firestartr-operation
-npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-vX.Y.Z/skills/firestartr/firestartr-operation
+npx skills add https://github.com/prefapp/skills/tree/firestartr-v1/skills/firestartr/firestartr
+npx skills add https://github.com/prefapp/skills/tree/firestartr-vX.Y.Z/skills/firestartr/firestartr
 ```
 
 ## 🚀 First run
 
-Invoke `/firestartr-operation` (or explicitly ask your agent to use the
-`firestartr-operation` skill), then just describe what you want.
+Invoke `/firestartr` (or explicitly ask your agent to use the `firestartr`
+skill), then just describe what you want.
 
 On first run the skill asks for your organization's GitHub org slug and
 proposes your current directory as its `paths` entry, then writes the config

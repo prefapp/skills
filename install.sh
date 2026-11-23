@@ -7,7 +7,7 @@
 # The Firestartr operational skill is installed via `npx skills add` from its
 # latest release, or from this checkout with --fs-local — a hard network
 # dependency with no fallback, same policy as fs-forge (see
-# skills/firestartr/firestartr-operation/reference/fs-forge-cookbook.md).
+# skills/firestartr/firestartr/reference/fs-forge-cookbook.md).
 #
 # Run without arguments for usage. Install the workflow set, the Firestartr
 # operational skill, or both.
@@ -18,7 +18,12 @@ SKILLS_DIR="$REPO_DIR/skills/workflow"
 NAMESPACE="prefapp-workflow"
 SKILLS_CLI_VERSION="1.5.23"
 RELEASE_REPO_URL="https://github.com/prefapp/skills"
-RELEASE_SKILL_PATH="skills/firestartr/firestartr-operation"
+# The skill was renamed firestartr-operation → firestartr (prefapp skills#6).
+# New releases ship both: the canonical skill and a thin deprecated alias, so
+# both names stay invocable. Legacy firestartr-operation-v* tags ship only the
+# pre-rename skill, under its old path.
+CANONICAL_SKILL_PATH="skills/firestartr/firestartr"
+ALIAS_SKILL_PATH="skills/firestartr/firestartr-operation"
 
 usage() {
   cat <<'EOF'
@@ -46,16 +51,27 @@ case "${1:-}" in
 esac
 [ "$#" -eq 1 ] || { echo "expected one option" >&2; usage >&2; exit 2; }
 
-# Print the newest stable firestartr-operation release tag (empty if none).
+# Print the newest stable <prefix>-vX.Y.Z release tag (empty if none).
 # Rolling major tags and prereleases don't match X.Y.Z, so they are ignored.
-latest_firestartr_release() {
-  local refs
-  refs="$(git ls-remote --tags --refs "$RELEASE_REPO_URL" 'firestartr-operation-v*')" || return 1
+newest_stable_tag() {
+  local prefix="$1" refs
+  refs="$(git ls-remote --tags --refs "$RELEASE_REPO_URL" "$prefix-v*")" || return 1
   printf '%s\n' "$refs" \
-    | sed -n 's|.*refs/tags/firestartr-operation-v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p' \
+    | sed -n "s|.*refs/tags/$prefix-v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p" \
     | sort -t. -k1,1n -k2,2n -k3,3n \
     | tail -n 1 \
-    | sed 's|^.|firestartr-operation-v&|'
+    | sed "s|^.|$prefix-v&|"
+}
+
+# Print the release tag to install: the newest `firestartr-v*` tag, or the
+# newest legacy `firestartr-operation-v*` one when no new-style tag exists.
+latest_firestartr_release() {
+  local tag
+  if tag="$(newest_stable_tag firestartr)" && [ -n "$tag" ]; then
+    printf '%s' "$tag"
+    return 0
+  fi
+  newest_stable_tag firestartr-operation
 }
 
 # Read the `name:` field from a skill's SKILL.md frontmatter (empty if absent).
@@ -65,6 +81,11 @@ skill_frontmatter_name() {
     NR > 1 && $0 == "---" { exit }
     NR > 1 && /^name:[ \t]*/ { sub(/^name:[ \t]*/, ""); sub(/[ \t\r]+$/, ""); print; exit }
   ' "$1" 2>/dev/null
+}
+
+# Install one skill from a directory or tag-tree URL through the skills CLI.
+install_skill() {
+  npx --yes "skills@$SKILLS_CLI_VERSION" add "$1" --skill "$2" --global
 }
 
 # Some harnesses (Claude Code, VS Code Copilot) only discover
@@ -137,7 +158,8 @@ fi
 
 if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
   if [ "$FIRESTARTR_LOCAL" -eq 1 ]; then
-    source="$REPO_DIR/skills"
+    source_root="$REPO_DIR"
+    legacy=0
     echo "prefapp-firestartr: installing this checkout via npx skills@$SKILLS_CLI_VERSION add"
   else
     tag="$(latest_firestartr_release)" || tag=""
@@ -146,7 +168,11 @@ if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
       echo "Check your network access, or use --fs-local to install from this checkout." >&2
       exit 1
     fi
-    source="$RELEASE_REPO_URL/tree/$tag/$RELEASE_SKILL_PATH"
+    source_root="$RELEASE_REPO_URL/tree/$tag"
+    case "$tag" in
+      firestartr-v*) legacy=0 ;;
+      *) legacy=1 ;;
+    esac
     echo "prefapp-firestartr: installing $tag via npx skills@$SKILLS_CLI_VERSION add"
   fi
   # Drop stale links left by earlier versions of this script (pre-npx): the
@@ -168,8 +194,19 @@ if [ "$INSTALL_FIRESTARTR" -eq 1 ]; then
       esac
     fi
   done
+  # Install both names: the canonical skill, then the deprecated alias, so
+  # either stays invocable. A pre-existing firestartr-operation install (or a
+  # stale symlink) is replaced by the skills CLI itself. Legacy tags predate
+  # the rename and ship only firestartr-operation.
   rc=0
-  npx --yes "skills@$SKILLS_CLI_VERSION" add "$source" --skill firestartr-operation --global || rc=$?
+  if [ "$legacy" -eq 1 ]; then
+    install_skill "$source_root/$ALIAS_SKILL_PATH" firestartr-operation || rc=$?
+  else
+    install_skill "$source_root/$CANONICAL_SKILL_PATH" firestartr || rc=$?
+    if [ "$rc" -eq 0 ]; then
+      install_skill "$source_root/$ALIAS_SKILL_PATH" firestartr-operation || rc=$?
+    fi
+  fi
   if [ "$rc" -ne 0 ]; then
     echo "prefapp-firestartr: 'npx skills@$SKILLS_CLI_VERSION add' failed (exit $rc) — hard dependency, no fallback." >&2
     echo "Ensure npx is available (Node >= 18) and that you have network access. Do not proceed without it." >&2

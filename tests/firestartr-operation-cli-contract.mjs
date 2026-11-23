@@ -6,7 +6,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const skill = join(root, 'skills/firestartr/firestartr-operation');
+const skill = join(root, 'skills/firestartr/firestartr');
 const packageName = '@firestartr/fs-forge-cli';
 
 function run(command, args) {

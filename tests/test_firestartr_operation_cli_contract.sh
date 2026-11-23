@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP/tests" "$TMP/skills/firestartr" "$TMP/bin"
-cp -R "$ROOT/skills/firestartr/firestartr-operation" "$TMP/skills/firestartr/"
+cp -R "$ROOT/skills/firestartr/firestartr" "$TMP/skills/firestartr/"
 cp "$ROOT/tests/firestartr-operation-cli-contract.mjs" "$TMP/tests/"
 
 # Stub only the registry's latest tag; installation and command help are real.
@@ -17,7 +17,7 @@ if [ "$1" = view ]; then echo 999.0.0; else exec "$REAL_NPM" "$@"; fi
 EOF
 chmod +x "$TMP/bin/npm"
 
-cat > "$TMP/skills/firestartr/firestartr-operation/contract-test.md" <<'EOF'
+cat > "$TMP/skills/firestartr/firestartr/contract-test.md" <<'EOF'
 ```bash
 npx @firestartr/fs-forge-cli@{version} validate -f {file} \
 --bogus
@@ -90,7 +90,7 @@ done
 }
 echo 'PASS: unknown commands and flags, source lines, negation, and dynamic kinds'
 
-cat > "$TMP/skills/firestartr/firestartr-operation/contract-test.md" <<'EOF'
+cat > "$TMP/skills/firestartr/firestartr/contract-test.md" <<'EOF'
 ```bash
 npx @firestartr/fs-forge-cli@{version} delete <kind> <name> --no-include-variants
 ```
@@ -103,7 +103,7 @@ OUTPUT="$(PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-operation-cli-contra
 }
 echo 'PASS: valid negation and latest warning do not fail the check'
 
-cat > "$TMP/skills/firestartr/firestartr-operation/contract-test.md" <<'EOF'
+cat > "$TMP/skills/firestartr/firestartr/contract-test.md" <<'EOF'
 ```bash
 npx @firestartr/fs-forge-cli@{version} kinds --json
 npx @firestartr/fs-forge-cli@{version} kinds show component --json

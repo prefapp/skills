@@ -4,6 +4,7 @@ name: Validate Firestartr Operation CLI Contract
 on:
   pull_request:
     paths:
+      - 'skills/firestartr/firestartr/**'
       - 'skills/firestartr/firestartr-operation/**'
       - 'tests/firestartr-operation-cli-contract.mjs'
       - 'tests/test_firestartr_operation_cli_contract.sh'

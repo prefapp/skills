@@ -107,9 +107,9 @@ def test_our_skill_names_and_classifier_against_workflow_dir():
         for name in ["tdd", "review", "setup-workflow", "implement", "grilling"]:
             os.makedirs(os.path.join(workflow, name))
             open(os.path.join(workflow, name, "SKILL.md"), "w").write("x")
-        os.makedirs(os.path.join(fixture, "skills/firestartr/firestartr-operation"))
+        os.makedirs(os.path.join(fixture, "skills/firestartr/firestartr"))
         open(os.path.join(
-            fixture, "skills/firestartr/firestartr-operation/SKILL.md"), "w").write("x")
+            fixture, "skills/firestartr/firestartr/SKILL.md"), "w").write("x")
 
         # (a) --ours skills/workflow picks up exactly the workflow names,
         # not the firestartr category.

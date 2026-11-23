@@ -6,7 +6,7 @@ Harness-agnostic agent skills maintained by Prefapp. This repo ships two sets:
   The end-to-end development workflow Prefapp developers (and clients'
   developers) follow on any repository: plan → spec → implement → review.
 - **Firestartr operational skill set** —
-  [`skills/firestartr/firestartr-operation/`](skills/firestartr/firestartr-operation/README.md)
+  [`skills/firestartr/firestartr/`](skills/firestartr/firestartr/README.md)
   A client-facing skill for operating a Prefapp-managed Firestartr platform
   in plain language.
 
@@ -17,9 +17,9 @@ git clone https://github.com/prefapp/skills.git ~/work/prefapp/skills
 cd ~/work/prefapp/skills
 
 ./install.sh --workflow   # workflow set: symlinked; git pull updates
-./install.sh --fs         # firestartr-operation: latest release, via npx skills add
-./install.sh --fs-local   # firestartr-operation: from this checkout, development only
-./install.sh --all        # workflow set and the latest firestartr-operation release
+./install.sh --fs         # firestartr (and the deprecated firestartr-operation alias): latest release, via npx skills add
+./install.sh --fs-local   # firestartr: from this checkout, development only
+./install.sh --all        # workflow set and the latest firestartr release
 ```
 
 `--fs-local` is meant for development only: it installs whatever the checkout

@@ -16,9 +16,13 @@ WORKFLOW_NS="$AGENTS/prefapp-workflow"
 NARGS="$TMP/npx-args.log"
 SKILLS_CLI_VERSION="1.5.23"
 GIT_ARGS="$TMP/git-args.log"
-RELEASE_URL="https://github.com/prefapp/skills/tree/firestartr-operation-v0.10.0/skills/firestartr/firestartr-operation"
-EXPECTED_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add $RELEASE_URL --skill firestartr-operation --global"
-EXPECTED_LOCAL_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add $REPO_DIR/skills --skill firestartr-operation --global"
+SKILL_BASE="https://github.com/prefapp/skills/tree/firestartr-v0.6.1/skills/firestartr"
+EXPECTED_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add $SKILL_BASE/firestartr --skill firestartr --global
+--yes skills@$SKILLS_CLI_VERSION add $SKILL_BASE/firestartr-operation --skill firestartr-operation --global"
+LEGACY_URL="https://github.com/prefapp/skills/tree/firestartr-operation-v0.10.0/skills/firestartr/firestartr-operation"
+EXPECTED_LEGACY_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add $LEGACY_URL --skill firestartr-operation --global"
+EXPECTED_LOCAL_NPX_ARGS="--yes skills@$SKILLS_CLI_VERSION add $REPO_DIR/skills/firestartr/firestartr --skill firestartr --global
+--yes skills@$SKILLS_CLI_VERSION add $REPO_DIR/skills/firestartr/firestartr-operation --skill firestartr-operation --global"
 
 # Stub npx so --all/--fs never touch the real one (no network, no node
 # dependency): it records its invocation args and exits with FAKE_NPX_EXIT.
@@ -31,17 +35,20 @@ EOF
 chmod +x "$TMP/bin/npx"
 
 # Stub git so the release lookup needs no network. It lists tags out of version
-# order, with a rolling major tag and a prerelease that must be ignored, unless
-# FAKE_GIT_REFS replaces them. FAKE_GIT_EXIT makes the lookup fail.
+# order, with rolling major tags and prereleases that must be ignored, unless
+# FAKE_GIT_REFS replaces them. Both tag prefixes are present: the renamed
+# `firestartr-v*` wins over the older-but-higher `firestartr-operation-v0.10.0`.
+# FAKE_GIT_EXIT makes the lookup fail.
 cat >"$TMP/bin/git" <<'EOF'
 #!/usr/bin/env bash
 echo "$@" >> "$GIT_ARGS"
 [ "${FAKE_GIT_EXIT:-0}" -eq 0 ] || exit "$FAKE_GIT_EXIT"
-printf '%s\n' "${FAKE_GIT_REFS-aaa	refs/tags/firestartr-operation-v0.9.0
-bbb	refs/tags/firestartr-operation-v0.10.0
-ccc	refs/tags/firestartr-operation-v1
-ddd	refs/tags/firestartr-operation-v2.0.0-rc.1
-eee	refs/tags/firestartr-operation-v0.2.0}"
+printf '%s\n' "${FAKE_GIT_REFS-aaa	refs/tags/firestartr-operation-v0.10.0
+bbb	refs/tags/firestartr-v0.6.1
+ccc	refs/tags/firestartr-v1
+ddd	refs/tags/firestartr-v2.0.0-rc.1
+eee	refs/tags/firestartr-v0.2.0
+fff	refs/tags/firestartr-operation-v0.9.0}"
 EOF
 chmod +x "$TMP/bin/git"
 export GIT_ARGS
@@ -121,13 +128,32 @@ OUT="$(HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" "$INSTALL" --fs 2>&1 >/d
   || { echo "FAIL: --fs npx invocation with stale skill links: $(cat "$NARGS")"; exit 1; }
 
 # npx failure is a hard dependency: propagated as-is, no fallback, no retry.
+# The alias install stops after the canonical one fails.
 set +e
+: > "$NARGS"
 FS_ERR="$(HOME="$TMP" PATH="$TMP/bin:$PATH" NARGS="$NARGS" FAKE_NPX_EXIT=7 "$INSTALL" --fs 2>&1 >/dev/null)"
 FS_RC=$?
 set -e
 [ "$FS_RC" -eq 7 ] || { echo "FAIL: --fs did not propagate npx exit 7 (got $FS_RC)"; exit 1; }
 printf '%s' "$FS_ERR" | grep -q -- 'hard dependency' \
   || { echo "FAIL: --fs failure did not report the hard dependency: $FS_ERR"; exit 1; }
+[ "$(cat "$NARGS")" = "$(printf '%s' "$EXPECTED_NPX_ARGS" | head -n 1)" ] \
+  || { echo "FAIL: --fs retried after a failure: $(cat "$NARGS")"; exit 1; }
+
+# A firestartr-operation directory left by an earlier npx install is replaced by
+# npx itself, so the alias install still runs to completion.
+reset
+mkdir -p "$AGENTS/firestartr-operation" "$CLAUDE/firestartr-operation"
+printf -- '---\nname: firestartr-operation\ndescription: older release\n---\n' \
+  >"$AGENTS/firestartr-operation/SKILL.md"
+printf -- '---\nname: firestartr-operation\ndescription: older release\n---\n' \
+  >"$CLAUDE/firestartr-operation/SKILL.md"
+: > "$NARGS"
+run --fs >/dev/null
+[ "$(cat "$NARGS")" = "$EXPECTED_NPX_ARGS" ] \
+  || { echo "FAIL: --fs npx invocation with a pre-existing alias dir: $(cat "$NARGS")"; exit 1; }
+[ ! -L "$AGENTS/firestartr-operation" ] \
+  || { echo "FAIL: --fs replaced the alias dir with a symlink"; exit 1; }
 
 # --all installs the same release as --fs.
 reset
@@ -136,13 +162,24 @@ run --all >/dev/null
 [ "$(cat "$NARGS")" = "$EXPECTED_NPX_ARGS" ] \
   || { echo "FAIL: --all npx invocation: $(cat "$NARGS")"; exit 1; }
 
-# --fs says which release it installs.
+# --fs says which release it installs, and prefers the renamed tag prefix.
 reset
 OUT="$(run --fs)"
-printf '%s' "$OUT" | grep -q -- 'firestartr-operation-v0.10.0' \
+printf '%s' "$OUT" | grep -q -- 'firestartr-v0.6.1' \
   || { echo "FAIL: --fs did not name the release: $OUT"; exit 1; }
 
-# --fs-local installs from the checkout and never looks up a release.
+# Only legacy firestartr-operation-v* tags exist: fall back to that tag and its
+# pre-rename path, installing just the one skill it ships.
+reset
+: > "$NARGS"
+FAKE_GIT_REFS="aaa	refs/tags/firestartr-operation-v0.9.0
+bbb	refs/tags/firestartr-operation-v0.10.0
+ccc	refs/tags/firestartr-operation-v1" run --fs >/dev/null
+[ "$(cat "$NARGS")" = "$EXPECTED_LEGACY_NPX_ARGS" ] \
+  || { echo "FAIL: legacy tag fallback invocation: $(cat "$NARGS")"; exit 1; }
+
+# --fs-local installs from the checkout and never looks up a release. It
+# installs both names, so the deprecated alias stays invocable.
 reset
 : > "$NARGS"
 : > "$GIT_ARGS"
@@ -175,8 +212,8 @@ assert_lookup_failure() {
 reset
 FAKE_GIT_EXIT=128 assert_lookup_failure "failed lookup"
 FAKE_GIT_REFS="" assert_lookup_failure "empty tag list"
-FAKE_GIT_REFS="ccc	refs/tags/firestartr-operation-v1
-ddd	refs/tags/firestartr-operation-v2.0.0-rc.1" assert_lookup_failure "no stable release"
+FAKE_GIT_REFS="ccc	refs/tags/firestartr-v1
+ddd	refs/tags/firestartr-v2.0.0-rc.1" assert_lookup_failure "no stable release"
 
 # Install both sets and remain idempotent.
 reset

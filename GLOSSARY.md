@@ -25,12 +25,12 @@ The opt-in Firestartr skills under `skills/firestartr/` (namespace
 
 **Playbook**:
 A disclosed `.md` file loaded on demand by the single entry skill
-`firestartr-operation` (e.g. `lifecycle`, `create-claim`). Not a skill — no
+`firestartr` (e.g. `lifecycle`, `create-claim`). Not a skill — no
 description, no auto-fire — so the operational group costs one description of
 context load.
 
 **Step commitment**:
-`firestartr-operation`'s rule that once a playbook is matched and its plan
+`firestartr`'s rule that once a playbook is matched and its plan
 approved, only that playbook's own numbered steps get executed for the
 operation cycle. A new need discovered mid-flow requires re-classification
 and fresh client approval — never silent expansion. Mirrored into the
@@ -236,19 +236,20 @@ every harness's skills location — no namespace-dir wrapper:
 - Claude Code: same flat layout under `~/.claude/skills/`
 
 The **operational skill set** is opt-in: `./install.sh --fs` installs the
-latest `firestartr-operation` release, and `./install.sh --fs-local` installs
-from the local checkout. Without a clone, `npx skills add prefapp/skills --skill
-firestartr-operation` always tracks `main` HEAD (see ADR-0006). None of these
+latest `firestartr` release, and `./install.sh --fs-local` installs
+from the local checkout. Both install the deprecated `firestartr-operation`
+alias alongside it. Without a clone, `npx skills add prefapp/skills --skill
+firestartr` always tracks `main` HEAD (see ADR-0006). None of these
 is a symlink to a local clone — re-run `--fs` to move to the newest release. To
 pin without a clone, point the install at a tag's tree: the full semver tag
-pins exactly; a rolling `firestartr-operation-vN`
+pins exactly; a rolling `firestartr-vN`
 major tag is also available from the `release_please` Feature (once enabled
 on the `prefapp/skills` claim) and tracks new releases within that major
 without tracking `main`:
 
 ```sh
-npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-v1/skills/firestartr/firestartr-operation
-npx skills add https://github.com/prefapp/skills/tree/firestartr-operation-vX.Y.Z/skills/firestartr/firestartr-operation
+npx skills add https://github.com/prefapp/skills/tree/firestartr-v1/skills/firestartr/firestartr
+npx skills add https://github.com/prefapp/skills/tree/firestartr-vX.Y.Z/skills/firestartr/firestartr
 ```
 
 Use `--workflow` for the workflow set or `--all` for both; no arguments shows

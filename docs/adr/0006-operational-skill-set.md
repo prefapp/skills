@@ -58,3 +58,15 @@ git-ignored). The install default is unaffected, so developers who don't opt in
 never see the operational group. Conformance of the skill markdown to
 `writing-for-agents` is checked via the `review` skill, not unit tests; the one
 automated check covers the `install.sh` opt-in seam (`tests/test_install.sh`).
+
+## Addendum (2026-11-23): the entry skill is renamed `firestartr`
+
+The entry skill moved from `skills/firestartr/firestartr-operation` to
+`skills/firestartr/firestartr` (`name: firestartr`, prefapp skills#6). Everything
+else here stands. During the transition a thin `firestartr-operation` skill
+stays in place as a deprecated alias that only points at the canonical skill, so
+both invocations keep working; `install.sh --fs`/`--fs-local` install both.
+Releases now carry a `firestartr-v*` tag prefix, versioned continuously with the
+previous `firestartr-operation-v*` line, which `install.sh` still falls back to
+when no new-style tag exists. Prose above keeps the original names as the
+record of what was decided then.
