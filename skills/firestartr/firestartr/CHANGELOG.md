@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/prefapp/skills/compare/firestartr-v0.5.1...firestartr-v0.6.0) (2026-11-23)
+
+
+### Features
+
+* **firestartr:** rename firestartr-operation to firestartr ([13d0293](https://github.com/prefapp/skills/commit/13d0293b0365918784053dc54ced5b1abdcfe1bc))
+
 ## [0.5.1](https://github.com/prefapp/skills/compare/firestartr-operation-v0.5.0...firestartr-operation-v0.5.1) (2026-11-03)
 
 
