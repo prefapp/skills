@@ -84,6 +84,11 @@ App has exactly one Service.
 One (cluster, tenant, env) combination of an App. Adding an env to an App adds a
 Deployment target.
 
+**Track**:
+Which builds of the Service a Deployment target receives: branch snapshots,
+pre-releases, or releases. Each Deployment target has exactly one Track.
+_Avoid_: image type, channel.
+
 **Validation sweep**:
 A whole-repo dispatch of `validate-claims.yaml` that renders every claim to
 confirm the claims repo is structurally sound, including that every
