@@ -6,7 +6,7 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP/tests" "$TMP/skills/firestartr" "$TMP/bin"
 cp -R "$ROOT/skills/firestartr/firestartr" "$TMP/skills/firestartr/"
-cp "$ROOT/tests/firestartr-operation-cli-contract.mjs" "$TMP/tests/"
+cp "$ROOT/tests/firestartr-cli-contract.mjs" "$TMP/tests/"
 
 # Stub only the registry's latest tag; installation and command help are real.
 REAL_NPM="$(command -v npm)"
@@ -60,7 +60,7 @@ npx @firestartr/fs-forge-cli@{version} preflight --kind <repo|team> --help --jso
 ```
 EOF
 set +e
-OUTPUT="$(PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-operation-cli-contract.mjs" 2>&1)"
+OUTPUT="$(PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-cli-contract.mjs" 2>&1)"
 STATUS=$?
 set -e
 [ "$STATUS" -eq 1 ] || { printf 'FAIL: expected exit 1, got %s\n%s\n' "$STATUS" "$OUTPUT"; exit 1; }
@@ -95,7 +95,7 @@ cat > "$TMP/skills/firestartr/firestartr/contract-test.md" <<'EOF'
 npx @firestartr/fs-forge-cli@{version} delete <kind> <name> --no-include-variants
 ```
 EOF
-OUTPUT="$(PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-operation-cli-contract.mjs" 2>&1)" || {
+OUTPUT="$(PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-cli-contract.mjs" 2>&1)" || {
   printf 'FAIL: valid negation or warning changed the exit status\n%s\n' "$OUTPUT"; exit 1;
 }
 [[ "$OUTPUT" == *'::warning::@firestartr/fs-forge-cli latest 999.0.0 is newer than skill target'* ]] || {
@@ -112,7 +112,7 @@ npx @firestartr/fs-forge-cli@{version} kinds show component --bogus-after-show
 ```
 EOF
 set +e
-OUTPUT="$(PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-operation-cli-contract.mjs" 2>&1)"
+OUTPUT="$(PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-cli-contract.mjs" 2>&1)"
 STATUS=$?
 set -e
 [ "$STATUS" -eq 1 ] || { printf 'FAIL: expected exit 1, got %s\n%s\n' "$STATUS" "$OUTPUT"; exit 1; }

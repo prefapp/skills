@@ -1,14 +1,14 @@
 ---
-name: Validate Firestartr Operation CLI Contract
+name: Validate Firestartr CLI Contract
 
 on:
   pull_request:
     paths:
       - 'skills/firestartr/firestartr/**'
       - 'skills/firestartr/firestartr-operation/**'
-      - 'tests/firestartr-operation-cli-contract.mjs'
-      - 'tests/test_firestartr_operation_cli_contract.sh'
-      - '.github/workflows/firestartr-operation-cli-contract.yaml'
+      - 'tests/firestartr-cli-contract.mjs'
+      - 'tests/test_firestartr_cli_contract.sh'
+      - '.github/workflows/firestartr-cli-contract.yaml'
   workflow_dispatch:
 
 permissions:
@@ -28,7 +28,7 @@ jobs:
           node-version: 24
 
       - name: Check documented CLI invocations
-        run: node tests/firestartr-operation-cli-contract.mjs
+        run: node tests/firestartr-cli-contract.mjs
 
       - name: Test the contract check
-        run: bash tests/test_firestartr_operation_cli_contract.sh
+        run: bash tests/test_firestartr_cli_contract.sh
