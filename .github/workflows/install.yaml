@@ -1,0 +1,25 @@
+---
+name: Test install.sh
+
+on:
+  pull_request:
+    paths:
+      - 'install.sh'
+      - 'tests/test_install.sh'
+      - '.github/workflows/install.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-install:
+    name: Test install.sh
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+
+      - name: Run the install test
+        run: bash tests/test_install.sh
