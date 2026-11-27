@@ -112,6 +112,7 @@ repos over asking.
 | "Create a repo called payments-api" | 🆕 new repo, landed via PR |
 | "Duplicate the web-frontend repo as web-frontend-v2" | 🆕 new repo named web-frontend-v2; the existing repo is read for likeness, not copied |
 | "Add ana to the platform team" | 👥 team membership edit |
+| "Deploy payments-api to dev" | 🚀 multi-repo deploy plan (guide-first by default, or landed as ordered PRs on request) |
 | "Who owns the billing service?" | 📖 catalog lookup, read-only |
 | "Is the claims repo in sync?" | 🩺 reconciliation status (synced, drifted, orphaned, stale) |
 

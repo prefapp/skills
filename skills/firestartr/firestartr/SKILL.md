@@ -31,7 +31,7 @@ Apply to every invocation, on top of whatever the matched playbook adds:
 
 ## Step 1: Resolve the target platform
 
-**Skill-target CLI version: `3.0.0`**
+**Skill-target CLI version: `3.0.0-snapshot.9195a218`**
 
 ```bash
 npx @firestartr/fs-forge-cli@{target} context --json
@@ -63,7 +63,8 @@ Emit one line confirming the resolved context, e.g.:
 ## Step 2: Classify the intent
 
 Map the request to one or more playbooks in `playbooks/`. A mutating request
-always loads `lifecycle` in addition to its authoring playbook.
+always loads `lifecycle` in addition to its authoring playbook, except
+`deploy-service` (guide-first by default; uses `app apply` when landing).
 
 | The client wants to… | Load |
 |---|---|
@@ -71,6 +72,7 @@ always loads `lifecycle` in addition to its authoring playbook.
 | create or duplicate a team, user, system, domain, secret, webhook, or TF workspace (tfwp, tfworkspace), including one like an existing entity | `create-claim` + `lifecycle` |
 | team membership; repo owner, maintainers, platform owner, CODEOWNERS or collaborators; add/edit/remove/list a repo Feature; or any other existing field | `edit-claim` + `lifecycle` |
 | delete a repo, team, user, or TF workspace | `lifecycle` |
+| deploy or ship a service, or add a deployment environment/cluster/tenant to an app | `deploy-service`; if the service repo has no claim yet, run `create-claim` + `lifecycle` first. Do not offer `build_and_dispatch_docker_images` or `release_please` at create time; `deploy-service` adds them. |
 | know if a repo/team is in sync, drifted, orphaned, or stale | `reconciliation` |
 | watch check runs on a repo, or monitor plan-apply status | `reconciliation` |
 | know who owns a service, what's in a system, or browse/search topology | `catalog` |

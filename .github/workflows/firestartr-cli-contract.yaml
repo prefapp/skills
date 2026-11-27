@@ -1,14 +1,16 @@
 ---
-name: Validate Firestartr Operation CLI Contract
+name: Validate Firestartr CLI Contract
 
 on:
   pull_request:
+    # ready_for_review re-runs the check, so a draft's prerelease target can't merge.
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'skills/firestartr/firestartr/**'
       - 'skills/firestartr/firestartr-operation/**'
-      - 'tests/firestartr-operation-cli-contract.mjs'
-      - 'tests/test_firestartr_operation_cli_contract.sh'
-      - '.github/workflows/firestartr-operation-cli-contract.yaml'
+      - 'tests/firestartr-cli-contract.mjs'
+      - 'tests/test_firestartr_cli_contract.sh'
+      - '.github/workflows/firestartr-cli-contract.yaml'
   workflow_dispatch:
 
 permissions:
@@ -18,6 +20,8 @@ jobs:
   validate-cli-contract:
     name: Validate CLI Contract
     runs-on: ubuntu-24.04
+    env:
+      ALLOW_PRERELEASE_TARGET: ${{ github.event.pull_request.draft == true }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -28,7 +32,7 @@ jobs:
           node-version: 24
 
       - name: Check documented CLI invocations
-        run: node tests/firestartr-operation-cli-contract.mjs
+        run: node tests/firestartr-cli-contract.mjs
 
       - name: Test the contract check
-        run: bash tests/test_firestartr_operation_cli_contract.sh
+        run: bash tests/test_firestartr_cli_contract.sh

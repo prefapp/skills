@@ -129,6 +129,10 @@ function check() {
   const targetMatch = /\*\*Skill-target CLI version: `([^`]+)`\*\*/.exec(readFileSync(join(skill, 'SKILL.md'), 'utf8'));
   if (!targetMatch) throw new Error('Skill-target CLI version not found in SKILL.md');
   const target = targetMatch[1];
+  // A prerelease target lets a draft PR test unreleased CLI commands; it must never merge.
+  if (target.includes('-') && process.env.ALLOW_PRERELEASE_TARGET !== 'true') {
+    throw new Error(`skill target ${target} is a prerelease; target a released fs-forge-cli before the PR leaves draft`);
+  }
   const latest = run('npm', ['view', packageName, 'version']).trim();
   if (compareVersions(latest, target) > 0) {
     console.log(`::warning::${packageName} latest ${latest} is newer than skill target ${target}`);
