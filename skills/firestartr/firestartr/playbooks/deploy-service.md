@@ -10,7 +10,7 @@ Confirm from the request and Step 1 discovery before planning. Stop and state wh
 
 - **Existing shared Helm chart.** Authoring a new chart is out of scope.
 - **Target platform already configured** in `{org}/.firestartr/platforms/`. Bootstrapping a cluster or ArgoCD is out of scope.
-- **Single-service App** whose Service repo already exists in the platform (has a repo definition in `{claims_repo}`). Importing an un-managed repo or wiring a multi-service App is out of scope.
+- **Single-service App** with a platform-managed Service repo in `{claims_repo}`. If the Service repo does not exist yet, run `create-claim` + `lifecycle` first, then return here. Importing an unmanaged repo or wiring a multi-service App is out of scope.
 
 ## Step 1: Discover platform candidates
 
@@ -28,7 +28,7 @@ Read candidates and proposals from `discover`: platforms (`tenants`, `envs`), re
 Ask one question at a time with a recommended answer (`../SKILL.md`). Skip anything `discover` resolved unambiguously; the CLI derives `state_repo` and namespaces.
 
 1. **Deployment targets (`targets[]`: `platform`, `tenant`, `env`).** Auto-pick a singular `platform` or `tenant`; default `env` to the lowest candidate (such as `dev`) when unspecified.
-2. **Cluster API URL (`targets[].cluster_url`).** Always confirm the URL `discover` found in `state-argocd` per target cluster; ask outright only if none exists yet.
+2. **Cluster API URL (`targets[].cluster_url`).** Always confirm the URL `discover` found in `state-argocd` per target cluster. When `discover` finds no cluster in `state-argocd`, ask the client; `https://kubernetes.default.svc` is the in-cluster address when ArgoCD runs on the target cluster.
 3. **Helm chart (`chart.name`, `chart.version`).** Always ask; there is no safe default.
 4. **Registry alias (`chart.registry`).** Auto-pick if one alias exists or one has `default: true`. Otherwise ask which existing alias in `docker_registries/` to use; this flow never renders new registries.
 5. **Track and flavor (`targets[].track`, `targets[].flavor`).** Propose `discover`'s `track` (`snapshots`, `pre-releases`, or `releases`) for each env and confirm. Ask `flavor` only if non-default.
@@ -47,14 +47,14 @@ Pass `--out {render-dir}` (a `mktemp -d` path) when guiding the client manually 
 
 Show the client:
 
-- **Ordered steps.** Step 1 lands `{claims_repo}` (one PR per claim: `app-<app>`, then Service). Step 2 opens `{org}/.firestartr`, `app-<app>`, and `{org}/state-argocd` in parallel after Step 1 provisions; merge `{org}/.firestartr` first so `app-<app>` validation reads `apps/<app>.yaml`. Step 3 opens the Service repo `.github/make_dispatches.yaml` PR after all Step 2 PRs merge.
+- **Ordered steps.** Step 1 lands `{claims_repo}` with one PR per claim: `app-<app>`, then Service. The Service PR edits the Service claim to add the `build_and_dispatch_docker_images` and `release_please` Features; tell the client before running `app apply`. Step 2 opens `{org}/.firestartr`, `app-<app>`, and `{org}/state-argocd` in parallel after Step 1 provisions; merge `{org}/.firestartr` first so `app-<app>` validation reads `apps/<app>.yaml`. Step 3 opens the Service repo `.github/make_dispatches.yaml` PR after all Step 2 PRs merge.
 - **Conflicts and failed checks.** Format existing-file conflicts (never overwritten) and failed checks as a plain-language client checklist. For a `build-images` failure, `.github/build_images.yaml` belongs to the Service owner. Propose the smallest file holding the flavor keys the check names, each pointing at the repo's Dockerfile, and open the Service-repo PR only after the client confirms.
 - **Developer opt-ins** that `plan` notes (`values.yaml` / `global.yaml` / `<service>.yaml`, `AUTO_MERGE`, `extra_artifacts/`, `set: global.chart_version`).
 
 Act on the exit code:
 
 - **Exit 0.** Plan is ready; proceed to Step 4.
-- **Exit 1.** Stopping conflict or failed check; stop here and hand the checklist to the client.
+- **Exit 1.** Stopping conflict or failed check; stop here and hand the checklist to the client. Treat files already written to `{render-dir}` as a draft; hand them over only after `app plan` exits 0.
 - **Exit 2.** Bad inputs or resolve error; fix `{inputs-file}` or discovery/auth errors and re-run `app plan`.
 
 ## Step 4: Walk the steps (default) or run `app apply` (on request)

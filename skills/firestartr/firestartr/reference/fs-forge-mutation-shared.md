@@ -31,7 +31,7 @@ npx @firestartr/fs-forge-cli@{version} edit <Kind>-<name> ... --commit \
 
 Write both in client terms; the CLI's default text says "claim". If an issue already exists, including one a failed attempt opened, pass `--issue <N>` instead; never open a second one.
 
-The CLI links the issue to the claims PR (`Closes #N`), comments the run URL and comments failures, reopening it once a workflow was dispatched. `delete` closes it after the run succeeds; with `--no-wait` it stays open, so say so. Don't link or close it yourself.
+The CLI links the issue to the claims PR (`Closes #N`), or to every claims PR in one `app apply` run, comments the run URL and comments failures, reopening it once a workflow was dispatched. `delete` closes it after the run succeeds; with `--no-wait` it stays open, so say so. Don't link or close it yourself.
 
 A `--commit` that fails before dispatch is a CLI error: fix the reported problem and re-run. On `Branch already exists`, an
 earlier attempt left `fs-forge/{kind}-{name}` behind: check that no open PR or

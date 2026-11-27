@@ -72,7 +72,7 @@ always loads `lifecycle` in addition to its authoring playbook, except
 | create or duplicate a team, user, system, domain, secret, webhook, or TF workspace (tfwp, tfworkspace), including one like an existing entity | `create-claim` + `lifecycle` |
 | team membership; repo owner, maintainers, platform owner, CODEOWNERS or collaborators; add/edit/remove/list a repo Feature; or any other existing field | `edit-claim` + `lifecycle` |
 | delete a repo, team, user, or TF workspace | `lifecycle` |
-| deploy or ship a service, or add a deployment environment/cluster/tenant to an app | `deploy-service` |
+| deploy or ship a service, or add a deployment environment/cluster/tenant to an app | `deploy-service`; if the service repo has no claim yet, run `create-claim` + `lifecycle` first |
 | know if a repo/team is in sync, drifted, orphaned, or stale | `reconciliation` |
 | watch check runs on a repo, or monitor plan-apply status | `reconciliation` |
 | know who owns a service, what's in a system, or browse/search topology | `catalog` |
