@@ -48,7 +48,7 @@ Pass `--out {render-dir}` (a `mktemp -d` path) when guiding the client manually 
 Show the client:
 
 - **Ordered steps.** Step 1 lands `{claims_repo}` (one PR per claim: `app-<app>`, then Service). Step 2 opens `{org}/.firestartr`, `app-<app>`, and `{org}/state-argocd` in parallel after Step 1 provisions; merge `{org}/.firestartr` first so `app-<app>` validation reads `apps/<app>.yaml`. Step 3 opens the Service repo `.github/make_dispatches.yaml` PR after all Step 2 PRs merge.
-- **Conflicts and failed checks.** Format existing-file conflicts (never overwritten) and failed checks as a plain-language client checklist.
+- **Conflicts and failed checks.** Format existing-file conflicts (never overwritten) and failed checks as a plain-language client checklist. For a `build-images` failure, `.github/build_images.yaml` belongs to the Service owner. Propose the smallest file holding the flavor keys the check names, each pointing at the repo's Dockerfile, and open the Service-repo PR only after the client confirms.
 - **Developer opt-ins** that `plan` notes (`values.yaml` / `global.yaml` / `<service>.yaml`, `AUTO_MERGE`, `extra_artifacts/`, `set: global.chart_version`).
 
 Act on the exit code:
