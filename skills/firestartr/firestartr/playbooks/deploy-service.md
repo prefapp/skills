@@ -29,7 +29,7 @@ Ask one question at a time with a recommended answer (`../SKILL.md`). Skip anyth
 
 1. **Deployment targets (`targets[]`: `platform`, `tenant`, `env`).** Auto-pick a singular `platform` or `tenant`; default `env` to the lowest candidate (such as `dev`) when unspecified.
 2. **Cluster API URL (`targets[].cluster_url`).** Always confirm the URL `discover` found in `state-argocd` per target cluster. When `discover` finds no cluster in `state-argocd`, ask the client; `https://kubernetes.default.svc` is the in-cluster address when ArgoCD runs on the target cluster.
-3. **Helm chart (`chart.name`, `chart.version`).** Always ask; there is no safe default.
+3. **Helm chart (`chart.name`, `chart.version`).** Always ask; there is no safe default. Recommend a chart only if it is reachable through the chosen registry alias and fits the target platform; otherwise ask without a recommendation.
 4. **Registry alias (`chart.registry`).** Auto-pick if one alias exists or one has `default: true`. Otherwise ask which existing alias in `docker_registries/` to use; this flow never renders new registries.
 5. **Track and flavor (`targets[].track`, `targets[].flavor`).** Propose `discover`'s `track` (`snapshots`, `pre-releases`, or `releases`) for each env and confirm. Ask `flavor` only if non-default.
 6. **Release type (`service.release_type`).** Skip if `discover` read it from `release-please-config.json`; otherwise confirm `discover`'s language proposal.
