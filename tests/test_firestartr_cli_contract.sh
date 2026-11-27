@@ -125,3 +125,14 @@ done
   printf 'FAIL: unexpected findings\n%s\n' "$OUTPUT"; exit 1;
 }
 echo 'PASS: flags after a command that is also a topic check its own flags'
+
+sed -i.bak 's/^\*\*Skill-target CLI version: `[^`]*`\*\*$/**Skill-target CLI version: `3.0.0-snapshot.0000000`**/' \
+  "$TMP/skills/firestartr/firestartr/SKILL.md"
+set +e
+OUTPUT="$(env -u ALLOW_PRERELEASE_TARGET PATH="$TMP/bin:$PATH" node "$TMP/tests/firestartr-cli-contract.mjs" 2>&1)"
+STATUS=$?
+set -e
+[ "$STATUS" -eq 1 ] && [[ "$OUTPUT" == *'skill target 3.0.0-snapshot.0000000 is a prerelease'* ]] || {
+  printf 'FAIL: prerelease target was not rejected (exit %s)\n%s\n' "$STATUS" "$OUTPUT"; exit 1;
+}
+echo 'PASS: a prerelease target fails unless ALLOW_PRERELEASE_TARGET=true'
